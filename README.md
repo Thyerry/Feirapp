@@ -1,6 +1,11 @@
 # Feirapp 🛒
 
-![tee](https://github.com/Thyerry/Feirapp/blob/main/Shopping-Cart-PNG.png?raw=true)
-Appzinho pra gerenciar a sua feira do mês!
+![Feirapp](https://github.com/Thyerry/Feirapp/blob/main/Shopping-Cart-PNG.png?raw=true)
 
-Aqui você consegue manter um historico de compras, comparar preços de produtos e saber quanto você teve de despesas a mais ou de economia!s
+<img scr="https://github.com/Thyerry/Feirapp/blob/main/Shopping-Cart-PNG.png" alt="Feirapp">
+Appzinho pra gerenciar a sua feira do mês 🛒!
+
+Aqui você consegue manter um histórico de compras, comparar preços de produtos e saber quanto você teve de despesas a mais ou de economia!
+
+# Implementação inicial
+No primeir
