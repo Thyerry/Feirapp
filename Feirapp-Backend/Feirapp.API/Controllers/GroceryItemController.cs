@@ -18,8 +18,8 @@ public class GroceryItemController : ControllerBase
     public async Task<IActionResult> GetAllGroceryItems()
     {
         var groceryItems = await _service.GetAllGroceryItems();
-        if(groceryItems.Any())
-            return Ok(groceryItems);
-        return NotFound();
+        if (!groceryItems.Any())
+            return NotFound();
+        return Ok(groceryItems);
     }
 }

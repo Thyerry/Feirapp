@@ -3,16 +3,15 @@ using System.Threading.Tasks;
 using Feirapp.API.Controllers;
 using Feirapp.Domain.Contracts;
 using Feirapp.Domain.Models;
-using Feirapp.Service.Services;
 using Feirapp.UnitTests.Fixtures;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 
-namespace Feirapp.UnitTests.Layers.Feirapp.API;
+namespace Feirapp.UnitTests.Layers.API;
 
-public class GroceryItemControllerTests
+public class TestGroceryItemController
 {
     [Fact]
     public async Task Get_OnSuccess_ReturnsStatusCoed200()

@@ -17,7 +17,7 @@ public class GroceryItemFixture
                 Price = 1.1,
                 BrandName = "Brand 1",
                 ID = Guid.NewGuid(),
-                ProductSection = ProductSectionEnum.DRINKS,
+                GroceryCategory = GroceryCategoryEnum.DRINK,
                 PurchaseDate = DateTime.Now,
                 GroceryStoreName = "Store 1"
             },
@@ -27,7 +27,7 @@ public class GroceryItemFixture
                 Price = 2.2,
                 BrandName = "Brand 2",
                 ID = new Guid(),
-                ProductSection = ProductSectionEnum.MEATS,
+                GroceryCategory = GroceryCategoryEnum.MEAT,
                 PurchaseDate = DateTime.Now,
                 GroceryStoreName = "Store 2"
             },
@@ -37,7 +37,7 @@ public class GroceryItemFixture
                 Price = 3.3,
                 BrandName = "Brand 3",
                 ID = new Guid(),
-                ProductSection = ProductSectionEnum.BOTTLED,
+                GroceryCategory = GroceryCategoryEnum.CANNED,
                 PurchaseDate = DateTime.Now,
                 GroceryStoreName = "Store 3"
             }
