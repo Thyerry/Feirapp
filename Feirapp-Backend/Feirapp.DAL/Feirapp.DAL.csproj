@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Feirapp.Domain\Feirapp.Domain.csproj" />
+    </ItemGroup>
+
 </Project>
