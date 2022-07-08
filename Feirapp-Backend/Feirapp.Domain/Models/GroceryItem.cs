@@ -1,10 +1,12 @@
 using Feirapp.Domain.Enums;
-
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 namespace Feirapp.Domain.Models;
 
 public class GroceryItem
 {
-    public Guid ID { get; set; }
+    [BsonRepresentation(BsonType.ObjectId)]
+    public Guid Id { get; set; }
     public string Name { get; set; }
     public double? Price { get; set; }
     public ProductSectionEnum ProductSection { get; set; }

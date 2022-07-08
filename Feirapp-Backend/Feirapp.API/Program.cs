@@ -1,5 +1,6 @@
 using Feirapp.Domain.Contracts;
 using Feirapp.Service.Services;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-ConfigureServices(builder.Services);
+ConfigureServices(builder.Services, builder.Configuration);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -29,7 +30,8 @@ app.MapControllers();
 
 app.Run();
 
-void ConfigureServices(IServiceCollection services)
+void ConfigureServices(IServiceCollection services, ConfigurationManager configuration)
 {
     services.AddTransient<IGroceryItemService, GroceryItemService>();
+    services.Configure<DatabaseConfiguration>(configuration.GetSection(nameof(DatabaseConfiguration)));
 }

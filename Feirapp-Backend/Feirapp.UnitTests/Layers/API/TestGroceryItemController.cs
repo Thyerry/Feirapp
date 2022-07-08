@@ -3,19 +3,18 @@ using System.Threading.Tasks;
 using Feirapp.API.Controllers;
 using Feirapp.Domain.Contracts;
 using Feirapp.Domain.Models;
-using Feirapp.Service.Services;
 using Feirapp.UnitTests.Fixtures;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 
-namespace Feirapp.UnitTests.Layers.Feirapp.API;
+namespace Feirapp.UnitTests.Layers.API;
 
 public class GroceryItemControllerTests
 {
     [Fact]
-    public async Task Get_OnSuccess_ReturnsStatusCoed200()
+    public async Task Get_OnSuccess_ReturnsStatusCode200()
     {
         // Arrange
         var mockGroceryItemService = new Mock<IGroceryItemService>();
@@ -42,7 +41,7 @@ public class GroceryItemControllerTests
         var sut = new GroceryItemController(mockGroceryItemService.Object);
 
         // Act
-        var result = await sut.GetAllGroceryItems();
+        await sut.GetAllGroceryItems();
 
         // Assert
         mockGroceryItemService.Verify(service => service.GetAllGroceryItems(), Times.Once);

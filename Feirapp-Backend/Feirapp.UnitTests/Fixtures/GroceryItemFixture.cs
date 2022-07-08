@@ -16,7 +16,7 @@ public class GroceryItemFixture
                 Name = "Item 1",
                 Price = 1.1,
                 BrandName = "Brand 1",
-                ID = Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 ProductSection = ProductSectionEnum.DRINKS,
                 PurchaseDate = DateTime.Now,
                 GroceryStoreName = "Store 1"
@@ -26,7 +26,7 @@ public class GroceryItemFixture
                 Name = "Item 2",
                 Price = 2.2,
                 BrandName = "Brand 2",
-                ID = new Guid(),
+                Id = new Guid(),
                 ProductSection = ProductSectionEnum.MEATS,
                 PurchaseDate = DateTime.Now,
                 GroceryStoreName = "Store 2"
@@ -36,7 +36,7 @@ public class GroceryItemFixture
                 Name = "Item 3",
                 Price = 3.3,
                 BrandName = "Brand 3",
-                ID = new Guid(),
+                Id = new Guid(),
                 ProductSection = ProductSectionEnum.BOTTLED,
                 PurchaseDate = DateTime.Now,
                 GroceryStoreName = "Store 3"
