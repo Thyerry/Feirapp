@@ -14,7 +14,7 @@ namespace Feirapp.UnitTests.Layers.API;
 public class TestGroceryItemController
 {
     [Fact]
-    public async Task Get_OnSuccess_ReturnsStatusCoed200()
+    public async Task GetAll_OnSuccess_ReturnsStatusCode200()
     {
         // Arrange
         var mockGroceryItemService = new Mock<IGroceryItemService>();
@@ -31,7 +31,7 @@ public class TestGroceryItemController
     }
 
     [Fact]
-    public async Task Get_OnSuccess_InvokeGroceryItemService()
+    public async Task GetAll_OnSuccess_InvokeGroceryItemService()
     {
         // Arrange
         var mockGroceryItemService = new Mock<IGroceryItemService>();
@@ -48,7 +48,7 @@ public class TestGroceryItemController
     }
     
     [Fact]
-    public async Task Get_OnSuccess_ReturnListOfGroceryItems()
+    public async Task GetAll_OnSuccess_ReturnListOfGroceryItems()
     {
         // Arrange
         var mockGroceryItemService = new Mock<IGroceryItemService>();
@@ -67,7 +67,7 @@ public class TestGroceryItemController
     }
 
     [Fact]
-    public async Task Get_OnNoGroceryItemsFound_Returns404()
+    public async Task GetAll_OnNoGroceryItemsFound_Returns404()
     {
         // Arrange
         var mockGroceryItemService = new Mock<IGroceryItemService>();
