@@ -28,6 +28,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Feirapp.API\Feirapp.API.csproj" />
+        <ProjectReference Include="..\Feirapp.DAL\Feirapp.DAL.csproj" />
     </ItemGroup>
 
 </Project>

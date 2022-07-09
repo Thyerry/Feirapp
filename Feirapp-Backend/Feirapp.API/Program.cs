@@ -1,3 +1,4 @@
+using Feirapp.DAL.Repositories;
 using Feirapp.Domain.Contracts;
 using Feirapp.Service.Services;
 
@@ -32,4 +33,5 @@ app.Run();
 void ConfigureServices(IServiceCollection services)
 {
     services.AddTransient<IGroceryItemService, GroceryItemService>();
+    services.AddTransient<IGroceryItemRepository, GroceryItemRepository>();
 }

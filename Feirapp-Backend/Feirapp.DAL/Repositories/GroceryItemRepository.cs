@@ -5,8 +5,8 @@ namespace Feirapp.DAL.Repositories;
 
 public class GroceryItemRepository : IGroceryItemRepository
 {
-    public Task<List<GroceryItem>> GetAllGroceryItems()
+    public async Task<List<GroceryItem>> GetAllGroceryItems()
     {
-        return null;
+        return new List<GroceryItem>();
     }
 }
