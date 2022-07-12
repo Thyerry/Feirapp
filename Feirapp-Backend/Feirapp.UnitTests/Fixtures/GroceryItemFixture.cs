@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Feirapp.Domain.Enums;
 using Feirapp.Domain.Models;
+using MongoDB.Bson;
 
 namespace Feirapp.UnitTests.Fixtures;
 
@@ -16,7 +17,7 @@ public class GroceryItemFixture
                 Name = "Item 1",
                 Price = 1.1,
                 BrandName = "Brand 1",
-                ID = Guid.NewGuid(),
+                Id = new ObjectId().ToString(),
                 GroceryCategory = GroceryCategoryEnum.DRINK,
                 PurchaseDate = DateTime.Now,
                 GroceryStoreName = "Store 1"
@@ -26,7 +27,7 @@ public class GroceryItemFixture
                 Name = "Item 2",
                 Price = 2.2,
                 BrandName = "Brand 2",
-                ID = new Guid(),
+                Id = new ObjectId().ToString(),
                 GroceryCategory = GroceryCategoryEnum.MEAT,
                 PurchaseDate = DateTime.Now,
                 GroceryStoreName = "Store 2"
@@ -36,7 +37,7 @@ public class GroceryItemFixture
                 Name = "Item 3",
                 Price = 3.3,
                 BrandName = "Brand 3",
-                ID = new Guid(),
+                Id = new ObjectId().ToString(),
                 GroceryCategory = GroceryCategoryEnum.CANNED,
                 PurchaseDate = DateTime.Now,
                 GroceryStoreName = "Store 3"
