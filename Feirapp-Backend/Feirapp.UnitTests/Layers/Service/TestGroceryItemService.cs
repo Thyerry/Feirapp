@@ -13,7 +13,7 @@ namespace Feirapp.UnitTests.Layers.Service;
 public class TestGroceryItemService
 {
     [Fact]
-    public async Task GetAllGroceryItems_OnSuccess_ReturnAllGroceryItems()
+    public async Task GetAllGroceryItems_ReturnListOfGroceryItems()
     {
         // Arrange
         var mockGroceryItemRepository = new Mock<IGroceryItemRepository>();
@@ -30,7 +30,7 @@ public class TestGroceryItemService
     }
 
     [Fact]
-    public async Task GetAllGroceryItems_OnSuccess_InvokeGroceryItemRepository()
+    public async Task GetAllGroceryItems_InvokeGroceryItemRepository()
     {
         // Arrange
         var mockGroceryItemRepository = new Mock<IGroceryItemRepository>();
