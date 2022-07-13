@@ -22,4 +22,14 @@ public class GroceryItemController : ControllerBase
             return NotFound();
         return Ok(groceryItems);
     }
+    
+    [HttpGet]
+    [Route("{name}")]
+    public async Task<IActionResult> GetByName([FromRoute]string name)
+    {
+        var groceryItems = await _service.GetByName(name);
+        if(!groceryItems.Any())
+            return NotFound();
+        return Ok(groceryItems);
+    }
 }

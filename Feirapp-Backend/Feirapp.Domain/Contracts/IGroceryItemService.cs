@@ -5,4 +5,5 @@ namespace Feirapp.Domain.Contracts;
 public interface IGroceryItemService
 {
     Task<List<GroceryItem>> GetAllGroceryItems();
+    Task<List<GroceryItem>> GetByName(string groceryName);
 }

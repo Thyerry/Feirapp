@@ -1,6 +1,8 @@
+using System.Text.RegularExpressions;
 using Feirapp.DAL.DataContext;
 using Feirapp.Domain.Contracts;
 using Feirapp.Domain.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Feirapp.DAL.Repositories;
@@ -16,6 +18,13 @@ public class GroceryItemRepository : IGroceryItemRepository
     public async Task<List<GroceryItem>> GetAllGroceryItems()
     {
         var result = await _groceryItemCollection.FindAsync(q => true);
-        return await result.ToListAsync();
+        return result.ToList();
+    }
+
+    public async Task<List<GroceryItem>> GetByName(string groceryName)
+    {
+        var groceryItems =
+            await _groceryItemCollection.FindAsync(g => g.Name!.Contains(groceryName));
+        return groceryItems.ToList();
     }
 }

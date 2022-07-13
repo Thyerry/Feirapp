@@ -16,4 +16,9 @@ public class GroceryItemService : IGroceryItemService
     {
         return await _groceryItemRepository.GetAllGroceryItems();
     }
+
+    public async Task<List<GroceryItem>> GetByName(string groceryName)
+    {
+        return await _groceryItemRepository.GetByName(groceryName.ToUpper());
+    }
 }
