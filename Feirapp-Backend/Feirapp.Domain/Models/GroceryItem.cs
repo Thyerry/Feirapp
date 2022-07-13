@@ -8,12 +8,12 @@ public class GroceryItem
 {
     [BsonId]
     [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
-    public string Id { get; set; }
+    public string? Id { get; set; }
     [BsonElement("Name")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public double? Price { get; set; }
     public GroceryCategoryEnum GroceryCategory { get; set; }
     public string? BrandName { get; set; }
-    public string GroceryStoreName { get; set; }
+    public string? GroceryStoreName { get; set; }
     public DateTime? PurchaseDate { get; set; }
 }
