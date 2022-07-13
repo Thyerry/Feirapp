@@ -21,4 +21,9 @@ public class GroceryItemService : IGroceryItemService
     {
         return await _groceryItemRepository.GetByName(groceryName.ToUpper());
     }
+
+    public async Task<GroceryItem> CreateGroceryItem(GroceryItem groceryItem)
+    {
+        throw new NotImplementedException();
+    }
 }
