@@ -55,4 +55,20 @@ public class GroceryItemController : ControllerBase
             return NotFound();
         return Ok(result);
     }
+
+    [HttpPut]
+    [ProducesResponseType(typeof(GroceryItem), 200)]
+    [ProducesResponseType(typeof(GroceryItem), 400)]
+    public async Task<IActionResult> UpdateGroceryItem(GroceryItem groceryItem)
+    {
+        try
+        {
+            var result = await _service.UpdateGroceryItem(groceryItem);
+            return Ok(result);
+        }
+        catch (Exception)
+        {
+            return BadRequest();
+        }
+    }
 }

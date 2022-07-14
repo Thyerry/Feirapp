@@ -25,12 +25,18 @@ public class GroceryItemService : IGroceryItemService
 
     public async Task<GroceryItem> CreateGroceryItem(GroceryItem groceryItem)
     {
-        // TODO: Validate the groceryItem fields here and apply
+        // TODO: Validate the groceryItem fields here before calling the repository
         return await _repository.CreateGroceryItem(groceryItem);
     }
 
     public async Task<GroceryItem> GetGroceryItemById(string groceryId)
     {
         return await _repository.GetGroceryItemById(groceryId);
+    }
+
+    public async Task<GroceryItem> UpdateGroceryItem(GroceryItem groceryItem)
+    {        
+        // TODO: Validate the groceryItem fields here before calling the repository
+        return await _repository.UpdateGroceryItem(groceryItem);
     }
 }

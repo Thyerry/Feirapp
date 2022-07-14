@@ -8,6 +8,7 @@ using Feirapp.Domain.Models;
 using Feirapp.Service.Services;
 using Feirapp.UnitTests.Fixtures;
 using FluentAssertions;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Moq;
 using Xunit;
 
@@ -166,5 +167,43 @@ public class TestGroceryItemService
         // Assert
         mockRepository.Verify(repo => repo.CreateGroceryItem(It.IsAny<GroceryItem>()), Times.Once);
     }
+    #endregion
+
+    #region TestUpdateGroceryItem
+
+    [Fact]
+    public async Task UpdateGroceryItem_ReturnUpdatedGroceryItem()
+    {
+        // Arrange
+        var mockRepository = new Mock<IGroceryItemRepository>();
+        mockRepository
+            .Setup(repo => repo.UpdateGroceryItem(It.IsAny<GroceryItem>()))
+            .ReturnsAsync(new GroceryItem());
+        var sut = new GroceryItemService(mockRepository.Object);
+        
+        // Act
+        var result = await sut.UpdateGroceryItem(new GroceryItem());
+
+        // Assert
+        result.Should().BeOfType<GroceryItem>();
+    }
+    
+    [Fact]
+    public async Task UpdateGroceryItem_InvokeGroceryItemRepository()
+    {
+        // Arrange
+        var mockRepository = new Mock<IGroceryItemRepository>();
+        mockRepository
+            .Setup(repo => repo.UpdateGroceryItem(It.IsAny<GroceryItem>()))
+            .ReturnsAsync(new GroceryItem());
+        var sut = new GroceryItemService(mockRepository.Object);
+        
+        // Act
+        await sut.UpdateGroceryItem(new GroceryItem());
+
+        // Assert
+        mockRepository.Verify(repo => repo.UpdateGroceryItem(It.IsAny<GroceryItem>()), Times.Once);
+    }
+    
     #endregion
 }

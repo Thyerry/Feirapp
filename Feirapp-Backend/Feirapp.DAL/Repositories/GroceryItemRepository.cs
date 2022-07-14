@@ -37,4 +37,20 @@ public class GroceryItemRepository : IGroceryItemRepository
         var result = (await _collection.FindAsync(p => p.Id == groceryId)).ToList();
         return result.FirstOrDefault()!;
     }
+
+    public async Task<GroceryItem> UpdateGroceryItem(GroceryItem groceryItem)
+    {
+        await _collection.UpdateOneAsync(
+            g => g.Id == groceryItem.Id,
+            Builders<GroceryItem>.Update
+                .Set(n => n.Name, groceryItem.Name)
+                .Set(n => n.Price, groceryItem.Price)
+                .Set(n => n.GroceryCategory, groceryItem.GroceryCategory)
+                .Set(n => n.GroceryStoreName, groceryItem.GroceryStoreName)
+                .Set(n => n.BrandName, groceryItem.BrandName)
+                .Set(n => n.PurchaseDate, groceryItem.PurchaseDate),
+            new UpdateOptions { IsUpsert = false } );
+        
+        return await GetGroceryItemById(groceryItem.Id!);
+    }
 }
