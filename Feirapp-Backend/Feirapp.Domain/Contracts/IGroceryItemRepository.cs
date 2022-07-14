@@ -6,4 +6,5 @@ public interface IGroceryItemRepository
 {
     Task<List<GroceryItem>> GetAllGroceryItems();
     Task<List<GroceryItem>> GetByName(string groceryName);
+    Task<GroceryItem> CreateGroceryItem(GroceryItem groceryItem);
 }
