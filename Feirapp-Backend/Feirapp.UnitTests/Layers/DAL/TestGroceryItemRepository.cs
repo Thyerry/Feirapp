@@ -178,4 +178,64 @@ public class TestGroceryItemRepository
     }
 
     #endregion
+
+    #region TestCreateGroceryItem
+
+    [Fact]
+    public async Task CreateGroceryItem_ReturnCreatedGroceryItem()
+    {
+        // Assert
+        var mockContext = new Mock<IMongoFeirappContext>();
+        var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
+        
+        mockCollection
+            .Setup(c => c.InsertOneAsync(It.IsAny<GroceryItem>(),
+                It.IsAny<InsertOneOptions>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+        
+        mockContext
+            .Setup(c => c.GetCollection<GroceryItem>(nameof(GroceryItem)))
+            .Returns(mockCollection.Object);
+
+        var sut = new GroceryItemRepository(mockContext.Object);
+
+        // Act
+        var result = await sut.CreateGroceryItem(new GroceryItem());
+        
+        // Assert
+        result.Should().BeOfType<GroceryItem>();
+    }
+    
+    [Fact]
+    public async Task CreateGroceryItem_InvokeGroceryItemCollection()
+    {
+        // Assert
+        var mockContext = new Mock<IMongoFeirappContext>();
+        var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
+        
+        mockCollection
+            .Setup(c => c.InsertOneAsync(It.IsAny<GroceryItem>(),
+                It.IsAny<InsertOneOptions>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+        
+        mockContext
+            .Setup(c => c.GetCollection<GroceryItem>(nameof(GroceryItem)))
+            .Returns(mockCollection.Object);
+        
+        var sut = new GroceryItemRepository(mockContext.Object);
+        
+        // Act
+        await sut.CreateGroceryItem(new GroceryItem());
+        
+        // Assert
+        mockCollection.Verify(c => c.InsertOneAsync(
+                It.IsAny<GroceryItem>(),
+                It.IsAny<InsertOneOptions>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    #endregion
 }

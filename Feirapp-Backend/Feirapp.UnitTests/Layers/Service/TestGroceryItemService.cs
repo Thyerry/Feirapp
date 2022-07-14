@@ -91,4 +91,41 @@ public class TestGroceryItemService
     }
     
     #endregion
+
+    #region TestCreateGroceryItem
+
+    [Fact]
+    public async Task CreateGroceryItem_ReturnGroceryItem()
+    {
+        // Arrange
+        var mockRepository = new Mock<IGroceryItemRepository>();
+        mockRepository
+            .Setup(repo => repo.CreateGroceryItem(It.IsAny<GroceryItem>()))
+            .ReturnsAsync(new GroceryItem());
+        var sut = new GroceryItemService(mockRepository.Object);
+
+        // Act
+        var result = await sut.CreateGroceryItem(new GroceryItem());
+
+        // Assert
+        result.Should().BeOfType<GroceryItem>();
+    }
+
+    [Fact]
+    public async Task CreateGroceryItem_InvokeGroceryItemRepository()
+    {
+        // Arrange
+        var mockRepository = new Mock<IGroceryItemRepository>();
+        mockRepository
+            .Setup(repo => repo.CreateGroceryItem(It.IsAny<GroceryItem>()))
+            .ReturnsAsync(new GroceryItem());
+        var sut = new GroceryItemService(mockRepository.Object);
+
+        // Act
+        await sut.CreateGroceryItem(new GroceryItem());
+
+        // Assert
+        mockRepository.Verify(repo => repo.CreateGroceryItem(It.IsAny<GroceryItem>()), Times.Once);
+    }
+    #endregion
 }
