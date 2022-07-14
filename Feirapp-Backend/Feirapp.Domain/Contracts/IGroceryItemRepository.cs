@@ -5,6 +5,7 @@ namespace Feirapp.Domain.Contracts;
 public interface IGroceryItemRepository
 {
     Task<List<GroceryItem>> GetAllGroceryItems();
-    Task<List<GroceryItem>> GetByName(string groceryName);
+    Task<List<GroceryItem>> GetGroceryItemsByName(string groceryName);
     Task<GroceryItem> CreateGroceryItem(GroceryItem groceryItem);
+    Task<GroceryItem> GetGroceryItemById(string groceryId);
 }

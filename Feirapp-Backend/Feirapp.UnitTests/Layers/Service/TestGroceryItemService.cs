@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Threading.Tasks;
 using Feirapp.Domain.Contracts;
 using Feirapp.Domain.Models;
@@ -54,40 +56,77 @@ public class TestGroceryItemService
 
     #endregion
 
-    #region TestGetByName
-    
+    #region TestGetGroceryItemById
+
     [Fact]
-    public async Task GetByName_ReturnsListOfGroceryItems()
+    public async Task GetGroceryItemById_ReturnGroceryItem()
     {
         // Arrange
         var mockRepository = new Mock<IGroceryItemRepository>();
         mockRepository
-            .Setup(repo => repo.GetByName(It.IsAny<string>()))
+            .Setup(repo => repo.GetGroceryItemById(It.IsAny<string>()))
+            .ReturnsAsync(new GroceryItem());
+        var sut = new GroceryItemService(mockRepository.Object);
+
+        // Act
+        var result = await sut.GetGroceryItemById(string.Empty);
+
+        // Assert
+        result.Should().BeOfType<GroceryItem>();
+    }
+
+    [Fact]
+    public async Task GetGroceryItemById_InvokeGroceryItemRepository()
+    {
+        // Arrange
+        var mockRepository = new Mock<IGroceryItemRepository>();
+        mockRepository
+            .Setup(repo => repo.GetGroceryItemById(It.IsAny<string>()))
+            .ReturnsAsync(new GroceryItem());
+        var sut = new GroceryItemService(mockRepository.Object);
+
+        // Act
+        await sut.GetGroceryItemById(string.Empty);
+
+        // Assert
+        mockRepository.Verify(repo => repo.GetGroceryItemById(It.IsAny<string>()), Times.Once);
+    }
+    #endregion
+    
+    #region TestGetGroceryItemByName
+    
+    [Fact]
+    public async Task GetGroceryItemByName_ReturnsListOfGroceryItems()
+    {
+        // Arrange
+        var mockRepository = new Mock<IGroceryItemRepository>();
+        mockRepository
+            .Setup(repo => repo.GetGroceryItemsByName(It.IsAny<string>()))
             .ReturnsAsync(new List<GroceryItem>());
         var sut = new GroceryItemService(mockRepository.Object);
         
         // Act
-        var result = await sut.GetByName(string.Empty);
+        var result = await sut.GetGroceryItemByName(string.Empty);
 
         //
         result.Should().BeOfType<List<GroceryItem>>();
     }
 
     [Fact]
-    public async Task GetByName_InvokeGroceryItemRepository()
+    public async Task GetGroceryItemByName_InvokeGroceryItemRepository()
     {
         // Arrange
         var mockRepository = new Mock<IGroceryItemRepository>();
         mockRepository
-            .Setup(repo => repo.GetByName(It.IsAny<string>()))
+            .Setup(repo => repo.GetGroceryItemsByName(It.IsAny<string>()))
             .ReturnsAsync(GroceryItemFixture.GetGroceryItems());
         var sut = new GroceryItemService(mockRepository.Object);
         
         // Act
-        var result = await sut.GetByName(string.Empty);
+        var result = await sut.GetGroceryItemByName(string.Empty);
 
         // Assert
-        mockRepository.Verify(repo => repo.GetByName(It.IsAny<string>()), Times.Once);
+        mockRepository.Verify(repo => repo.GetGroceryItemsByName(It.IsAny<string>()), Times.Once);
     }
     
     #endregion

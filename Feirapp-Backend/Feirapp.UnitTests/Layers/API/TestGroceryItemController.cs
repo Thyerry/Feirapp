@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Feirapp.API.Controllers;
@@ -89,15 +90,90 @@ public class TestGroceryItemController
 
     #endregion
 
-    #region TestGetByName
+    #region TestGetGroceryItemById
 
     [Fact]
-    public async Task GetByName_OnSuccess_ReturnStatusCode200()
+    public async Task GetGroceryItemById_OnSuccess_ReturnStatus200()
     {
         // Arrange
         var mockService = new Mock<IGroceryItemService>();
         mockService
-            .Setup(service => service.GetByName(It.IsAny<string>()))
+            .Setup(service => service.GetGroceryItemById(It.IsAny<string>()))
+            .ReturnsAsync(new GroceryItem());
+        var sut = new GroceryItemController(mockService.Object);
+
+        // Act
+        var result = (OkObjectResult) await sut.GetGroceryItemById(string.Empty);
+        
+        // Assert
+        result.StatusCode.Should().Be(200);
+    }
+    
+    [Fact]
+    public async Task GetGroceryItemById_OnSuccess_ReturnGroceryItem()
+    {
+        // Arrange
+        var mockService = new Mock<IGroceryItemService>();
+        mockService
+            .Setup(service => service.GetGroceryItemById(It.IsAny<string>()))
+            .ReturnsAsync(new GroceryItem());
+        var sut = new GroceryItemController(mockService.Object);
+
+        // Act
+        var result = await sut.GetGroceryItemById(string.Empty);
+        
+        // Assert
+        result.Should().BeOfType<OkObjectResult>();
+        var objectResult = (OkObjectResult)result;
+        objectResult.Value.Should().BeOfType<GroceryItem>();
+    }
+    
+    [Fact]
+    public async Task GetGroceryItemById_OnSuccess_InvokeGroceryItemService()
+    {
+        // Arrange
+        var mockService = new Mock<IGroceryItemService>();
+        mockService
+            .Setup(service => service.GetGroceryItemById(It.IsAny<string>()))
+            .ReturnsAsync(new GroceryItem());
+        
+        var sut = new GroceryItemController(mockService.Object);
+
+        // Act
+        await sut.GetGroceryItemById(string.Empty);
+        
+        // Assert
+        mockService.Verify(service => service.GetGroceryItemById(It.IsAny<string>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetGroceryItemById_OnNoGroceryItemFound_ReturnStatus404()
+    {
+        // Arrange
+        var mockService = new Mock<IGroceryItemService>();
+        mockService
+            .Setup(service => service.GetGroceryItemById(It.IsAny<string>()));
+        var sut = new GroceryItemController(mockService.Object);
+
+        // Act
+        var result = await sut.GetGroceryItemById(string.Empty);
+        
+        // Assert
+        result.Should().BeOfType<NotFoundResult>();
+        var objectResult = (NotFoundResult)result;
+        objectResult.StatusCode.Should().Be(404);
+    }
+    #endregion 
+    
+    #region TestGetGroceryItemByName
+
+    [Fact]
+    public async Task GetGroceryItemByName_OnSuccess_ReturnStatusCode200()
+    {
+        // Arrange
+        var mockService = new Mock<IGroceryItemService>();
+        mockService
+            .Setup(service => service.GetGroceryItemByName(It.IsAny<string>()))
             .ReturnsAsync(GroceryItemFixture.GetGroceryItems());
         var sut = new GroceryItemController(mockService.Object);
 
@@ -109,12 +185,12 @@ public class TestGroceryItemController
     }
     
     [Fact]
-    public async Task GetByName_OnSuccess_InvokeGroceryItemService()
+    public async Task GetGroceryItemByName_OnSuccess_InvokeGroceryItemService()
     {
         // Arrange
         var mockService = new Mock<IGroceryItemService>();
         mockService
-            .Setup(service => service.GetByName(It.IsAny<string>()))
+            .Setup(service => service.GetGroceryItemByName(It.IsAny<string>()))
             .ReturnsAsync(GroceryItemFixture.GetGroceryItems());
         var sut = new GroceryItemController(mockService.Object);
 
@@ -122,16 +198,16 @@ public class TestGroceryItemController
         await sut.GetGroceryItemsByName(string.Empty);
 
         // Assert
-        mockService.Verify(service => service.GetByName(It.IsAny<string>()), Times.Once);
+        mockService.Verify(service => service.GetGroceryItemByName(It.IsAny<string>()), Times.Once);
     }
     
     [Fact]
-    public async Task GetByName_OnSuccess_ReturnListOfGroceryItems()
+    public async Task GetGroceryItemByName_OnSuccess_ReturnListOfGroceryItems()
     {
         // Arrange
         var mockService = new Mock<IGroceryItemService>();
         mockService
-            .Setup(service => service.GetByName(It.IsAny<string>()))
+            .Setup(service => service.GetGroceryItemByName(It.IsAny<string>()))
             .ReturnsAsync(GroceryItemFixture.GetGroceryItems());
         var sut = new GroceryItemController(mockService.Object);
 
@@ -145,12 +221,12 @@ public class TestGroceryItemController
     }
     
     [Fact]
-    public async Task GetByName_OnNoGroceryItemsFound_ReturnListOfGroceryItems()
+    public async Task GetGroceryItemByName_OnNoGroceryItemsFound_ReturnListOfGroceryItems()
     {
         // Arrange
         var mockService = new Mock<IGroceryItemService>();
         mockService
-            .Setup(service => service.GetByName(It.IsAny<string>()))
+            .Setup(service => service.GetGroceryItemByName(It.IsAny<string>()))
             .ReturnsAsync(new List<GroceryItem>());
         var sut = new GroceryItemController(mockService.Object);
 
@@ -164,7 +240,7 @@ public class TestGroceryItemController
     }
 
     #endregion
-
+    
     #region TestCreateGroceryItem
 
     [Fact]
