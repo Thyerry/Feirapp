@@ -19,7 +19,7 @@ public class GroceryItemRepository : IGroceryItemRepository
         return result.ToList();
     }
 
-    public async Task<List<GroceryItem>> GetByName(string groceryName)
+    public async Task<List<GroceryItem>> GetGroceryItemsByName(string groceryName)
     {
         var groceryItems =
             await _collection.FindAsync(g => g.Name!.Contains(groceryName));
@@ -29,7 +29,12 @@ public class GroceryItemRepository : IGroceryItemRepository
     public async Task<GroceryItem> CreateGroceryItem(GroceryItem groceryItem)
     {
         await _collection.InsertOneAsync(groceryItem);
-        // TODO: Change this for GetById once the method is created
-        return (await GetByName(groceryItem.Name)).FirstOrDefault();
+        return await GetGroceryItemById(groceryItem.Id!);
+    }
+
+    public async Task<GroceryItem> GetGroceryItemById(string groceryId)
+    {
+        var result = (await _collection.FindAsync(p => p.Id == groceryId)).ToList();
+        return result.FirstOrDefault()!;
     }
 }

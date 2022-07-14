@@ -97,10 +97,10 @@ public class TestGroceryItemRepository
 
     #endregion
 
-    #region TestGetByName
+    #region TestGetGroceryItemById
 
     [Fact]
-    public async Task GetByName_ReturnListOfGroceryItem()
+    public async Task GetGroceryItemById_ReturnGroceryItem()
     {
         // Arrange
         var mockDbContext = new Mock<IMongoFeirappContext>();
@@ -131,14 +131,98 @@ public class TestGroceryItemRepository
         var sut = new GroceryItemRepository(mockDbContext.Object);
         
         // Act
-        var result = await sut.GetByName(string.Empty);
+        var result = await sut.GetGroceryItemById(string.Empty);
+        
+        // Assert
+        result.Should().BeOfType<GroceryItem>();
+    }
+
+    [Fact]
+    public async Task GetGroceryItemById_InvokeGroceryItemCollection()
+    {
+        // Arrange
+        var mockDbContext = new Mock<IMongoFeirappContext>();
+        var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
+        var mockCursor = new Mock<IAsyncCursor<GroceryItem>>();
+        var groceryList = GroceryItemFixture.GetGroceryItems();
+        
+        mockCursor
+            .Setup(c => c.Current)
+            .Returns(groceryList);
+        mockCursor
+            .SetupSequence(c => c.MoveNext(It.IsAny<CancellationToken>()))
+            .Returns(true)
+            .Returns(false);
+
+        mockCollection
+            .Setup(c => c.FindAsync(
+                It.IsAny<FilterDefinition<GroceryItem>>(),
+                It.IsAny<FindOptions<GroceryItem, GroceryItem>>(),
+                It.IsAny<CancellationToken>()
+            ))
+            .ReturnsAsync(mockCursor.Object);
+
+        mockDbContext
+            .Setup(db => db.GetCollection<GroceryItem>(nameof(GroceryItem)))
+            .Returns(mockCollection.Object);
+        
+        var sut = new GroceryItemRepository(mockDbContext.Object);
+        
+        // Act
+        var result = await sut.GetGroceryItemById(string.Empty);
+        
+        // Assert
+        mockCollection.Verify(c => c.FindAsync(
+            It.IsAny<FilterDefinition<GroceryItem>>(),
+            It.IsAny<FindOptions<GroceryItem, GroceryItem>>(),
+            It.IsAny<CancellationToken>()
+            ));
+    }
+        
+    #endregion
+    
+    #region TestGetGroceryItemsByName
+
+    [Fact]
+    public async Task GetGroceryItemsByName_ReturnListOfGroceryItem()
+    {
+        // Arrange
+        var mockDbContext = new Mock<IMongoFeirappContext>();
+        var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
+        var mockCursor = new Mock<IAsyncCursor<GroceryItem>>();
+        var groceryList = GroceryItemFixture.GetGroceryItems();
+        
+        mockCursor
+            .Setup(c => c.Current)
+            .Returns(groceryList);
+        mockCursor
+            .SetupSequence(c => c.MoveNext(It.IsAny<CancellationToken>()))
+            .Returns(true)
+            .Returns(false);
+
+        mockCollection
+            .Setup(c => c.FindAsync(
+                It.IsAny<FilterDefinition<GroceryItem>>(),
+                It.IsAny<FindOptions<GroceryItem, GroceryItem>>(),
+                It.IsAny<CancellationToken>()
+            ))
+            .ReturnsAsync(mockCursor.Object);
+
+        mockDbContext
+            .Setup(db => db.GetCollection<GroceryItem>(nameof(GroceryItem)))
+            .Returns(mockCollection.Object);
+        
+        var sut = new GroceryItemRepository(mockDbContext.Object);
+        
+        // Act
+        var result = await sut.GetGroceryItemsByName(string.Empty);
         
         // Assert
         result.Should().BeOfType<List<GroceryItem>>();
     }
 
     [Fact]
-    public async Task GetByName_InvokeGroceryItemCollection()
+    public async Task GetGroceryItemsByName_InvokeGroceryItemCollection()
     {
         var mockDbContext = new Mock<IMongoFeirappContext>();
         var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
@@ -167,7 +251,7 @@ public class TestGroceryItemRepository
         var sut = new GroceryItemRepository(mockDbContext.Object);
         
         // Act
-        await sut.GetByName(string.Empty);
+        await sut.GetGroceryItemsByName(string.Empty);
         
         // Assert
         mockCollection.Verify(db => db.FindAsync(
@@ -187,6 +271,24 @@ public class TestGroceryItemRepository
         // Assert
         var mockContext = new Mock<IMongoFeirappContext>();
         var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
+        var mockCursor = new Mock<IAsyncCursor<GroceryItem>>();
+        var groceryList = GroceryItemFixture.GetGroceryItems();
+        
+        mockCursor
+            .Setup(c => c.Current)
+            .Returns(groceryList);
+        mockCursor
+            .SetupSequence(c => c.MoveNext(It.IsAny<CancellationToken>()))
+            .Returns(true)
+            .Returns(false);
+
+        mockCollection
+            .Setup(c => c.FindAsync(
+                It.IsAny<FilterDefinition<GroceryItem>>(),
+                It.IsAny<FindOptions<GroceryItem, GroceryItem>>(),
+                It.IsAny<CancellationToken>()
+            ))
+            .ReturnsAsync(mockCursor.Object);
         
         mockCollection
             .Setup(c => c.InsertOneAsync(It.IsAny<GroceryItem>(),
@@ -213,6 +315,24 @@ public class TestGroceryItemRepository
         // Assert
         var mockContext = new Mock<IMongoFeirappContext>();
         var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
+        var mockCursor = new Mock<IAsyncCursor<GroceryItem>>();
+        var groceryList = GroceryItemFixture.GetGroceryItems();
+        
+        mockCursor
+            .Setup(c => c.Current)
+            .Returns(groceryList);
+        mockCursor
+            .SetupSequence(c => c.MoveNext(It.IsAny<CancellationToken>()))
+            .Returns(true)
+            .Returns(false);
+
+        mockCollection
+            .Setup(c => c.FindAsync(
+                It.IsAny<FilterDefinition<GroceryItem>>(),
+                It.IsAny<FindOptions<GroceryItem, GroceryItem>>(),
+                It.IsAny<CancellationToken>()
+            ))
+            .ReturnsAsync(mockCursor.Object);
         
         mockCollection
             .Setup(c => c.InsertOneAsync(It.IsAny<GroceryItem>(),

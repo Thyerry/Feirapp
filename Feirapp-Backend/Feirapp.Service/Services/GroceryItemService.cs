@@ -1,5 +1,6 @@
 using Feirapp.Domain.Contracts;
 using Feirapp.Domain.Models;
+using MongoDB.Bson;
 
 namespace Feirapp.Service.Services;
 
@@ -17,14 +18,19 @@ public class GroceryItemService : IGroceryItemService
         return await _repository.GetAllGroceryItems();
     }
 
-    public async Task<List<GroceryItem>> GetByName(string groceryName)
+    public async Task<List<GroceryItem>> GetGroceryItemByName(string groceryName)
     {
-        return await _repository.GetByName(groceryName.ToUpper());
+        return await _repository.GetGroceryItemsByName(groceryName.ToUpper());
     }
 
     public async Task<GroceryItem> CreateGroceryItem(GroceryItem groceryItem)
     {
         // TODO: Validate the groceryItem fields here and apply
         return await _repository.CreateGroceryItem(groceryItem);
+    }
+
+    public async Task<GroceryItem> GetGroceryItemById(string groceryId)
+    {
+        return await _repository.GetGroceryItemById(groceryId);
     }
 }

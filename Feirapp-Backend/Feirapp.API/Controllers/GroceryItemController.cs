@@ -26,12 +26,12 @@ public class GroceryItemController : ControllerBase
         return Ok(groceryItems);
     }
     
-    [HttpGet("{groceryItemName}", Name = "GetGroceryItemsByName")]
+    [HttpGet("Name/{groceryItemName}", Name = "GetGroceryItemsByName")]
     [ProducesResponseType(typeof(List<GroceryItem>), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetGroceryItemsByName([FromRoute]string groceryItemName)
     {
-        var groceryItems = await _service.GetByName(groceryItemName);
+        var groceryItems = await _service.GetGroceryItemByName(groceryItemName);
         if(!groceryItems.Any())
             return NotFound();
         return Ok(groceryItems);
@@ -43,5 +43,16 @@ public class GroceryItemController : ControllerBase
     {
         var result = await _service.CreateGroceryItem(groceryItem);
         return Created(nameof(GroceryItem), result);
+    }
+
+    [HttpGet("{groceryId}", Name = "GetGroceryItemById")]
+    [ProducesResponseType(typeof(GroceryItem), 200)]
+    [ProducesResponseType(typeof(NotFoundResult), 404)]
+    public async Task<IActionResult> GetGroceryItemById([FromRoute]string groceryId)
+    {
+        var result = await _service.GetGroceryItemById(groceryId);
+        if(result == null!)
+            return NotFound();
+        return Ok(result);
     }
 }
