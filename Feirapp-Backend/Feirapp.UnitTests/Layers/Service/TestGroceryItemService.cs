@@ -206,4 +206,28 @@ public class TestGroceryItemService
     }
     
     #endregion
+
+    #region TestDeleteGroceryItem
+
+    [Fact]
+    public async Task DeleteGroceryItem_InvokeGroceryItemRepository()
+    {
+        // Arrange
+        var mockRepository = new Mock<IGroceryItemRepository>();
+        var sut = new GroceryItemService(mockRepository.Object);
+        
+        // Act
+        await sut.DeleteGroceryItem(string.Empty);
+        
+        // Arrange
+        mockRepository.Verify(repo => repo.DeleteGroceryItem(It.IsAny<string>()), Times.Once);
+    }
+
+    #endregion
+
+    #region TestSearchGroceryItem
+
+    
+
+    #endregion
 }

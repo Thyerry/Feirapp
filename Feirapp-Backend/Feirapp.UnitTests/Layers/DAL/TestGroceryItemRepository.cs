@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -459,5 +458,30 @@ public class TestGroceryItemRepository
             ),
             Times.Once);
     }
+    #endregion
+
+    #region TestDeleteGroceryItem
+
+    [Fact]
+    public async Task DeleteGroceryItem_InvokeGroceryItemCollection()
+    {
+        // Arrange
+        var mockContext = new Mock<IMongoFeirappContext>();
+        var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
+        mockContext
+            .Setup(context => context.GetCollection<GroceryItem>(nameof(GroceryItem)))
+            .Returns(mockCollection.Object);
+        var sut = new GroceryItemRepository(mockContext.Object);
+        
+        // Act
+        await sut.DeleteGroceryItem(string.Empty);
+
+        // Assert
+        mockCollection.Verify(collection => collection.DeleteOneAsync(
+            It.IsAny<FilterDefinition<GroceryItem>>(),
+            It.IsAny<CancellationToken>()
+            ));
+    }
+
     #endregion
 }

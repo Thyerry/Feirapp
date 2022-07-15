@@ -40,8 +40,8 @@ public class GroceryItemService : IGroceryItemService
         return await _repository.UpdateGroceryItem(groceryItem);
     }
 
-    public Task DeleteGroceryItem(string groceryId)
+    public async Task DeleteGroceryItem(string groceryId)
     {
-        throw new NotImplementedException();
+        await _repository.DeleteGroceryItem(groceryId);
     }
 }

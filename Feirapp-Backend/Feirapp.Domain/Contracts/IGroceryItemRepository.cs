@@ -9,4 +9,5 @@ public interface IGroceryItemRepository
     Task<GroceryItem> CreateGroceryItem(GroceryItem groceryItem);
     Task<GroceryItem> GetGroceryItemById(string groceryId);
     Task<GroceryItem> UpdateGroceryItem(GroceryItem groceryItem);
+    Task DeleteGroceryItem(string groceryId);
 }

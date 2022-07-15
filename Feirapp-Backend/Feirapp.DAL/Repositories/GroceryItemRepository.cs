@@ -53,4 +53,9 @@ public class GroceryItemRepository : IGroceryItemRepository
         
         return await GetGroceryItemById(groceryItem.Id!);
     }
+
+    public async Task DeleteGroceryItem(string groceryId)
+    {
+        await _collection.DeleteOneAsync(groceryItem => groceryItem.Id == groceryId);
+    }
 }
