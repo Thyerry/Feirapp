@@ -16,12 +16,19 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Exceptions" />
-      <Folder Include="Validators\ExceptionMessages" />
+      <Compile Remove="Validators\ExceptionMessages\ValidationExceptionMessage.cs" />
+      <Compile Remove="Exceptions\**" />
+      <Compile Remove="Validators\ExceptionMessages\**" />
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="Validators\ExceptionMessages\ValidationExceptionMessage.cs" />
+      <EmbeddedResource Remove="Exceptions\**" />
+      <EmbeddedResource Remove="Validators\ExceptionMessages\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Exceptions\**" />
+      <None Remove="Validators\ExceptionMessages\**" />
     </ItemGroup>
 
 </Project>

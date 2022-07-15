@@ -2,6 +2,7 @@ namespace Feirapp.Domain.Enums;
 
 public enum GroceryCategoryEnum
 {
+    EMPTY = 0,
     DRINK,
     MEAT,
     GRAIN,

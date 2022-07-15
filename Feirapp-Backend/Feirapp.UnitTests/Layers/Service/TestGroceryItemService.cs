@@ -190,7 +190,7 @@ public class TestGroceryItemService
     #region TestUpdateGroceryItem
 
     [Fact]
-    public async Task UpdateGroceryItem_ReturnUpdatedGroceryItem()
+    public async Task UpdateGroceryItem_OnValidGroceryItem_ReturnUpdatedGroceryItem()
     {
         // Arrange
         var mockRepository = new Mock<IGroceryItemRepository>();
@@ -207,7 +207,7 @@ public class TestGroceryItemService
     }
     
     [Fact]
-    public async Task UpdateGroceryItem_InvokeGroceryItemRepository()
+    public async Task UpdateGroceryItem_OnValidGroceryItem_InvokeGroceryItemRepository()
     {
         // Arrange
         var mockRepository = new Mock<IGroceryItemRepository>();
@@ -223,6 +223,16 @@ public class TestGroceryItemService
         mockRepository.Verify(repo => repo.UpdateGroceryItem(It.IsAny<GroceryItem>()), Times.Once);
     }
     
+    [Fact]
+    public async Task UpdateGroceryItem_OnInvalidValidGroceryItem_ThrowValidationException()
+    {
+        // Arrange
+        var mockRepository = new Mock<IGroceryItemRepository>();
+        var sut = new GroceryItemService(mockRepository.Object);
+        
+        // Act & Assert
+        await Assert.ThrowsAsync<ValidationException>(() => sut.UpdateGroceryItem(new GroceryItem()));
+    }
     #endregion
 
     #region TestDeleteGroceryItem

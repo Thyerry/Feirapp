@@ -73,9 +73,9 @@ public class GroceryItemController : ControllerBase
             var result = await _service.UpdateGroceryItem(groceryItem);
             return Ok(result);
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            return BadRequest();
+            return BadRequest(e.Message);
         }
     }
 

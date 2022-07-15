@@ -28,9 +28,9 @@ public class GroceryItemService : IGroceryItemService
     public async Task<GroceryItem> CreateGroceryItem(GroceryItem groceryItem)
     {
         var validator = new CreateGroceryItemValidator();
-        var isValid = await validator.ValidateAsync(groceryItem);
-        if (isValid.Errors.Count > 0)
-            throw new ValidationException(isValid.Errors);
+        var validationResult = await validator.ValidateAsync(groceryItem);
+        if (validationResult.Errors.Count > 0)
+            throw new ValidationException(validationResult.Errors);
         return await _repository.CreateGroceryItem(FormatTextFields(groceryItem));
     }
 
@@ -40,8 +40,11 @@ public class GroceryItemService : IGroceryItemService
     }
 
     public async Task<GroceryItem> UpdateGroceryItem(GroceryItem groceryItem)
-    {        
-        // TODO: Validate the groceryItem fields here before calling the repository
+    {
+        var validator = new UpdateGroceryItemValidator();
+        var validationResult = await validator.ValidateAsync(groceryItem);
+        if (validationResult.Errors.Count > 0)
+            throw new ValidationException(validationResult.Errors);
         return await _repository.UpdateGroceryItem(groceryItem);
     }
 
@@ -54,6 +57,7 @@ public class GroceryItemService : IGroceryItemService
     {
         return new GroceryItem()
         {
+            Id = groceryItem.Id ?? null,
             Name = groceryItem.Name!.ToUpper(),
             Price = groceryItem.Price,
             BrandName = groceryItem.BrandName!.ToUpper(),
