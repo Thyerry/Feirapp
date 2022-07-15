@@ -370,4 +370,51 @@ public class TestGroceryItemController
     }
     
     #endregion
+
+    #region TestDeleteGroceryItem
+
+    [Fact]
+    public async Task DeleteGroceryItem_OnSuccess_ReturnStatus200()
+    {
+        // Arrange
+        var mockService = new Mock<IGroceryItemService>();
+        var sut = new GroceryItemController(mockService.Object);
+        
+        // Act
+        var result = (OkResult) await sut.DeleteGroceryItem(new string('*',10));
+
+        // Assert
+        result.StatusCode.Should().Be(200);
+    }
+
+    [Fact]
+    public async Task DeleteGroceryItem_OnSuccess_InvokeGroceryItemService()
+    {
+        // Arrange
+        var mockService = new Mock<IGroceryItemService>();
+        var sut = new GroceryItemController(mockService.Object);
+
+        // Act
+        await sut.DeleteGroceryItem(new string('*',10));
+
+        // Assert
+        mockService.Verify(service => service.DeleteGroceryItem(It.IsAny<string>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteGroceryItem_OnIdNullOrEmpty_ReturnStatus400()
+    {
+        // Arrange
+        var mockService = new Mock<IGroceryItemService>();
+        var sut = new GroceryItemController(mockService.Object);
+
+        // Act
+        var result = await sut.DeleteGroceryItem(string.Empty);
+        
+        // Assert
+        result.Should().BeOfType<BadRequestResult>();
+        result.As<BadRequestResult>().StatusCode.Should().Be(400);
+    }
+
+    #endregion
 }

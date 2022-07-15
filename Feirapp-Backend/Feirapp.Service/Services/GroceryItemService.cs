@@ -39,4 +39,9 @@ public class GroceryItemService : IGroceryItemService
         // TODO: Validate the groceryItem fields here before calling the repository
         return await _repository.UpdateGroceryItem(groceryItem);
     }
+
+    public Task DeleteGroceryItem(string groceryId)
+    {
+        throw new NotImplementedException();
+    }
 }

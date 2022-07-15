@@ -71,4 +71,15 @@ public class GroceryItemController : ControllerBase
             return BadRequest();
         }
     }
+
+    [HttpDelete]
+    [ProducesResponseType(typeof(OkResult), 200)]
+    [ProducesResponseType(typeof(BadRequestResult), 400)]
+    public async Task<IActionResult> DeleteGroceryItem(string groceryId)
+    {
+        if (string.IsNullOrEmpty(groceryId))
+            return BadRequest();
+        await _service.DeleteGroceryItem(groceryId);
+        return Ok();
+    }
 }
