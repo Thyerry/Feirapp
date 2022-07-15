@@ -1,6 +1,7 @@
 using Feirapp.Domain.Contracts;
 using Feirapp.Domain.Models;
-using MongoDB.Bson;
+using Feirapp.Service.Validators.GroceryItemValidators;
+using FluentValidation;
 
 namespace Feirapp.Service.Services;
 
@@ -10,6 +11,7 @@ public class GroceryItemService : IGroceryItemService
 
     public GroceryItemService(IGroceryItemRepository repository)
     {
+        // TODO: Throw ArgumentException when IGroceryItemRepository is null
         _repository = repository;
     }
 
@@ -25,8 +27,11 @@ public class GroceryItemService : IGroceryItemService
 
     public async Task<GroceryItem> CreateGroceryItem(GroceryItem groceryItem)
     {
-        // TODO: Validate the groceryItem fields here before calling the repository
-        return await _repository.CreateGroceryItem(groceryItem);
+        var validator = new CreateGroceryItemValidator();
+        var isValid = await validator.ValidateAsync(groceryItem);
+        if (isValid.Errors.Count > 0)
+            throw new ValidationException(isValid.Errors);
+        return await _repository.CreateGroceryItem(FormatTextFields(groceryItem));
     }
 
     public async Task<GroceryItem> GetGroceryItemById(string groceryId)
@@ -43,5 +48,18 @@ public class GroceryItemService : IGroceryItemService
     public async Task DeleteGroceryItem(string groceryId)
     {
         await _repository.DeleteGroceryItem(groceryId);
+    }
+
+    private GroceryItem FormatTextFields(GroceryItem groceryItem)
+    {
+        return new GroceryItem()
+        {
+            Name = groceryItem.Name!.ToUpper(),
+            Price = groceryItem.Price,
+            BrandName = groceryItem.BrandName!.ToUpper(),
+            GroceryCategory = groceryItem.GroceryCategory,
+            PurchaseDate = groceryItem.PurchaseDate,
+            GroceryStoreName = groceryItem.GroceryStoreName!.ToUpper()
+        };
     }
 }
