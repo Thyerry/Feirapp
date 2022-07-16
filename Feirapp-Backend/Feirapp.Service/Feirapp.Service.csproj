@@ -7,7 +7,28 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Feirapp.Domain\Feirapp.Domain.csproj"/>
+        <ProjectReference Include="..\Feirapp.Domain\Feirapp.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FluentValidation" Version="11.1.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Validators\ExceptionMessages\ValidationExceptionMessage.cs" />
+      <Compile Remove="Exceptions\**" />
+      <Compile Remove="Validators\ExceptionMessages\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Exceptions\**" />
+      <EmbeddedResource Remove="Validators\ExceptionMessages\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Exceptions\**" />
+      <None Remove="Validators\ExceptionMessages\**" />
     </ItemGroup>
 
 </Project>
