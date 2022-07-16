@@ -21,7 +21,7 @@ public class UpdateGroceryItemValidator : AbstractValidator<GroceryItem>
             .WithMessage("É necessário inserir o Preço");
 
         RuleFor(item => item.GroceryCategory)
-            .Equal(GroceryCategoryEnum.EMPTY)
+            .NotEqual(item => GroceryCategoryEnum.EMPTY)
             .WithMessage("É necessário selecionar uma categoria");
 
         RuleFor(item => item.GroceryStoreName)
