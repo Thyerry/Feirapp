@@ -41,15 +41,8 @@ public class GroceryItemController : ControllerBase
     [ProducesResponseType(typeof(GroceryItem), 201)]
     public async Task<IActionResult> CreateGroceryItem([FromBody]GroceryItem groceryItem)
     {
-        try
-        {
-            var result = await _service.CreateGroceryItem(groceryItem);
-            return Created(nameof(GroceryItem), result);
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
+        var result = await _service.CreateGroceryItem(groceryItem);
+        return Created(nameof(GroceryItem), result);
     }
 
     [HttpGet("{groceryId}", Name = "GetGroceryItemById")]
