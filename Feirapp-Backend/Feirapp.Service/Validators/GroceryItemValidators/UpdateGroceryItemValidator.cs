@@ -18,14 +18,14 @@ public class UpdateGroceryItemValidator : AbstractValidator<GroceryItem>
 
         RuleFor(item => item.Price)
             .GreaterThan(0)
-            .WithMessage("É necessário inserir o Preço");
+            .WithMessage("O Preço deve ser maior que 0");
 
         RuleFor(item => item.GroceryCategory)
             .NotEqual(item => GroceryCategoryEnum.EMPTY)
-            .WithMessage("É necessário selecionar uma categoria");
+            .WithMessage("Selecione uma categoria");
 
         RuleFor(item => item.GroceryStoreName)
             .NotEmpty()
-            .WithMessage("É necessário inserir o nome do mercado");
+            .WithMessage("O Nome do Mercado não pode ser vazio");
     }
 }

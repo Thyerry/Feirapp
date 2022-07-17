@@ -1,9 +1,11 @@
 using Feirapp.Domain.Contracts;
 using Feirapp.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Feirapp.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class GroceryItemController : ControllerBase
@@ -12,7 +14,7 @@ public class GroceryItemController : ControllerBase
 
     public GroceryItemController(IGroceryItemService service)
     {
-        _service = service;
+        _service = service ?? throw new ArgumentNullException(nameof(service));
     }
 
     [HttpGet]
@@ -39,16 +41,16 @@ public class GroceryItemController : ControllerBase
 
     [HttpPost(Name = "CreateGroceryItem")]
     [ProducesResponseType(typeof(GroceryItem), 201)]
-    public async Task<IActionResult> CreateGroceryItem([FromBody]GroceryItem groceryItem)
+    public async Task<IActionResult> CreateGroceryItem(GroceryItem groceryItem)
     {
         var result = await _service.CreateGroceryItem(groceryItem);
         return Created(nameof(GroceryItem), result);
     }
 
-    [HttpGet("{groceryId}", Name = "GetGroceryItemById")]
+    [HttpGet("{groceryId:length(24)}", Name = "GetGroceryItemById")]
     [ProducesResponseType(typeof(GroceryItem), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
-    public async Task<IActionResult> GetGroceryItemById([FromRoute]string groceryId)
+    public async Task<IActionResult> GetGroceryItemById(string groceryId)
     {
         var result = await _service.GetGroceryItemById(groceryId);
         if(result == null!)
@@ -61,15 +63,8 @@ public class GroceryItemController : ControllerBase
     [ProducesResponseType(typeof(GroceryItem), 400)]
     public async Task<IActionResult> UpdateGroceryItem(GroceryItem groceryItem)
     {
-        try
-        {
-            var result = await _service.UpdateGroceryItem(groceryItem);
-            return Ok(result);
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
+        var result = await _service.UpdateGroceryItem(groceryItem);
+        return Ok(result);
     }
 
     [HttpDelete]

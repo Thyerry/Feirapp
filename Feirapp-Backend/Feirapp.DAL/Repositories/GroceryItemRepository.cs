@@ -45,10 +45,11 @@ public class GroceryItemRepository : IGroceryItemRepository
             Builders<GroceryItem>.Update
                 .Set(n => n.Name, groceryItem.Name)
                 .Set(n => n.Price, groceryItem.Price)
-                .Set(n => n.GroceryCategory, groceryItem.GroceryCategory)
-                .Set(n => n.GroceryStoreName, groceryItem.GroceryStoreName)
                 .Set(n => n.BrandName, groceryItem.BrandName)
-                .Set(n => n.PurchaseDate, groceryItem.PurchaseDate),
+                .Set(n => n.PurchaseDate, groceryItem.PurchaseDate)
+                .Set(n => n.GroceryCategory, groceryItem.GroceryCategory)
+                .Set(n => n.GroceryImageUrl, groceryItem.GroceryImageUrl)
+                .Set(n => n.GroceryStoreName, groceryItem.GroceryStoreName),
             new UpdateOptions { IsUpsert = false } );
         
         return await GetGroceryItemById(groceryItem.Id!);
