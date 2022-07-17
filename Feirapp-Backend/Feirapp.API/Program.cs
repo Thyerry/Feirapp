@@ -1,3 +1,4 @@
+using Feirapp.API.Helpers;
 using Feirapp.DAL.DataContext;
 using Feirapp.DAL.Repositories;
 using Feirapp.Domain.Contracts;
@@ -8,8 +9,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-
-// TODO: Create Middleware to catch global Exceptions an treat them accordingly.
 
 ConfigurationAndServices(builder.Services, builder.Configuration);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -24,6 +23,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 
