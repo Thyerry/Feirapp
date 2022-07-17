@@ -9,8 +9,9 @@ public class CreateGroceryItemValidator : AbstractValidator<GroceryItem>
     {
         RuleFor(item => item.Name)
             .NotEmpty()
-            .WithMessage("O nome do produto é obrigatório");
+            .WithMessage("O Nome do produto é obrigatório");
         RuleFor(item => item.Price)
-            .GreaterThanOrEqualTo(0);
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("O Preço não pode ter um valor negativo");
     }
 }

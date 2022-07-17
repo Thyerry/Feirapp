@@ -11,8 +11,7 @@ public class GroceryItemService : IGroceryItemService
 
     public GroceryItemService(IGroceryItemRepository repository)
     {
-        // TODO: Throw ArgumentException when IGroceryItemRepository is null
-        _repository = repository;
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     }
 
     public async Task<List<GroceryItem>> GetAllGroceryItems()
@@ -62,6 +61,7 @@ public class GroceryItemService : IGroceryItemService
             Price = groceryItem.Price,
             BrandName = groceryItem.BrandName!.ToUpper(),
             GroceryCategory = groceryItem.GroceryCategory,
+            GroceryImageUrl = groceryItem.GroceryImageUrl,
             PurchaseDate = groceryItem.PurchaseDate,
             GroceryStoreName = groceryItem.GroceryStoreName!.ToUpper()
         };
