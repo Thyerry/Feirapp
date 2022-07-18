@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Feirapp.API.Controllers;
 
-[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class GroceryItemController : ControllerBase
