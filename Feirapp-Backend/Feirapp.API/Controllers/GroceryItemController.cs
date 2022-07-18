@@ -1,6 +1,5 @@
 using Feirapp.Domain.Contracts;
 using Feirapp.Domain.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Feirapp.API.Controllers;

@@ -1,6 +1,4 @@
-using System.Buffers.Text;
 using Feirapp.Domain.Enums;
-using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace Feirapp.Domain.Models;
