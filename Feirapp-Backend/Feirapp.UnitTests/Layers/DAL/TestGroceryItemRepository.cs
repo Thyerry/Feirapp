@@ -169,7 +169,7 @@ public class TestGroceryItemRepository
         var sut = new GroceryItemRepository(mockDbContext.Object);
         
         // Act
-        var result = await sut.GetGroceryItemById(string.Empty);
+        await sut.GetGroceryItemById(string.Empty);
         
         // Assert
         mockCollection.Verify(c => c.FindAsync(

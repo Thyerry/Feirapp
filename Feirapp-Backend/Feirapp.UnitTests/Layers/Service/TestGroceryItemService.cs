@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Feirapp.Domain.Contracts;
@@ -10,7 +7,6 @@ using Feirapp.Service.Services;
 using Feirapp.UnitTests.Fixtures;
 using FluentAssertions;
 using FluentValidation;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Moq;
 using Xunit;
 
@@ -126,7 +122,7 @@ public class TestGroceryItemService
         var sut = new GroceryItemService(mockRepository.Object);
         
         // Act
-        var result = await sut.GetGroceryItemByName(string.Empty);
+        await sut.GetGroceryItemByName(string.Empty);
 
         // Assert
         mockRepository.Verify(repo => repo.GetGroceryItemsByName(It.IsAny<string>()), Times.Once);
