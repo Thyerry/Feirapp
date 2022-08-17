@@ -349,25 +349,6 @@ public class TestGroceryItemController
         // Assert
         mockService.Verify(service => service.UpdateGroceryItem(It.IsAny<GroceryItem>()));
     }
-
-    [Fact]
-    public async Task UpdateGroceryItem_OnException_ReturnStatus400()
-    {
-        // Arrange
-        var mockService = new Mock<IGroceryItemService>();
-        mockService
-            .Setup(service => service.UpdateGroceryItem(It.IsAny<GroceryItem>()))
-            .Throws<Exception>();
-        var sut = new GroceryItemController(mockService.Object);
-        
-        // Act
-        var result = await sut.UpdateGroceryItem(new GroceryItem());
-        
-        // Assert
-        result.Should().BeOfType<BadRequestResult>();
-        var badRequest = (BadRequestResult)result;
-        badRequest.StatusCode.Should().Be(400);
-    }
     
     #endregion
 

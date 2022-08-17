@@ -35,11 +35,22 @@ public class GroceryItemRepository : IGroceryItemRepository
     public async Task<GroceryItem> GetGroceryItemById(string groceryId)
     {
         var result = (await _collection.FindAsync(p => p.Id == groceryId)).ToList();
-        return result.FirstOrDefault()!;
+        var asd = result.FirstOrDefault();
+        return asd;
     }
 
     public async Task<GroceryItem> UpdateGroceryItem(GroceryItem groceryItem)
     {
+        var groceryItemToUpdate = await GetGroceryItemById(groceryItem.Id!);
+        if (groceryItem.Price != groceryItemToUpdate.Price)
+        {
+            if (groceryItem.PriceHistory!.Count == 1
+                && groceryItem.PriceHistory!.FirstOrDefault()!.Price == 0.0)
+                groceryItem.PriceHistory = new List<PriceLog>(){ new() { Price = groceryItem.Price, LogDate = groceryItem.PurchaseDate } };
+            else 
+                groceryItem.PriceHistory.Add(new PriceLog() { Price = groceryItem.Price, LogDate = groceryItem.PurchaseDate });
+        }
+
         await _collection.UpdateOneAsync(
             g => g.Id == groceryItem.Id,
             Builders<GroceryItem>.Update
@@ -49,10 +60,11 @@ public class GroceryItemRepository : IGroceryItemRepository
                 .Set(n => n.PurchaseDate, groceryItem.PurchaseDate)
                 .Set(n => n.GroceryCategory, groceryItem.GroceryCategory)
                 .Set(n => n.GroceryImageUrl, groceryItem.GroceryImageUrl)
-                .Set(n => n.GroceryStoreName, groceryItem.GroceryStoreName),
+                .Set(n => n.GroceryStoreName, groceryItem.GroceryStoreName)
+                .Set(n => n.PriceHistory, groceryItem.PriceHistory),
             new UpdateOptions { IsUpsert = false } );
-        
-        return await GetGroceryItemById(groceryItem.Id!);
+
+        return groceryItem;
     }
 
     public async Task DeleteGroceryItem(string groceryId)
