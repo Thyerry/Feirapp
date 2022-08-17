@@ -20,7 +20,8 @@ public class GroceryItemFixture
                 Id = new ObjectId().ToString(),
                 GroceryCategory = GroceryCategoryEnum.DRINK,
                 PurchaseDate = DateTime.Now,
-                GroceryStoreName = "Store 1"
+                GroceryStoreName = "Store 1",
+                PriceHistory = new List<PriceLog>(){new (){ Price= 1.1, LogDate = DateTime.Now}}
             },
             new()
             {
@@ -30,7 +31,8 @@ public class GroceryItemFixture
                 Id = new ObjectId().ToString(),
                 GroceryCategory = GroceryCategoryEnum.MEAT,
                 PurchaseDate = DateTime.Now,
-                GroceryStoreName = "Store 2"
+                GroceryStoreName = "Store 2",
+                PriceHistory = new List<PriceLog>(){new (){ Price= 2.2, LogDate = DateTime.Now}}
             },
             new()
             {
@@ -40,7 +42,8 @@ public class GroceryItemFixture
                 Id = new ObjectId().ToString(),
                 GroceryCategory = GroceryCategoryEnum.CANNED,
                 PurchaseDate = DateTime.Now,
-                GroceryStoreName = "Store 3"
+                GroceryStoreName = "Store 3",
+                PriceHistory = new List<PriceLog>(){new (){ Price= 3.3, LogDate = DateTime.Now}}
             }
         };
     }

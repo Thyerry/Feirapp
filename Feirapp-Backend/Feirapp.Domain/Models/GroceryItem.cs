@@ -22,4 +22,6 @@ public class GroceryItem
     public DateTime? PurchaseDate { get; set; }
     [BsonElement("GroceryImageUrl")]
     public string? GroceryImageUrl { get; set; }
+    [BsonElement("PriceHistory")]
+    public List<PriceLog>? PriceHistory { get; set; }
 }

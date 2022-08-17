@@ -30,6 +30,14 @@ public class GroceryItemService : IGroceryItemService
         var validationResult = await validator.ValidateAsync(groceryItem);
         if (validationResult.Errors.Count > 0)
             throw new ValidationException(validationResult.Errors);
+        groceryItem.PriceHistory = new List<PriceLog>
+        {
+            new()
+            {
+                Price = groceryItem.Price,
+                LogDate = groceryItem.PurchaseDate
+            }
+        };
         return await _repository.CreateGroceryItem(FormatTextFields(groceryItem));
     }
 
@@ -44,7 +52,8 @@ public class GroceryItemService : IGroceryItemService
         var validationResult = await validator.ValidateAsync(groceryItem);
         if (validationResult.Errors.Count > 0)
             throw new ValidationException(validationResult.Errors);
-        return await _repository.UpdateGroceryItem(groceryItem);
+
+        return await _repository.UpdateGroceryItem(FormatTextFields(groceryItem));
     }
 
     public async Task DeleteGroceryItem(string groceryId)
@@ -63,7 +72,8 @@ public class GroceryItemService : IGroceryItemService
             GroceryCategory = groceryItem.GroceryCategory,
             GroceryImageUrl = groceryItem.GroceryImageUrl,
             PurchaseDate = groceryItem.PurchaseDate,
-            GroceryStoreName = groceryItem.GroceryStoreName!.ToUpper()
+            GroceryStoreName = groceryItem.GroceryStoreName!.ToUpper(),
+            PriceHistory = groceryItem.PriceHistory
         };
     }
 }
