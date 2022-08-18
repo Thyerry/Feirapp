@@ -468,7 +468,7 @@ public class TestGroceryItemRepository
         var mockContext = new Mock<IMongoFeirappContext>();
         var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
         var mockCursor = new Mock<IAsyncCursor<GroceryItem>>();
-        var groceryList = GroceryItemFixture.GetGroceryItems();
+        var groceryList = GroceryItemFixture.GetGroceryItemsWithPriceHistory();
         
         mockCursor
             .Setup(c => c.Current)
@@ -501,7 +501,7 @@ public class TestGroceryItemRepository
         var sut = new GroceryItemRepository(mockContext.Object);
         
         // Act
-        var result = await sut.UpdateGroceryItem(groceryList[1]);
+        var result = await sut.UpdateGroceryItem(groceryList[2]);
         
         // Assert
         result.PriceHistory.Count.Should().Be(2);
