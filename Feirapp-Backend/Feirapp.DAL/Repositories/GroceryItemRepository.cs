@@ -19,6 +19,16 @@ public class GroceryItemRepository : IGroceryItemRepository
         return result.ToList();
     }
 
+    public async Task<List<GroceryItem>> GetRandomGroceryItems(int quantity)
+    {
+        var result = await _collection.AggregateAsync(PipelineDefinition<GroceryItem, GroceryItem>.Create($@"
+        {{ 
+            $sample: {{ size: {quantity} }}
+        }}
+        "));
+        return result.ToList();
+    }
+
     public async Task<List<GroceryItem>> GetGroceryItemsByName(string groceryName)
     {
         var groceryItems =

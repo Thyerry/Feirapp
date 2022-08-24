@@ -55,6 +55,44 @@ public class TestGroceryItemService
 
     #endregion
 
+    #region TestGetRandomGroceryItems
+
+    [Fact]
+    public async Task GetRandomGroceryItems_ShouldReturnListOfGroceryItems()
+    {
+        // Arrange
+        var mockGroceryItemRepository = new Mock<IGroceryItemRepository>();
+        mockGroceryItemRepository
+            .Setup(repository => repository.GetRandomGroceryItems(It.IsAny<int>()))
+            .ReturnsAsync(new List<GroceryItem>());
+        var sut = new GroceryItemService(mockGroceryItemRepository.Object);
+        
+        // Act
+        var result = await sut.GetRandomGroceryItems(new int());
+        
+        // Assert
+        result.Should().BeOfType<List<GroceryItem>>();
+    }
+    
+    [Fact]
+    public async Task GetRandomGroceryItems_ShouldInvokeRepository()
+    {
+        // Arrange
+        var mockGroceryItemRepository = new Mock<IGroceryItemRepository>();
+        mockGroceryItemRepository
+            .Setup(repository => repository.GetRandomGroceryItems(It.IsAny<int>()))
+            .ReturnsAsync(new List<GroceryItem>());
+        var sut = new GroceryItemService(mockGroceryItemRepository.Object);
+        
+        // Act
+        var result = await sut.GetRandomGroceryItems(new int());
+        
+        // Assert
+        mockGroceryItemRepository.Verify(repo => repo.GetRandomGroceryItems(It.IsAny<int>()), Times.Once);
+    }
+        
+    #endregion
+    
     #region TestGetGroceryItemById
 
     [Fact]
@@ -250,5 +288,4 @@ public class TestGroceryItemService
     }
 
     #endregion
-    
 }
