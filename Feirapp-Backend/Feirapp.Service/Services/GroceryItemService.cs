@@ -19,6 +19,11 @@ public class GroceryItemService : IGroceryItemService
         return await _repository.GetAllGroceryItems();
     }
 
+    public async Task<List<GroceryItem>> GetRandomGroceryItems(int quantity)
+    {
+        return await _repository.GetRandomGroceryItems(quantity);
+    }
+
     public async Task<List<GroceryItem>> GetGroceryItemByName(string groceryName)
     {
         return await _repository.GetGroceryItemsByName(groceryName.ToUpper());

@@ -26,6 +26,17 @@ public class GroceryItemController : ControllerBase
         return Ok(groceryItems);
     }
     
+    [HttpGet("Random/{quantity:int}")]
+    [ProducesResponseType(typeof(List<GroceryItem>), 200)]
+    [ProducesResponseType(typeof(NotFoundResult), 404)]
+    public async Task<IActionResult> GetRandomGroceryItems(int quantity)
+    {
+        if (quantity <= 0)
+            return BadRequest();
+        var randomGroceryItems = await _service.GetRandomGroceryItems(quantity);
+        return Ok(randomGroceryItems);
+    }
+
     [HttpGet("Name/{groceryItemName}", Name = "GetGroceryItemsByName")]
     [ProducesResponseType(typeof(List<GroceryItem>), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
@@ -75,4 +86,5 @@ public class GroceryItemController : ControllerBase
         await _service.DeleteGroceryItem(groceryId);
         return Ok();
     }
+
 }
