@@ -24,7 +24,7 @@ public class ExceptionHandlerMiddleware
             var response = context.Response;
             response.ContentType = "application/json";
 
-            string result = "";
+            var result = "";
             switch (exception)
             {
                 case ValidationException e:
@@ -33,7 +33,7 @@ public class ExceptionHandlerMiddleware
                     break;
                 default:
                     response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    result = JsonConvert.SerializeObject(new { message = exception?.Message });
+                    result = JsonConvert.SerializeObject(new { message = exception.Message });
                     break;
             }
             await response.WriteAsync(result);
