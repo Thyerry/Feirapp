@@ -32,14 +32,14 @@ public class GroceryItemRepository : IGroceryItemRepository
     public async Task<List<GroceryItem>> GetGroceryItemsByName(string groceryName)
     {
         var groceryItems =
-            await _collection.FindAsync(g => g.Name!.Contains(groceryName));
+            await _collection.FindAsync(g => g.Name.Contains(groceryName));
         return groceryItems.ToList();
     }
 
     public async Task<GroceryItem> CreateGroceryItem(GroceryItem groceryItem)
     {
         await _collection.InsertOneAsync(groceryItem);
-        return await GetGroceryItemById(groceryItem.Id!);
+        return await GetGroceryItemById(groceryItem.Id);
     }
 
     public async Task<GroceryItem> GetGroceryItemById(string groceryId)
@@ -50,11 +50,11 @@ public class GroceryItemRepository : IGroceryItemRepository
 
     public async Task<GroceryItem> UpdateGroceryItem(GroceryItem groceryItem)
     {
-        var groceryItemToUpdate = await GetGroceryItemById(groceryItem.Id!);
+        var groceryItemToUpdate = await GetGroceryItemById(groceryItem.Id);
         groceryItem.PriceHistory = groceryItemToUpdate.PriceHistory;
         if (groceryItem.PurchaseDate != groceryItemToUpdate.PurchaseDate)
         {
-            if (groceryItem.PriceHistory.FirstOrDefault()!.Price == 0.0)
+            if (groceryItem.PriceHistory.FirstOrDefault().Price == 0.0)
                 groceryItem.PriceHistory = new List<PriceLog>(){ new() { Price = groceryItem.Price, LogDate = groceryItem.PurchaseDate } };
             else 
                 groceryItem.PriceHistory.Add(new PriceLog() { Price = groceryItem.Price, LogDate = groceryItem.PurchaseDate });

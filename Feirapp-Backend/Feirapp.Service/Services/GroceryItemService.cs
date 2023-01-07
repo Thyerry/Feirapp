@@ -66,7 +66,7 @@ public class GroceryItemService : IGroceryItemService
         await _repository.DeleteGroceryItem(groceryId);
     }
 
-    private GroceryItem FormatTextFields(GroceryItem groceryItem)
+    private static GroceryItem FormatTextFields(GroceryItem groceryItem)
     {
         return new GroceryItem()
         {
