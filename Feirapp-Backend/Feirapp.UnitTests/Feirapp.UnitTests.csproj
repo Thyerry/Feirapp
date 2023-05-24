@@ -24,7 +24,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Helpers" />
+        <ProjectReference Include="..\Feirapp.API\Feirapp.API.csproj" />
+        <ProjectReference Include="..\Feirapp.DAL\Feirapp.DAL.csproj" />
     </ItemGroup>
 
     <ItemGroup>

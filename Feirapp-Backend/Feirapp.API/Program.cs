@@ -3,6 +3,7 @@ using Feirapp.DAL.DataContext;
 using Feirapp.DAL.Repositories;
 using Feirapp.Domain.Contracts;
 using Feirapp.Service.Services;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
