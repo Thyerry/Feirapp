@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Feirapp.API.Controllers;
 using Feirapp.Domain.Contracts;
@@ -464,8 +466,7 @@ public class TestGroceryItemController
         
             // Assert
             result.Should().BeOfType<BadRequestResult>();
-            result.As<BadRequestResult>().StatusCode.Should().Be(400);
+            result.As<BadRequestResult>().StatusCode.Should().Be(400);	// Output: "False"
         }
-
     }
 }

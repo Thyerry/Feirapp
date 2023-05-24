@@ -16,5 +16,6 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+        <PackageReference Include="Riok.Mapperly" Version="2.7.0" />
     </ItemGroup>
 </Project>
