@@ -5,7 +5,7 @@ using MongoDB.Driver;
 
 namespace Feirapp.DAL.Repositories;
 
-public class GroceryItemRepository : IGroceryItemRepository
+public class GroceryItemRepository : IGroceryItemRepository, IDisposable
 {
     private readonly IMongoCollection<GroceryItem> _collection;
     public GroceryItemRepository(IMongoFeirappContext context)
@@ -80,5 +80,10 @@ public class GroceryItemRepository : IGroceryItemRepository
     public async Task DeleteGroceryItem(string groceryId)
     {
         await _collection.DeleteOneAsync(groceryItem => groceryItem.Id == groceryId);
+    }
+
+    public void Dispose()
+    {
+        throw new NotImplementedException();
     }
 }
