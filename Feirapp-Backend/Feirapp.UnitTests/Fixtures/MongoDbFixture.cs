@@ -1,12 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Feirapp.DAL.DataContext;
 
 namespace Feirapp.UnitTests.Fixtures
 {
-    internal class MongoDbFixture
+    public class MongoDbFixture
     {
+        public MongoFeirappContext Context { get; set; }
+
+        public MongoDbFixture()
+        {
+            var mongoSettings = new MongoSettings()
+            {
+                ConnectionString = "mongodb://localhost:27017",
+                DatabaseName = "Feirapp",
+            };
+            Context = new MongoFeirappContext(new OptionsConfigurationMock<MongoSettings>(mongoSettings));
+        }
     }
 }

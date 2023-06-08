@@ -1,5 +1,4 @@
 using Feirapp.Domain.Models;
-using Microsoft.VisualBasic;
 using MongoDB.Driver;
 using Moq;
 
