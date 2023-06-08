@@ -3,12 +3,13 @@ using Feirapp.DAL.Repositories;
 using Feirapp.Domain.Models;
 using Feirapp.UnitTests.Fixtures;
 using FluentAssertions;
+using System;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace Feirapp.UnitTests.IntegrationTest;
 
-public class TestGroceryItemRepository
+public class TestGroceryItemRepository : IDisposable
 {
     private readonly IMongoFeirappContext _context;
     private readonly DockerComposeTestBase _docker;
@@ -18,6 +19,7 @@ public class TestGroceryItemRepository
         _context = new MongoDbFixture().Context;
         _docker = new DockerComposeTestBase();
     }
+
 
     [Fact]
     public async Task NewGroceryItem_InsertItOnDatabase_ShouldBeInsertedOnDatabase()
@@ -32,9 +34,7 @@ public class TestGroceryItemRepository
         //Assert
         actual.Should().BeEquivalentTo(expected);
     }
-
-    [Fact]
-    public async Task n()
+    public void Dispose()
     {
         _docker.Dispose();
     }
