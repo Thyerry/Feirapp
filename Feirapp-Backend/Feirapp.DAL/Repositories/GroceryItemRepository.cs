@@ -7,21 +7,21 @@ namespace Feirapp.DAL.Repositories;
 
 public class GroceryItemRepository : IGroceryItemRepository, IDisposable
 {
-    private readonly IMongoCollection<GroceryItem> _collection;
+    private readonly IMongoCollection<GroceryItem> _groceryItemCollection;
     public GroceryItemRepository(IMongoFeirappContext context)
     {
-        _collection = context.GetCollection<GroceryItem>(nameof(GroceryItem));
+        _groceryItemCollection = context.GetCollection<GroceryItem>(nameof(GroceryItem));
     }
 
     public async Task<List<GroceryItem>> GetAllGroceryItems()
     {
-        var result = await _collection.FindAsync(q => true);
+        var result = await _groceryItemCollection.FindAsync(q => true);
         return result.ToList();
     }
 
     public async Task<List<GroceryItem>> GetRandomGroceryItems(int quantity)
     {
-        var result = await _collection.AggregateAsync(PipelineDefinition<GroceryItem, GroceryItem>.Create($@"
+        var result = await _groceryItemCollection.AggregateAsync(PipelineDefinition<GroceryItem, GroceryItem>.Create($@"
         {{ 
             $sample: {{ size: {quantity} }}
         }}
@@ -32,19 +32,19 @@ public class GroceryItemRepository : IGroceryItemRepository, IDisposable
     public async Task<List<GroceryItem>> GetGroceryItemsByName(string groceryName)
     {
         var groceryItems =
-            await _collection.FindAsync(g => g.Name.Contains(groceryName));
+            await _groceryItemCollection.FindAsync(g => g.Name.Contains(groceryName));
         return groceryItems.ToList();
     }
 
     public async Task<GroceryItem> CreateGroceryItem(GroceryItem groceryItem)
     {
-        await _collection.InsertOneAsync(groceryItem);
+        await _groceryItemCollection.InsertOneAsync(groceryItem);
         return await GetGroceryItemById(groceryItem.Id);
     }
 
     public async Task<GroceryItem> GetGroceryItemById(string groceryId)
     {
-        var result = (await _collection.FindAsync(p => p.Id == groceryId)).ToList();
+        var result = (await _groceryItemCollection.FindAsync(p => p.Id == groceryId)).ToList();
         return result.FirstOrDefault();
     }
 
@@ -61,7 +61,7 @@ public class GroceryItemRepository : IGroceryItemRepository, IDisposable
         }
         var sortedPriceLogs = groceryItem.PriceHistory.OrderByDescending(pl => pl.LogDate).ToList();
         groceryItem.PriceHistory = sortedPriceLogs;
-        await _collection.UpdateOneAsync(
+        await _groceryItemCollection.UpdateOneAsync(
             g => g.Id == groceryItem.Id,
             Builders<GroceryItem>.Update
                 .Set(n => n.Name, groceryItem.Name)
@@ -79,7 +79,7 @@ public class GroceryItemRepository : IGroceryItemRepository, IDisposable
 
     public async Task DeleteGroceryItem(string groceryId)
     {
-        await _collection.DeleteOneAsync(groceryItem => groceryItem.Id == groceryId);
+        await _groceryItemCollection.DeleteOneAsync(groceryItem => groceryItem.Id == groceryId);
     }
 
     public void Dispose()
