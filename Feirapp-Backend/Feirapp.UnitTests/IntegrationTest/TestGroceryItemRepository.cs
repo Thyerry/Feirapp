@@ -1,4 +1,5 @@
-﻿using Feirapp.DAL.DataContext;
+﻿using Faker;
+using Feirapp.DAL.DataContext;
 using Feirapp.DAL.Repositories;
 using Feirapp.Domain.Models;
 using Feirapp.UnitTests.Fixtures;
@@ -26,7 +27,10 @@ public class TestGroceryItemRepository : IDisposable
     {
         //Arrange
         var _repository = new GroceryItemRepository(_context);
-        var expected = new GroceryItem();
+        var expected = new GroceryItem()
+        {
+            Name = Name.FullName(),
+        };
 
         //Act
         var actual = await _repository.CreateGroceryItem(expected);
@@ -34,6 +38,7 @@ public class TestGroceryItemRepository : IDisposable
         //Assert
         actual.Should().BeEquivalentTo(expected);
     }
+
     public void Dispose()
     {
         _docker.Dispose();
