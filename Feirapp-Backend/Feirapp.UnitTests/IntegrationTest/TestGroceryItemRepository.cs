@@ -1,7 +1,5 @@
-﻿using Faker;
-using Feirapp.DAL.DataContext;
+﻿using Feirapp.DAL.DataContext;
 using Feirapp.DAL.Repositories;
-using Feirapp.Domain.Models;
 using Feirapp.UnitTests.Fixtures;
 using FluentAssertions;
 using System;
@@ -21,16 +19,12 @@ public class TestGroceryItemRepository : IDisposable
         _docker = new DockerComposeTestBase();
     }
 
-
     [Fact]
     public async Task NewGroceryItem_InsertItOnDatabase_ShouldBeInsertedOnDatabase()
     {
         //Arrange
         var _repository = new GroceryItemRepository(_context);
-        var expected = new GroceryItem()
-        {
-            Name = Name.FullName(),
-        };
+        var expected = GroceryItemFixture.CreateRandomGroceryItem();
 
         //Act
         var actual = await _repository.CreateGroceryItem(expected);
