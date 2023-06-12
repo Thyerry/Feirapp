@@ -92,13 +92,12 @@ public class GroceryItemFixture
 
     public static GroceryItem CreateRandomGroceryItem()
     {
-        var dataSets = new MockDataSets();
         var fakePriceLog = new Faker<PriceLog>()
             .RuleFor(pl => pl.Price, f => f.Random.Float() * 100)
             .RuleFor(pl => pl.LogDate, f =>
             {
                 var date = f.Date.Past();
-                return new DateTime(date.Year, date.Month, date.Day);
+                return new DateTime(date.Year, date.Month, date.Day).ToUniversalTime();
             });
 
         var fakeGroceryItem = new Faker<GroceryItem>()
@@ -107,14 +106,13 @@ public class GroceryItemFixture
             .RuleFor(gi => gi.GroceryCategory, f => f.PickRandom<GroceryCategoryEnum>())
             .RuleFor(gi => gi.BrandName, f => f.Company.CompanyName())
             .RuleFor(gi => gi.GroceryStoreName, f => f.Company.CompanyName())
+            .RuleFor(gi => gi.GroceryImageUrl, f => f.Internet.Avatar())
+            .RuleFor(gi => gi.PriceHistory, f => fakePriceLog.Generate(3).ToList())
             .RuleFor(gi => gi.PurchaseDate, f =>
             {
-                var date = f.Date.Past();
-                return new DateTime(date.Year, date.Month, date.Day);
-            })
-            .RuleFor(gi => gi.GroceryImageUrl, f => f.Internet.Avatar())
-            .RuleFor(gi => gi.PriceHistory, f => fakePriceLog.Generate(3).ToList());
-            
+                var date = f.Date.PastDateOnly();
+                return new DateTime(date.Year, date.Month, date.Day).ToUniversalTime();
+            });
 
         return fakeGroceryItem.Generate();
     }
