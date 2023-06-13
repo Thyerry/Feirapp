@@ -3,7 +3,6 @@ using Feirapp.DAL.DataContext;
 using Feirapp.DAL.Repositories;
 using Feirapp.Domain.Contracts;
 using Feirapp.Service.Services;
-using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,16 +24,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
 {
     app.UseCors(x => x
         .AllowAnyOrigin()
         .AllowAnyMethod()
         .AllowAnyHeader());
-    
+
     // global exception handler
     app.UseMiddleware<ExceptionHandlerMiddleware>();
-    
+
     app.UseHttpsRedirection();
 
     //app.UseAuthorization();
@@ -43,7 +41,6 @@ if (app.Environment.IsDevelopment())
 
     app.Run();
 }
-
 
 void ConfigurationAndServices(IServiceCollection services, IConfiguration configuration)
 {

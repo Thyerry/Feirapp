@@ -12,11 +12,10 @@ public enum GroceryCategoryEnum
     CLEANING_SUPPLIES,
     PERSONAL_HYGIENE,
     FISH_SHOP,
-    HORTIFRUTI, 
+    HORTIFRUTI,
     BAKERY,
     PASTA,
     LUNCH,
     CONDIMENTS,
     MISCELLANEOUS,
-    
 }

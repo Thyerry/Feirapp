@@ -116,4 +116,31 @@ public class GroceryItemFixture
 
         return fakeGroceryItem.Generate();
     }
+
+    public static List<GroceryItem> CreateListGroceryItem(int howMany = 1)
+    {
+        var fakePriceLog = new Faker<PriceLog>()
+            .RuleFor(pl => pl.Price, f => f.Random.Float() * 100)
+            .RuleFor(pl => pl.LogDate, f =>
+            {
+                var date = f.Date.Past();
+                return new DateTime(date.Year, date.Month, date.Day).ToUniversalTime();
+            });
+
+        var fakeGroceryItem = new Faker<GroceryItem>()
+            .RuleFor(gi => gi.Name, f => f.Commerce.ProductName())
+            .RuleFor(gi => gi.Price, f => f.Random.Float() * 100)
+            .RuleFor(gi => gi.GroceryCategory, f => f.PickRandom<GroceryCategoryEnum>())
+            .RuleFor(gi => gi.BrandName, f => f.Company.CompanyName())
+            .RuleFor(gi => gi.GroceryStoreName, f => f.Company.CompanyName())
+            .RuleFor(gi => gi.GroceryImageUrl, f => f.Internet.Avatar())
+            .RuleFor(gi => gi.PriceHistory, f => fakePriceLog.Generate(3).ToList())
+            .RuleFor(gi => gi.PurchaseDate, f =>
+            {
+                var date = f.Date.PastDateOnly();
+                return new DateTime(date.Year, date.Month, date.Day).ToUniversalTime();
+            });
+
+        return fakeGroceryItem.Generate(howMany);
+    }
 }

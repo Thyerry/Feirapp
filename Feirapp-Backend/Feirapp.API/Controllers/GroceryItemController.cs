@@ -25,7 +25,7 @@ public class GroceryItemController : ControllerBase
             return NotFound();
         return Ok(groceryItems);
     }
-    
+
     [HttpGet("Random/{quantity:int}")]
     [ProducesResponseType(typeof(List<GroceryItem>), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
@@ -40,13 +40,13 @@ public class GroceryItemController : ControllerBase
     [HttpGet("Name/{groceryItemName}", Name = "GetGroceryItemsByName")]
     [ProducesResponseType(typeof(List<GroceryItem>), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
-    public async Task<IActionResult> GetGroceryItemsByName([FromRoute]string groceryItemName)
+    public async Task<IActionResult> GetGroceryItemsByName([FromRoute] string groceryItemName)
     {
         var groceryItems = await _service.GetGroceryItemByName(groceryItemName);
-        if(!groceryItems.Any())
+        if (!groceryItems.Any())
             return NotFound();
         return Ok(groceryItems);
-     }
+    }
 
     [HttpPost(Name = "CreateGroceryItem")]
     [ProducesResponseType(typeof(GroceryItem), 201)]
@@ -62,7 +62,7 @@ public class GroceryItemController : ControllerBase
     public async Task<IActionResult> GetGroceryItemById(string groceryId)
     {
         var result = await _service.GetGroceryItemById(groceryId);
-        if(result == null!)
+        if (result == null!)
             return NotFound();
         return Ok(result);
     }
@@ -86,5 +86,4 @@ public class GroceryItemController : ControllerBase
         await _service.DeleteGroceryItem(groceryId);
         return Ok();
     }
-
 }

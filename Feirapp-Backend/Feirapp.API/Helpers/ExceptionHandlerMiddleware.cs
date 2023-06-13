@@ -1,6 +1,6 @@
-using System.Net;
 using FluentValidation;
 using Newtonsoft.Json;
+using System.Net;
 
 namespace Feirapp.API.Helpers;
 
@@ -31,6 +31,7 @@ public class ExceptionHandlerMiddleware
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     result = JsonConvert.SerializeObject(e.Errors);
                     break;
+
                 default:
                     response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     result = JsonConvert.SerializeObject(new { message = exception.Message });

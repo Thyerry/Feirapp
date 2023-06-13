@@ -1,11 +1,11 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Feirapp.Domain.Contracts;
 using Feirapp.Domain.Models;
 using Feirapp.Service.Services;
 using Feirapp.UnitTests.Fixtures;
 using FluentAssertions;
 using Moq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Feirapp.UnitTests.Layers.Services;

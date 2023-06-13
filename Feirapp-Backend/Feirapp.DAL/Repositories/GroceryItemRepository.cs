@@ -8,6 +8,7 @@ namespace Feirapp.DAL.Repositories;
 public class GroceryItemRepository : IGroceryItemRepository, IDisposable
 {
     private readonly IMongoCollection<GroceryItem> _groceryItemCollection;
+
     public GroceryItemRepository(IMongoFeirappContext context)
     {
         _groceryItemCollection = context.GetCollection<GroceryItem>(nameof(GroceryItem));
@@ -22,7 +23,7 @@ public class GroceryItemRepository : IGroceryItemRepository, IDisposable
     public async Task<List<GroceryItem>> GetRandomGroceryItems(int quantity)
     {
         var result = await _groceryItemCollection.AggregateAsync(PipelineDefinition<GroceryItem, GroceryItem>.Create($@"
-        {{ 
+        {{
             $sample: {{ size: {quantity} }}
         }}
         "));
@@ -55,8 +56,8 @@ public class GroceryItemRepository : IGroceryItemRepository, IDisposable
         if (groceryItem.PurchaseDate != groceryItemToUpdate.PurchaseDate)
         {
             if (groceryItem.PriceHistory.FirstOrDefault().Price == 0.0)
-                groceryItem.PriceHistory = new List<PriceLog>(){ new() { Price = groceryItem.Price, LogDate = groceryItem.PurchaseDate } };
-            else 
+                groceryItem.PriceHistory = new List<PriceLog>() { new() { Price = groceryItem.Price, LogDate = groceryItem.PurchaseDate } };
+            else
                 groceryItem.PriceHistory.Add(new PriceLog() { Price = groceryItem.Price, LogDate = groceryItem.PurchaseDate });
         }
         var sortedPriceLogs = groceryItem.PriceHistory.OrderByDescending(pl => pl.LogDate).ToList();
@@ -72,7 +73,7 @@ public class GroceryItemRepository : IGroceryItemRepository, IDisposable
                 .Set(n => n.GroceryImageUrl, groceryItem.GroceryImageUrl)
                 .Set(n => n.GroceryStoreName, groceryItem.GroceryStoreName)
                 .Set(n => n.PriceHistory, groceryItem.PriceHistory),
-            new UpdateOptions { IsUpsert = false } );
+            new UpdateOptions { IsUpsert = false });
 
         return groceryItem;
     }
@@ -82,8 +83,12 @@ public class GroceryItemRepository : IGroceryItemRepository, IDisposable
         await _groceryItemCollection.DeleteOneAsync(groceryItem => groceryItem.Id == groceryId);
     }
 
+    public async Task CreateGroceryItemBatch(List<GroceryItem> groceryItems)
+    {
+        await _groceryItemCollection.InsertManyAsync(groceryItems);
+    }
+
     public void Dispose()
     {
-        throw new NotImplementedException();
     }
 }

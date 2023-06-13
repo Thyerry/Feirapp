@@ -1,6 +1,8 @@
 ﻿using Feirapp.DAL.DataContext;
 using Feirapp.DAL.Repositories;
+using Feirapp.Domain.Models;
 using Feirapp.UnitTests.Fixtures;
+using Feirapp.UnitTests.Helpers;
 using FluentAssertions;
 using System;
 using System.Threading.Tasks;
@@ -8,15 +10,15 @@ using Xunit;
 
 namespace Feirapp.UnitTests.IntegrationTest;
 
+[Collection("Database Integration Test")]
 public class TestGroceryItemRepository : IDisposable
 {
     private readonly IMongoFeirappContext _context;
-    private readonly DockerComposeTestBase _docker;
+    private const int GROCERY_ITEMS_COUNT = 5;
 
     public TestGroceryItemRepository()
     {
-        _context = new MongoDbFixture().Context;
-        _docker = new DockerComposeTestBase();
+        _context ??= new MongoDbContextMock().Context;
     }
 
     [Fact]
@@ -33,8 +35,38 @@ public class TestGroceryItemRepository : IDisposable
         actual.Should().BeEquivalentTo(expected);
     }
 
+    [Fact]
+    public async Task CreateGroceryItemBatch_ValidBatch_ShouldInsertAllGroceryItems()
+    {
+        //Arrange
+        var _repository = new GroceryItemRepository(_context);
+        var groceryItems = GroceryItemFixture.CreateListGroceryItem(GROCERY_ITEMS_COUNT);
+
+        //Act
+        await _repository.CreateGroceryItemBatch(groceryItems);
+
+        //Assert
+        var actual = await _repository.GetAllGroceryItems();
+        actual.Count.Should().Be(GROCERY_ITEMS_COUNT);
+    }
+
+    [Fact]
+    public async Task GetAllGroceryItems_IntegrationTest()
+    {
+        //Arrange
+        var _repository = new GroceryItemRepository(_context);
+        var groceryItems = GroceryItemFixture.CreateListGroceryItem(GROCERY_ITEMS_COUNT);
+        await _repository.CreateGroceryItemBatch(groceryItems);
+
+        //Act
+        var actual = await _repository.GetAllGroceryItems();
+
+        //Assert
+        actual.Count.Should().Be(groceryItems.Count);
+    }
+
     public void Dispose()
     {
-        _docker.Dispose();
+        _context.DropCollection(nameof(GroceryItem));
     }
 }

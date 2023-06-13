@@ -1,10 +1,9 @@
 ﻿using Ductus.FluentDocker.Builders;
 using Ductus.FluentDocker.Services;
-using Microsoft.Extensions.Options;
 using System;
 using System.Diagnostics;
 
-namespace Feirapp.UnitTests.Fixtures;
+namespace Feirapp.UnitTests.Helpers;
 
 public class DockerComposeTestBase : IDisposable
 {
@@ -45,15 +44,5 @@ public class DockerComposeTestBase : IDisposable
         ");
 
         _container.Dispose();
-    }
-}
-
-public class OptionsConfigurationMock<T> : IOptions<T> where T : class
-{
-    public T Value { get; }
-
-    public OptionsConfigurationMock(T value)
-    {
-        Value = value;
     }
 }
