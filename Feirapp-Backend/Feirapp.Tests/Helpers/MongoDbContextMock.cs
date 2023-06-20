@@ -1,6 +1,6 @@
 ﻿using Feirapp.DAL.DataContext;
 
-namespace Feirapp.UnitTests.Helpers;
+namespace Feirapp.Tests.Helpers;
 
 public class MongoDbContextMock
 {

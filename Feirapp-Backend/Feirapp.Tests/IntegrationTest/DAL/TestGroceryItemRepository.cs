@@ -1,14 +1,14 @@
 ﻿using Feirapp.DAL.DataContext;
 using Feirapp.DAL.Repositories;
 using Feirapp.Domain.Models;
-using Feirapp.UnitTests.Fixtures;
-using Feirapp.UnitTests.Helpers;
+using Feirapp.Tests.Fixtures;
+using Feirapp.Tests.Helpers;
 using FluentAssertions;
 using System;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Feirapp.UnitTests.IntegrationTest;
+namespace Feirapp.Tests.IntegrationTest;
 
 [Collection("Database Integration Test")]
 public class TestGroceryItemRepository : IDisposable
@@ -62,7 +62,7 @@ public class TestGroceryItemRepository : IDisposable
         var actual = await _repository.GetAllGroceryItems();
 
         //Assert
-        actual.Count.Should().Be(groceryItems.Count);
+        actual.Count.Should().Be(GROCERY_ITEMS_COUNT);
     }
 
     public void Dispose()

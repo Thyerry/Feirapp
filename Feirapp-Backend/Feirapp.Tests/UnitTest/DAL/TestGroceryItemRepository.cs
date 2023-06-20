@@ -1,7 +1,7 @@
 using Feirapp.DAL.DataContext;
 using Feirapp.DAL.Repositories;
 using Feirapp.Domain.Models;
-using Feirapp.UnitTests.Fixtures;
+using Feirapp.Tests.Fixtures;
 using FluentAssertions;
 using MongoDB.Driver;
 using Moq;
@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Feirapp.UnitTests.Layers.DAL;
+namespace Feirapp.Tests.UnitTest.DAL;
 
 public class TestGroceryItemRepository
 {

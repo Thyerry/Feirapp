@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 
-namespace Feirapp.UnitTests.Helpers
+namespace Feirapp.Tests.Helpers
 {
     public class OptionsConfigurationMock<T> : IOptions<T> where T : class
     {

@@ -1,7 +1,7 @@
 using Feirapp.Domain.Contracts;
 using Feirapp.Domain.Models;
 using Feirapp.Service.Services;
-using Feirapp.UnitTests.Fixtures;
+using Feirapp.Tests.Fixtures;
 using FluentAssertions;
 using FluentValidation;
 using Moq;
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Feirapp.UnitTests.Layers.Service;
+namespace Feirapp.Tests.UnitTest.Service;
 
 public class TestGroceryItemService
 {

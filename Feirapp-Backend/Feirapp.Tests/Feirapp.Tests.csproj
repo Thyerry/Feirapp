@@ -36,4 +36,8 @@
         <ProjectReference Include="..\Feirapp.DAL\Feirapp.DAL.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="IntegrationTest\DAL\" />
+    </ItemGroup>
+
 </Project>

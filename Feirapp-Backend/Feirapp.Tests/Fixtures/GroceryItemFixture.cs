@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Feirapp.UnitTests.Fixtures;
+namespace Feirapp.Tests.Fixtures;
 
 public class GroceryItemFixture
 {

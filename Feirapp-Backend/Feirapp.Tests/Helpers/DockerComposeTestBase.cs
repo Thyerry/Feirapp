@@ -3,7 +3,7 @@ using Ductus.FluentDocker.Services;
 using System;
 using System.Diagnostics;
 
-namespace Feirapp.UnitTests.Helpers;
+namespace Feirapp.Tests.Helpers;
 
 public class DockerComposeTestBase : IDisposable
 {

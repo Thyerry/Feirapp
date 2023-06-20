@@ -1,7 +1,7 @@
 using Feirapp.API.Controllers;
 using Feirapp.Domain.Contracts;
 using Feirapp.Domain.Models;
-using Feirapp.UnitTests.Fixtures;
+using Feirapp.Tests.Fixtures;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -10,7 +10,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Feirapp.UnitTests.Layers.API;
+namespace Feirapp.Tests.UnitTest.API;
 
 public class TestGroceryItemController
 {

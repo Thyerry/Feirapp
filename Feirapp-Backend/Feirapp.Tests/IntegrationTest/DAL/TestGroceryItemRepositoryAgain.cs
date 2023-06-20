@@ -1,14 +1,14 @@
 ﻿using Feirapp.DAL.DataContext;
 using Feirapp.DAL.Repositories;
 using Feirapp.Domain.Models;
-using Feirapp.UnitTests.Fixtures;
-using Feirapp.UnitTests.Helpers;
+using Feirapp.Tests.Fixtures;
+using Feirapp.Tests.Helpers;
 using FluentAssertions;
 using System;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Feirapp.UnitTests.IntegrationTest;
+namespace Feirapp.Tests.IntegrationTest;
 
 [Collection("Database Integration Test")]
 public class TestGroceryItemRepositoryAgain : IDisposable
