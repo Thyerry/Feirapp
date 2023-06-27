@@ -1,16 +1,21 @@
 ﻿using Ductus.FluentDocker.Builders;
 using Ductus.FluentDocker.Services;
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Feirapp.Tests.Helpers;
 
 public class DockerComposeTestBase : IDisposable
 {
     private readonly IContainerService _container;
+    private readonly IList<IVolumeService>? _volumes;
 
     public DockerComposeTestBase()
     {
+        var hosts = new Hosts().Discover();
+        _volumes = hosts.FirstOrDefault()!.GetVolumes();
+
         _container = new Builder()
             .UseContainer()
             .UseImage("mongo:latest")
@@ -24,25 +29,10 @@ public class DockerComposeTestBase : IDisposable
 
     public void Dispose()
     {
-        Debug.WriteLine("YEAH, I'M THINKING I'M DISPOSED 😡");
-        Debug.Write(@"
-        ⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⢀⣴⣾⣿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⢀⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⠀⠀⠀⠀
-        ⠀⠀⢀⣾⣿⣿⣿⣿⡿⠿⠿⣿⣿⠿⠿⢿⣿⣿⣿⣿⣧⡀⠀⠀
-        ⠀⠀⣾⣿⣿⣿⣿⠏⠀⠀⠀⠈⠁⠀⠀⠀⠹⣿⣿⣿⣿⣧⠀⠀
-        ⠀⣸⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣿⣿⣿⣿⡆⠀
-        ⠀⣿⣿⣿⣿⣿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⣿⣿⠀
-        ⢠⣿⣿⣿⣿⡇⠈⠛⣿⡟⠀⠀⠀⠀⢻⣿⠛⠁⢸⣿⣿⣿⣿⡀
-        ⢸⣿⣿⣿⣿⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⣿⣿⣿⣿⡇
-        ⠸⣿⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⣿⣿⣿⣿⠁
-        ⠀⣿⣿⣿⣿⣿⣿⠀⢠⣶⣿⣿⣿⣿⣶⡄⠀⣿⣿⣿⣿⣿⣿⠀
-        ⠀⠘⣿⣿⣿⣿⣿⡄⢸⡟⠋⠉⠉⠙⢻⡇⢠⣿⣿⣿⣿⣿⠃⠀
-        ⠀⠀⠈⠛⠿⣿⣿⣿⣾⣇⢀⣿⣿⡀⣸⣷⣿⣿⣿⠿⠛⠁⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠙⢿⣿⣿⣿⣿⣿⣿⡿⠋⠀⠀⠀⠀⠀⠀⠀
-        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠛⠛⠋⠉
-        ");
-
         _container.Dispose();
+        foreach (var volumeService in _container.GetVolumes())
+        {
+            volumeService.Remove();
+        }
     }
 }

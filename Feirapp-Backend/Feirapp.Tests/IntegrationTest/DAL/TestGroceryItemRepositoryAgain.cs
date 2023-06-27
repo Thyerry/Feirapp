@@ -13,9 +13,8 @@ namespace Feirapp.Tests.IntegrationTest;
 [Collection("Database Integration Test")]
 public class TestGroceryItemRepositoryAgain : IDisposable
 {
+    private const string NewGroceryItemName = "NEW_GROCERY_ITEM_NAME";
     private readonly IMongoFeirappContext _context;
-
-    private const string NEW_GROCERY_ITEM_NAME = "New Name";
 
     public TestGroceryItemRepositoryAgain(DockerComposeTestBase docker)
     {
@@ -26,15 +25,15 @@ public class TestGroceryItemRepositoryAgain : IDisposable
     public async Task OneMoreTestJustToKnowWhatHappensIfIRunTwoTestClassesWithTheSameDockerComposeSource()
     {
         //Arrange
-        var _repository = new GroceryItemRepository(_context);
+        var repository = new GroceryItemRepository(_context);
         var groceryItem = GroceryItemFixture.CreateRandomGroceryItem();
-        await _repository.CreateGroceryItem(groceryItem);
-        groceryItem.Name = NEW_GROCERY_ITEM_NAME;
+        await repository.CreateGroceryItem(groceryItem);
+        groceryItem.Name = NewGroceryItemName;
         //Act
-        await _repository.UpdateGroceryItem(groceryItem);
+        await repository.UpdateGroceryItem(groceryItem);
         //Assert
-        var actual = await _repository.GetGroceryItemById(groceryItem.Id);
-        actual.Name.Should().Be(NEW_GROCERY_ITEM_NAME);
+        var actual = await repository.GetGroceryItemById(groceryItem.Id!);
+        actual.Name.Should().Be(NewGroceryItemName);
     }
 
     public void Dispose()
