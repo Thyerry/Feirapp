@@ -1,6 +1,7 @@
 using Feirapp.Domain.Contracts.Repository;
 using Feirapp.Domain.Models;
-using Feirapp.Service.Services;
+using Feirapp.Domain.Services;
+using Feirapp.Entities;
 using Feirapp.Tests.Fixtures;
 using FluentAssertions;
 using FluentValidation;
@@ -8,7 +9,6 @@ using Moq;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Feirapp.Entities;
 using Xunit;
 
 namespace Feirapp.Tests.UnitTest.Service;
@@ -23,7 +23,7 @@ public class TestGroceryItemService
             // Arrange
             var mockGroceryItemRepository = new Mock<IGroceryItemRepository>();
             mockGroceryItemRepository
-                .Setup(repository => repository.GetAllGroceryItems())
+                .Setup(repository => repository.GetAllAsync())
                 .ReturnsAsync(new List<GroceryItem>());
             var sut = new GroceryItemService(mockGroceryItemRepository.Object);
 
@@ -40,7 +40,7 @@ public class TestGroceryItemService
             // Arrange
             var mockGroceryItemRepository = new Mock<IGroceryItemRepository>();
             mockGroceryItemRepository
-                .Setup(repository => repository.GetAllGroceryItems())
+                .Setup(repository => repository.GetAllAsync())
                 .ReturnsAsync(new List<GroceryItem>());
             var sut = new GroceryItemService(mockGroceryItemRepository.Object);
 
@@ -49,7 +49,7 @@ public class TestGroceryItemService
 
             // Assert
             mockGroceryItemRepository.Verify(
-                repository => repository.GetAllGroceryItems(),
+                repository => repository.GetAllAsync(),
                 Times.Once
             );
         }
@@ -100,7 +100,7 @@ public class TestGroceryItemService
             // Arrange
             var mockRepository = new Mock<IGroceryItemRepository>();
             mockRepository
-                .Setup(repo => repo.GetGroceryItemById(It.IsAny<string>()))
+                .Setup(repo => repo.GetByIdAsync(It.IsAny<string>()))
                 .ReturnsAsync(new GroceryItem());
             var sut = new GroceryItemService(mockRepository.Object);
 
@@ -117,7 +117,7 @@ public class TestGroceryItemService
             // Arrange
             var mockRepository = new Mock<IGroceryItemRepository>();
             mockRepository
-                .Setup(repo => repo.GetGroceryItemById(It.IsAny<string>()))
+                .Setup(repo => repo.GetByIdAsync(It.IsAny<string>()))
                 .ReturnsAsync(new GroceryItem());
             var sut = new GroceryItemService(mockRepository.Object);
 
@@ -125,7 +125,7 @@ public class TestGroceryItemService
             await sut.GetGroceryItemById(string.Empty);
 
             // Assert
-            mockRepository.Verify(repo => repo.GetGroceryItemById(It.IsAny<string>()), Times.Once);
+            mockRepository.Verify(repo => repo.GetByIdAsync(It.IsAny<string>()), Times.Once);
         }
     }
 
@@ -137,7 +137,7 @@ public class TestGroceryItemService
             // Arrange
             var mockRepository = new Mock<IGroceryItemRepository>();
             mockRepository
-                .Setup(repo => repo.CreateGroceryItem(It.IsAny<GroceryItem>()))
+                .Setup(repo => repo.InsertAsync(It.IsAny<GroceryItem>()))
                 .ReturnsAsync(new GroceryItem());
             var sut = new GroceryItemService(mockRepository.Object);
             var groceryItem = GroceryItemFixture.GetGroceryItems().FirstOrDefault();
@@ -155,7 +155,7 @@ public class TestGroceryItemService
             // Arrange
             var mockRepository = new Mock<IGroceryItemRepository>();
             mockRepository
-                .Setup(repo => repo.CreateGroceryItem(It.IsAny<GroceryItem>()))
+                .Setup(repo => repo.InsertAsync(It.IsAny<GroceryItem>()))
                 .ReturnsAsync(new GroceryItem());
             var sut = new GroceryItemService(mockRepository.Object);
             var groceryItem = GroceryItemFixture.GetGroceryItems().FirstOrDefault();
@@ -163,7 +163,7 @@ public class TestGroceryItemService
             await sut.CreateGroceryItem(groceryItem!);
 
             // Assert
-            mockRepository.Verify(repo => repo.CreateGroceryItem(It.IsAny<GroceryItem>()), Times.Once);
+            mockRepository.Verify(repo => repo.InsertAsync(It.IsAny<GroceryItem>()), Times.Once);
         }
 
         [Fact]
@@ -172,7 +172,7 @@ public class TestGroceryItemService
             // Arrange
             var mockRepository = new Mock<IGroceryItemRepository>();
             mockRepository
-                .Setup(repo => repo.CreateGroceryItem(It.IsAny<GroceryItem>()))
+                .Setup(repo => repo.InsertAsync(It.IsAny<GroceryItem>()))
                 .ReturnsAsync(new GroceryItem());
             var sut = new GroceryItemService(mockRepository.Object);
 
@@ -184,42 +184,20 @@ public class TestGroceryItemService
     public class TestUpdateGroceryItem
     {
         [Fact]
-        public async Task OnValidGroceryItem_ReturnUpdatedGroceryItem()
-        {
-            // Arrange
-            var groceryItemModel = GroceryItemFixture.GetGroceryItems().FirstOrDefault()!;
-            var groceryItem = GroceryItemFixture.CreateRandomGroceryItem();
-
-            var mockRepository = new Mock<IGroceryItemRepository>();
-            mockRepository
-                .Setup(repo => repo.UpdateGroceryItem(It.IsAny<GroceryItem>()))
-                .ReturnsAsync(groceryItem);
-            var sut = new GroceryItemService(mockRepository.Object);
-
-            // Act
-            var result = await sut.UpdateGroceryItem(groceryItemModel);
-
-            // Assert
-            result.Should().BeOfType<GroceryItemModel>();
-        }
-
-        [Fact]
         public async Task OnValidGroceryItem_InvokeGroceryItemRepository()
         {
             // Arrange
             var groceryItemModel = GroceryItemFixture.GetGroceryItems().FirstOrDefault()!;
-            var groceryItem = GroceryItemFixture.CreateRandomGroceryItem();
             var mockRepository = new Mock<IGroceryItemRepository>();
             mockRepository
-                .Setup(repo => repo.UpdateGroceryItem(It.IsAny<GroceryItem>()))
-                .ReturnsAsync(groceryItem);
+                .Setup(repo => repo.UpdateAsync(It.IsAny<GroceryItem>()));
             var sut = new GroceryItemService(mockRepository.Object);
 
             // Act
             await sut.UpdateGroceryItem(groceryItemModel);
 
             // Assert
-            mockRepository.Verify(repo => repo.UpdateGroceryItem(It.IsAny<GroceryItem>()), Times.Once);
+            mockRepository.Verify(repo => repo.UpdateAsync(It.IsAny<GroceryItem>()), Times.Once);
         }
 
         [Fact]
@@ -247,7 +225,7 @@ public class TestGroceryItemService
             await sut.DeleteGroceryItem(string.Empty);
 
             // Arrange
-            mockRepository.Verify(repo => repo.DeleteGroceryItem(It.IsAny<string>()), Times.Once);
+            mockRepository.Verify(repo => repo.DeleteAsync(It.IsAny<string>()), Times.Once);
         }
     }
 }

@@ -4,15 +4,17 @@ namespace Feirapp.Domain.Contracts.Repository;
 
 public interface IGroceryItemRepository
 {
-    Task<List<GroceryItem>> GetAllGroceryItems();
+    Task<GroceryItem> GetByIdAsync(string id);
+
+    Task<List<GroceryItem>> GetAllAsync();
 
     Task<List<GroceryItem>> GetRandomGroceryItems(int quantity);
 
-    Task<GroceryItem> CreateGroceryItem(GroceryItem groceryItem);
+    Task<GroceryItem> InsertAsync(GroceryItem groceryItem);
 
-    Task<GroceryItem> GetGroceryItemById(string groceryId);
+    Task<List<GroceryItem>> InsertGroceryItemBatch(List<GroceryItem> groceryItems);
 
-    Task<GroceryItem> UpdateGroceryItem(GroceryItem groceryItem);
+    Task UpdateAsync(GroceryItem groceryItem);
 
-    Task DeleteGroceryItem(string groceryId);
+    Task DeleteAsync(string id);
 }

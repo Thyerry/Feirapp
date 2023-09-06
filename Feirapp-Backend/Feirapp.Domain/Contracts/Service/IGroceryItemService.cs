@@ -1,4 +1,6 @@
+using Feirapp.Domain.Contracts.Repository;
 using Feirapp.Domain.Models;
+using Feirapp.Entities;
 
 namespace Feirapp.Domain.Contracts.Service;
 
@@ -12,7 +14,7 @@ public interface IGroceryItemService
 
     Task<GroceryItemModel> CreateGroceryItem(GroceryItemModel groceryItem);
 
-    Task<GroceryItemModel> UpdateGroceryItem(GroceryItemModel groceryItem);
+    Task UpdateGroceryItem(GroceryItemModel groceryItem);
 
     Task DeleteGroceryItem(string groceryId);
 }

@@ -7,6 +7,7 @@ public class GroceryItemModel
     public string? Id { get; set; }
     public string? Name { get; set; }
     public decimal? Price { get; set; }
+    public string? CEAN { get; set; }
     public GroceryCategoryModel? Category { get; set; }
     public string? Brand { get; set; }
     public string? GroceryStore { get; set; }

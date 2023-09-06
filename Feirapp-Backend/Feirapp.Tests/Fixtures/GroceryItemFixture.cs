@@ -1,11 +1,9 @@
 using Bogus;
 using Feirapp.Domain.Models;
+using Feirapp.Entities;
 using MongoDB.Bson;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Feirapp.Entities;
-using Feirapp.Entities.Enums;
 
 namespace Feirapp.Tests.Fixtures;
 
@@ -60,7 +58,6 @@ public class GroceryItemFixture
                 Id = new ObjectId().ToString(),
                 PurchaseDate = DateTime.Now,
                 GroceryStore = "Store 1",
-                PriceHistory = new List<PriceLog>(){new (){ Price= 1.1m, LogDate = DateTime.Now}}
             },
             new()
             {
@@ -70,7 +67,6 @@ public class GroceryItemFixture
                 Id = new ObjectId().ToString(),
                 PurchaseDate = DateTime.Now,
                 GroceryStore = "Store 2",
-                PriceHistory = new List<PriceLog>(){new (){ Price= 2.2m, LogDate = DateTime.Now}}
             },
             new()
             {
@@ -80,7 +76,6 @@ public class GroceryItemFixture
                 Id = new ObjectId().ToString(),
                 PurchaseDate = DateTime.Now,
                 GroceryStore = "Store 3",
-                PriceHistory = new List<PriceLog>(){new (){ Price= 3.3m, LogDate = DateTime.Now}}
             }
         };
     }
@@ -101,7 +96,6 @@ public class GroceryItemFixture
             .RuleFor(gi => gi.Brand, f => f.Company.CompanyName())
             .RuleFor(gi => gi.GroceryStore, f => f.Company.CompanyName())
             .RuleFor(gi => gi.ImageUrl, f => f.Internet.Avatar())
-            .RuleFor(gi => gi.PriceHistory, f => fakePriceLog.Generate(3).ToList())
             .RuleFor(gi => gi.PurchaseDate, f =>
             {
                 var date = f.Date.PastDateOnly();
@@ -127,7 +121,6 @@ public class GroceryItemFixture
             .RuleFor(gi => gi.Brand, f => f.Company.CompanyName())
             .RuleFor(gi => gi.GroceryStore, f => f.Company.CompanyName())
             .RuleFor(gi => gi.ImageUrl, f => f.Internet.Avatar())
-            .RuleFor(gi => gi.PriceHistory, f => fakePriceLog.Generate(3).ToList())
             .RuleFor(gi => gi.PurchaseDate, f =>
             {
                 var date = f.Date.PastDateOnly();

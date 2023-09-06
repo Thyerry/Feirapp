@@ -11,8 +11,8 @@ public class GroceryItem : BaseEntity
     [BsonElement("Price")]
     public decimal? Price { get; set; }
 
-    [BsonElement("Category")]
-    public GroceryCategory? Category { get; set; }
+    [BsonElement("CEAN")]
+    public string? CEAN { get; set; }
 
     [BsonElement("Brand")]
     public string? Brand { get; set; }
@@ -28,7 +28,4 @@ public class GroceryItem : BaseEntity
 
     [BsonElement("ImageUrl")]
     public string? ImageUrl { get; set; }
-
-    [BsonElement("PriceHistory")]
-    public List<PriceLog>? PriceHistory { get; set; }
 }

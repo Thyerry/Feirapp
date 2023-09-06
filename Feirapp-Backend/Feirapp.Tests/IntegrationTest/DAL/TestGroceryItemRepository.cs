@@ -16,7 +16,7 @@ namespace Feirapp.Tests.IntegrationTest;
 public class TestGroceryItemRepository : IDisposable
 {
     private readonly IMongoFeirappContext _context;
-    private const int GROCERY_ITEMS_COUNT = 5;
+    private const int GroceryItemsCount = 5;
 
     public TestGroceryItemRepository()
     {
@@ -31,7 +31,7 @@ public class TestGroceryItemRepository : IDisposable
         var expected = GroceryItemFixture.CreateRandomGroceryItem();
 
         //Act
-        var actual = await _repository.CreateGroceryItem(new GroceryItem());
+        var actual = await _repository.InsertAsync(new GroceryItem());
 
         //Assert
         actual.Should().BeEquivalentTo(expected);
@@ -42,14 +42,14 @@ public class TestGroceryItemRepository : IDisposable
     {
         //Arrange
         var _repository = new GroceryItemRepository(_context);
-        var groceryItems = GroceryItemFixture.CreateListGroceryItem(GROCERY_ITEMS_COUNT);
+        var groceryItems = GroceryItemFixture.CreateListGroceryItem(GroceryItemsCount);
 
         //Act
-        await _repository.CreateGroceryItemBatch(new List<GroceryItem>());
+        await _repository.InsertGroceryItemBatch(new List<GroceryItem>());
 
         //Assert
-        var actual = await _repository.GetAllGroceryItems();
-        actual.Count.Should().Be(GROCERY_ITEMS_COUNT);
+        var actual = await _repository.GetAllAsync();
+        actual.Count.Should().Be(GroceryItemsCount);
     }
 
     [Fact(Skip = "Skipping this test due to an error on DockerComposeTestBase")]
@@ -57,14 +57,14 @@ public class TestGroceryItemRepository : IDisposable
     {
         //Arrange
         var _repository = new GroceryItemRepository(_context);
-        var groceryItems = GroceryItemFixture.CreateListGroceryItem(GROCERY_ITEMS_COUNT);
-        await _repository.CreateGroceryItemBatch(new List<GroceryItem>());
+        var groceryItems = GroceryItemFixture.CreateListGroceryItem(GroceryItemsCount);
+        await _repository.InsertGroceryItemBatch(new List<GroceryItem>());
 
         //Act
-        var actual = await _repository.GetAllGroceryItems();
+        var actual = await _repository.GetAllAsync();
 
         //Assert
-        actual.Count.Should().Be(GROCERY_ITEMS_COUNT);
+        actual.Count.Should().Be(GroceryItemsCount);
     }
 
     public void Dispose()

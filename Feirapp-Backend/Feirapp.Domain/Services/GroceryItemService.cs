@@ -6,7 +6,7 @@ using Feirapp.Domain.Validators.GroceryItemValidators;
 using Feirapp.Entities;
 using FluentValidation;
 
-namespace Feirapp.Service.Services;
+namespace Feirapp.Domain.Services;
 
 public class GroceryItemService : IGroceryItemService
 {
@@ -18,8 +18,8 @@ public class GroceryItemService : IGroceryItemService
     }
 
     public async Task<List<GroceryItemModel>> GetAllGroceryItems()
-    { 
-        return (await _repository.GetAllGroceryItems()).ToModelList();
+    {
+        return (await _repository.GetAllAsync()).ToModelList();
     }
 
     public async Task<List<GroceryItemModel>> GetRandomGroceryItems(int quantity)
@@ -33,51 +33,27 @@ public class GroceryItemService : IGroceryItemService
         var validationResult = await validator.ValidateAsync(groceryItem);
         if (validationResult.Errors.Count > 0)
             throw new ValidationException(validationResult.Errors);
-        groceryItem.PriceHistory = new List<PriceLogModel>
-        {
-            new()
-            {
-                Price = groceryItem.Price,
-                LogDate = groceryItem.PurchaseDate
-            }
-        };
-        return (await _repository.CreateGroceryItem(groceryItem.ToEntity())).ToModel();
+
+        return (await _repository.InsertAsync(groceryItem.ToEntity())).ToModel();
     }
 
     public async Task<GroceryItemModel> GetGroceryItemById(string groceryId)
     {
-        return (await _repository.GetGroceryItemById(groceryId)).ToModel();
+        return (await _repository.GetByIdAsync(groceryId)).ToModel();
     }
 
-    public async Task<GroceryItemModel> UpdateGroceryItem(GroceryItemModel groceryItem)
+    public async Task UpdateGroceryItem(GroceryItemModel groceryItem)
     {
         var validator = new UpdateGroceryItemValidator();
         var validationResult = await validator.ValidateAsync(groceryItem);
         if (validationResult.Errors.Count > 0)
             throw new ValidationException(validationResult.Errors);
 
-        return (await _repository.UpdateGroceryItem(FormatTextFields(groceryItem.ToEntity()))).ToModel();
+        await _repository.UpdateAsync(groceryItem.ToEntity());
     }
 
     public async Task DeleteGroceryItem(string groceryId)
     {
-        await _repository.DeleteGroceryItem(groceryId);
-    }
-
-    private static GroceryItem FormatTextFields(GroceryItem groceryItem)
-    {
-        return new GroceryItem()
-        {
-            Id = groceryItem.Id ?? null,
-            Name = groceryItem.Name!.ToUpper(),
-            Price = groceryItem.Price,
-            Brand = groceryItem.Brand!.ToUpper(),
-            Category = groceryItem.Category,
-            MeasureUnit = groceryItem.MeasureUnit,
-            ImageUrl = groceryItem.ImageUrl,
-            PurchaseDate = groceryItem.PurchaseDate,
-            GroceryStore = groceryItem.GroceryStore!.ToUpper(),
-            PriceHistory = groceryItem.PriceHistory
-        };
+        await _repository.DeleteAsync(groceryId);
     }
 }

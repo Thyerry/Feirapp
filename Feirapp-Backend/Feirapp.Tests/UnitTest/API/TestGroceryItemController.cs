@@ -316,8 +316,7 @@ public class TestGroceryItemController
             // Arrange
             var mockService = new Mock<IGroceryItemService>();
             mockService
-                .Setup(service => service.UpdateGroceryItem(It.IsAny<GroceryItemModel>()))
-                .ReturnsAsync(new GroceryItemModel());
+                .Setup(service => service.UpdateGroceryItem(It.IsAny<GroceryItemModel>()));
             var sut = new GroceryItemController(mockService.Object);
 
             // Act
@@ -335,8 +334,7 @@ public class TestGroceryItemController
             // Arrange
             var mockService = new Mock<IGroceryItemService>();
             mockService
-                .Setup(service => service.UpdateGroceryItem(It.IsAny<GroceryItemModel>()))
-                .ReturnsAsync(new GroceryItemModel());
+                .Setup(service => service.UpdateGroceryItem(It.IsAny<GroceryItemModel>()));
             var sut = new GroceryItemController(mockService.Object);
 
             // Act

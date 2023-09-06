@@ -61,8 +61,8 @@ public class GroceryItemController : ControllerBase
     [ProducesResponseType(typeof(GroceryItemModel), 400)]
     public async Task<IActionResult> UpdateGroceryItem(GroceryItemModel groceryItem)
     {
-        var result = await _service.UpdateGroceryItem(groceryItem);
-        return Ok(result);
+        await _service.UpdateGroceryItem(groceryItem);
+        return Accepted();
     }
 
     [HttpDelete]
@@ -73,6 +73,6 @@ public class GroceryItemController : ControllerBase
         if (string.IsNullOrEmpty(groceryId))
             return BadRequest();
         await _service.DeleteGroceryItem(groceryId);
-        return Ok();
+        return Accepted();
     }
 }

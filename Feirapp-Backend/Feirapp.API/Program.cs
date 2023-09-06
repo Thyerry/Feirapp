@@ -1,9 +1,9 @@
 using Feirapp.API.Helpers;
 using Feirapp.Domain.Contracts.Repository;
 using Feirapp.Domain.Contracts.Service;
+using Feirapp.Domain.Services;
 using Feirapp.Infrastructure.DataContext;
 using Feirapp.Infrastructure.Repository;
-using Feirapp.Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
