@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Feirapp.Domain.Contracts.Repository;
 using Feirapp.Domain.Models;
 using Feirapp.Domain.Services;
@@ -6,12 +9,9 @@ using Feirapp.Tests.Fixtures;
 using FluentAssertions;
 using FluentValidation;
 using Moq;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
-namespace Feirapp.Tests.UnitTest.Service;
+namespace Feirapp.Tests.UnitTest.Domain;
 
 public class TestGroceryItemService
 {

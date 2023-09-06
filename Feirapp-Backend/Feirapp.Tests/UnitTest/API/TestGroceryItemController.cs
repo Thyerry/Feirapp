@@ -297,35 +297,17 @@ public class TestGroceryItemController
     public class TestUpdateGroceryItem
     {
         [Fact]
-        public async Task OnSuccess_ReturnStatus200()
+        public async Task OnSuccess_ReturnStatus202()
         {
             // Arrange
             var mockService = new Mock<IGroceryItemService>();
             var sut = new GroceryItemController(mockService.Object);
 
             // Act
-            var result = (OkObjectResult)await sut.UpdateGroceryItem(new GroceryItemModel());
+            var result = (AcceptedResult)await sut.UpdateGroceryItem(new GroceryItemModel());
 
             // Assert
-            result.StatusCode.Should().Be(200);
-        }
-
-        [Fact]
-        public async Task OnSuccess_ReturnUpdatedGroceryItem()
-        {
-            // Arrange
-            var mockService = new Mock<IGroceryItemService>();
-            mockService
-                .Setup(service => service.UpdateGroceryItem(It.IsAny<GroceryItemModel>()));
-            var sut = new GroceryItemController(mockService.Object);
-
-            // Act
-            var result = await sut.UpdateGroceryItem(new GroceryItemModel());
-
-            // Assert
-            result.Should().BeOfType<OkObjectResult>();
-            var objectResult = (OkObjectResult)result;
-            objectResult.Value.Should().BeOfType<GroceryItemModel>();
+            result.StatusCode.Should().Be(202);
         }
 
         [Fact]
@@ -348,17 +330,17 @@ public class TestGroceryItemController
     public class TestDeleteGroceryItem
     {
         [Fact]
-        public async Task OnSuccess_ReturnStatus200()
+        public async Task OnSuccess_ReturnStatus202()
         {
             // Arrange
             var mockService = new Mock<IGroceryItemService>();
             var sut = new GroceryItemController(mockService.Object);
 
             // Act
-            var result = (OkResult)await sut.DeleteGroceryItem(new string('*', 10));
+            var result = (AcceptedResult)await sut.DeleteGroceryItem(new string('*', 10));
 
             // Assert
-            result.StatusCode.Should().Be(200);
+            result.StatusCode.Should().Be(202);
         }
 
         [Fact]

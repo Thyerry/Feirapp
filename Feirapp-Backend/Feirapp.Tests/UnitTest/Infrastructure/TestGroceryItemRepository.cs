@@ -1,19 +1,17 @@
-using Feirapp.Domain.Models;
+using Feirapp.Entities;
 using Feirapp.Infrastructure.DataContext;
 using Feirapp.Infrastructure.Repository;
 using Feirapp.Tests.Fixtures;
 using FluentAssertions;
 using MongoDB.Driver;
 using Moq;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Feirapp.Entities;
 using Xunit;
 
-namespace Feirapp.Tests.UnitTest.DAL;
+namespace Feirapp.Tests.UnitTest.Infrastructure;
 
 public class TestGroceryItemRepository
 {

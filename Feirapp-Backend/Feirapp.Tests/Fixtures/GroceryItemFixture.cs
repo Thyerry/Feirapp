@@ -82,14 +82,6 @@ public class GroceryItemFixture
 
     public static GroceryItem CreateRandomGroceryItem()
     {
-        var fakePriceLog = new Faker<PriceLog>()
-            .RuleFor(pl => pl.Price, f => (decimal)f.Random.Float() * 100)
-            .RuleFor(pl => pl.LogDate, f =>
-            {
-                var date = f.Date.Past();
-                return new DateTime(date.Year, date.Month, date.Day).ToUniversalTime();
-            });
-
         var fakeGroceryItem = new Faker<GroceryItem>()
             .RuleFor(gi => gi.Name, f => f.Commerce.ProductName())
             .RuleFor(gi => gi.Price, f => (decimal)f.Random.Float() * 100)
@@ -107,14 +99,6 @@ public class GroceryItemFixture
 
     public static List<GroceryItem> CreateListGroceryItem(int howMany = 1)
     {
-        var fakePriceLog = new Faker<PriceLog>()
-            .RuleFor(pl => pl.Price, f => (decimal)f.Random.Float() * 100)
-            .RuleFor(pl => pl.LogDate, f =>
-            {
-                var date = f.Date.Past();
-                return new DateTime(date.Year, date.Month, date.Day).ToUniversalTime();
-            });
-
         var fakeGroceryItem = new Faker<GroceryItem>()
             .RuleFor(gi => gi.Name, f => f.Commerce.ProductName())
             .RuleFor(gi => gi.Price, f => (decimal)f.Random.Float() * 100)

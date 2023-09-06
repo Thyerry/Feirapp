@@ -1,16 +1,14 @@
-﻿using Feirapp.Domain.Models;
+﻿using Feirapp.Entities;
 using Feirapp.Infrastructure.DataContext;
 using Feirapp.Infrastructure.Repository;
 using Feirapp.Tests.Fixtures;
 using Feirapp.Tests.Helpers;
 using FluentAssertions;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Feirapp.Entities;
 using Xunit;
 
-namespace Feirapp.Tests.IntegrationTest;
+namespace Feirapp.Tests.IntegrationTest.Infrastructure;
 
 [Collection("Database Integration Test")]
 public class TestGroceryItemRepository : IDisposable
@@ -23,45 +21,45 @@ public class TestGroceryItemRepository : IDisposable
         _context ??= new MongoDbContextMock().Context;
     }
 
-    [Fact(Skip = "Skipping this test due to an error on DockerComposeTestBase")]
+    [Fact]
     public async Task NewGroceryItem_InsertItOnDatabase_ShouldBeInsertedOnDatabase()
     {
         //Arrange
-        var _repository = new GroceryItemRepository(_context);
+        var repository = new GroceryItemRepository(_context);
         var expected = GroceryItemFixture.CreateRandomGroceryItem();
 
         //Act
-        var actual = await _repository.InsertAsync(new GroceryItem());
+        var actual = await repository.InsertAsync(expected);
 
         //Assert
         actual.Should().BeEquivalentTo(expected);
     }
 
-    [Fact(Skip = "Skipping this test due to an error on DockerComposeTestBase")]
+    [Fact]
     public async Task CreateGroceryItemBatch_ValidBatch_ShouldInsertAllGroceryItems()
     {
         //Arrange
-        var _repository = new GroceryItemRepository(_context);
+        var repository = new GroceryItemRepository(_context);
         var groceryItems = GroceryItemFixture.CreateListGroceryItem(GroceryItemsCount);
 
         //Act
-        await _repository.InsertGroceryItemBatch(new List<GroceryItem>());
+        await repository.InsertGroceryItemBatch(groceryItems);
 
         //Assert
-        var actual = await _repository.GetAllAsync();
+        var actual = await repository.GetAllAsync();
         actual.Count.Should().Be(GroceryItemsCount);
     }
 
-    [Fact(Skip = "Skipping this test due to an error on DockerComposeTestBase")]
+    [Fact]
     public async Task GetAllGroceryItems_IntegrationTest()
     {
         //Arrange
-        var _repository = new GroceryItemRepository(_context);
+        var repository = new GroceryItemRepository(_context);
         var groceryItems = GroceryItemFixture.CreateListGroceryItem(GroceryItemsCount);
-        await _repository.InsertGroceryItemBatch(new List<GroceryItem>());
+        await repository.InsertGroceryItemBatch(groceryItems);
 
         //Act
-        var actual = await _repository.GetAllAsync();
+        var actual = await repository.GetAllAsync();
 
         //Assert
         actual.Count.Should().Be(GroceryItemsCount);
@@ -69,6 +67,6 @@ public class TestGroceryItemRepository : IDisposable
 
     public void Dispose()
     {
-        _context.DropCollection(nameof(GroceryItemModel));
+        _context.DropCollection(nameof(GroceryItem));
     }
 }
