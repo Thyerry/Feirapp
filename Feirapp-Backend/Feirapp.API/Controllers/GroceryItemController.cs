@@ -18,7 +18,7 @@ public class GroceryItemController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(List<GroceryItemModel>), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
-    public async Task<IActionResult> GetAllGroceryItems()
+    public async Task<IActionResult> GetAll(CancellationToken cancellation = default)
     {
         var groceryItems = await _service.GetAllGroceryItems();
         if (!groceryItems.Any())
@@ -29,7 +29,7 @@ public class GroceryItemController : ControllerBase
     [HttpGet("Random/{quantity:int}")]
     [ProducesResponseType(typeof(List<GroceryItemModel>), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
-    public async Task<IActionResult> GetRandomGroceryItems(int quantity)
+    public async Task<IActionResult> GetRandomGroceryItems(int quantity, CancellationToken cancellationToken = default)
     {
         if (quantity <= 0)
             return BadRequest();
@@ -37,18 +37,18 @@ public class GroceryItemController : ControllerBase
         return Ok(randomGroceryItems);
     }
 
-    [HttpPost(Name = "CreateGroceryItem")]
+    [HttpPost]
     [ProducesResponseType(typeof(GroceryItemModel), 201)]
-    public async Task<IActionResult> CreateGroceryItem(GroceryItemModel groceryItem)
+    public async Task<IActionResult> Insert(GroceryItemModel groceryItem, CancellationToken cancellationToken = default)
     {
         var result = await _service.CreateGroceryItem(groceryItem);
         return Created(nameof(GroceryItemModel), result);
     }
 
-    [HttpGet("{groceryId:length(24)}", Name = "GetGroceryItemById")]
+    [HttpGet("{groceryId:length(24)}")]
     [ProducesResponseType(typeof(GroceryItemModel), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
-    public async Task<IActionResult> GetGroceryItemById(string groceryId)
+    public async Task<IActionResult> GetById(string groceryId, CancellationToken cancellationToken = default)
     {
         var result = await _service.GetGroceryItemById(groceryId);
         if (result == null!)
@@ -59,7 +59,7 @@ public class GroceryItemController : ControllerBase
     [HttpPut]
     [ProducesResponseType(typeof(GroceryItemModel), 200)]
     [ProducesResponseType(typeof(GroceryItemModel), 400)]
-    public async Task<IActionResult> UpdateGroceryItem(GroceryItemModel groceryItem)
+    public async Task<IActionResult> Update(GroceryItemModel groceryItem, CancellationToken cancellationToken = default)
     {
         await _service.UpdateGroceryItem(groceryItem);
         return Accepted();
@@ -68,7 +68,7 @@ public class GroceryItemController : ControllerBase
     [HttpDelete]
     [ProducesResponseType(typeof(OkResult), 200)]
     [ProducesResponseType(typeof(BadRequestResult), 400)]
-    public async Task<IActionResult> DeleteGroceryItem(string groceryId)
+    public async Task<IActionResult> Delete(string groceryId, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(groceryId))
             return BadRequest();

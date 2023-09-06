@@ -28,7 +28,7 @@ public class TestGroceryItemController
             var sut = new GroceryItemController(mockGroceryItemService.Object);
 
             // Act
-            var result = (OkObjectResult)await sut.GetAllGroceryItems();
+            var result = (OkObjectResult)await sut.GetAll();
 
             // Assert
             result.StatusCode.Should().Be(200);
@@ -45,7 +45,7 @@ public class TestGroceryItemController
             var sut = new GroceryItemController(mockGroceryItemService.Object);
 
             // Act
-            await sut.GetAllGroceryItems();
+            await sut.GetAll();
 
             // Assert
             mockGroceryItemService.Verify(service => service.GetAllGroceryItems(), Times.Once);
@@ -62,11 +62,11 @@ public class TestGroceryItemController
             var sut = new GroceryItemController(mockGroceryItemService.Object);
 
             // Act
-            var result = await sut.GetAllGroceryItems();
+            var result = await sut.GetAll();
 
             // Assert
             result.Should().BeOfType<OkObjectResult>();
-            var objectResult = (OkObjectResult)result;
+            var objectResult = result as OkObjectResult;
             objectResult.Value.Should().BeOfType<List<GroceryItemModel>>();
         }
 
@@ -81,7 +81,7 @@ public class TestGroceryItemController
             var sut = new GroceryItemController(mockGroceryItemService.Object);
 
             // Act
-            var result = await sut.GetAllGroceryItems();
+            var result = await sut.GetAll();
 
             // Assert
             result.Should().BeOfType<NotFoundResult>();
@@ -176,7 +176,7 @@ public class TestGroceryItemController
             var sut = new GroceryItemController(mockService.Object);
 
             // Act
-            var result = (OkObjectResult)await sut.GetGroceryItemById(string.Empty);
+            var result = (OkObjectResult)await sut.GetById(string.Empty);
 
             // Assert
             result.StatusCode.Should().Be(200);
@@ -193,7 +193,7 @@ public class TestGroceryItemController
             var sut = new GroceryItemController(mockService.Object);
 
             // Act
-            var result = await sut.GetGroceryItemById(string.Empty);
+            var result = await sut.GetById(string.Empty);
 
             // Assert
             result.Should().BeOfType<OkObjectResult>();
@@ -213,7 +213,7 @@ public class TestGroceryItemController
             var sut = new GroceryItemController(mockService.Object);
 
             // Act
-            await sut.GetGroceryItemById(string.Empty);
+            await sut.GetById(string.Empty);
 
             // Assert
             mockService.Verify(service => service.GetGroceryItemById(It.IsAny<string>()), Times.Once);
@@ -229,7 +229,7 @@ public class TestGroceryItemController
             var sut = new GroceryItemController(mockService.Object);
 
             // Act
-            var result = await sut.GetGroceryItemById(string.Empty);
+            var result = await sut.GetById(string.Empty);
 
             // Assert
             result.Should().BeOfType<NotFoundResult>();
@@ -248,7 +248,7 @@ public class TestGroceryItemController
             var sut = new GroceryItemController(mockGroceryService.Object);
 
             // Act
-            var result = (CreatedResult)await sut.CreateGroceryItem(new GroceryItemModel());
+            var result = (CreatedResult)await sut.Insert(new GroceryItemModel());
 
             // Assert
             result.StatusCode.Should().Be(201);
@@ -265,7 +265,7 @@ public class TestGroceryItemController
             var sut = new GroceryItemController(mockGroceryService.Object);
 
             // Act
-            var result = await sut.CreateGroceryItem(new GroceryItemModel());
+            var result = await sut.Insert(new GroceryItemModel());
 
             // Assert
             result.Should().BeOfType<CreatedResult>();
@@ -284,7 +284,7 @@ public class TestGroceryItemController
             var sut = new GroceryItemController(mockGroceryService.Object);
 
             // Act
-            await sut.CreateGroceryItem(new GroceryItemModel());
+            await sut.Insert(new GroceryItemModel());
 
             // Assert
             mockGroceryService.Verify(
@@ -304,7 +304,7 @@ public class TestGroceryItemController
             var sut = new GroceryItemController(mockService.Object);
 
             // Act
-            var result = (AcceptedResult)await sut.UpdateGroceryItem(new GroceryItemModel());
+            var result = (AcceptedResult)await sut.Update(new GroceryItemModel());
 
             // Assert
             result.StatusCode.Should().Be(202);
@@ -320,7 +320,7 @@ public class TestGroceryItemController
             var sut = new GroceryItemController(mockService.Object);
 
             // Act
-            await sut.UpdateGroceryItem(new GroceryItemModel());
+            await sut.Update(new GroceryItemModel());
 
             // Assert
             mockService.Verify(service => service.UpdateGroceryItem(It.IsAny<GroceryItemModel>()));
@@ -337,7 +337,7 @@ public class TestGroceryItemController
             var sut = new GroceryItemController(mockService.Object);
 
             // Act
-            var result = (AcceptedResult)await sut.DeleteGroceryItem(new string('*', 10));
+            var result = (AcceptedResult)await sut.Delete(new string('*', 10));
 
             // Assert
             result.StatusCode.Should().Be(202);
@@ -351,7 +351,7 @@ public class TestGroceryItemController
             var sut = new GroceryItemController(mockService.Object);
 
             // Act
-            await sut.DeleteGroceryItem(new string('*', 10));
+            await sut.Delete(new string('*', 10));
 
             // Assert
             mockService.Verify(service => service.DeleteGroceryItem(It.IsAny<string>()), Times.Once);
@@ -365,11 +365,11 @@ public class TestGroceryItemController
             var sut = new GroceryItemController(mockService.Object);
 
             // Act
-            var result = await sut.DeleteGroceryItem(string.Empty);
+            var result = await sut.Delete(string.Empty);
 
             // Assert
             result.Should().BeOfType<BadRequestResult>();
-            result.As<BadRequestResult>().StatusCode.Should().Be(400);	// Output: "False"
+            result.As<BadRequestResult>().StatusCode.Should().Be(400);
         }
     }
 }

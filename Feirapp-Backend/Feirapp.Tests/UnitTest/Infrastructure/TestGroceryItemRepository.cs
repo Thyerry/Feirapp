@@ -15,10 +15,10 @@ namespace Feirapp.Tests.UnitTest.Infrastructure;
 
 public class TestGroceryItemRepository
 {
-    public class TestGetAllGroceryItems
+    public class TestGetAllAsync
     {
         [Fact]
-        public async Task GetAllGroceryItems_ShouldReturnListOfGroceryItems()
+        public async Task GetAllAsync_ShouldReturnListOfGroceryItems()
         {
             // Arrange
             var mockDbContext = new Mock<IMongoFeirappContext>();
@@ -56,7 +56,7 @@ public class TestGroceryItemRepository
         }
 
         [Fact]
-        public async Task GetAllGroceryItems_ShouldInvokeGroceryItemCollection()
+        public async Task GetAllAsync_ShouldInvokeGroceryItemCollection()
         {
             // Arrange
             var mockDbContext = new Mock<IMongoFeirappContext>();
@@ -182,10 +182,10 @@ public class TestGroceryItemRepository
         }
     }
 
-    public class TestGetGroceryItemById
+    public class TestGetByIdAsync
     {
         [Fact]
-        public async Task GetGroceryItemById_ReturnGroceryItem()
+        public async Task GetByIdAsync_ReturnGroceryItem()
         {
             // Arrange
             var mockDbContext = new Mock<IMongoFeirappContext>();
@@ -223,7 +223,7 @@ public class TestGroceryItemRepository
         }
 
         [Fact]
-        public async Task GetGroceryItemById_InvokeGroceryItemCollection()
+        public async Task GetByIdAsync_InvokeGroceryItemCollection()
         {
             // Arrange
             var mockDbContext = new Mock<IMongoFeirappContext>();
@@ -265,10 +265,10 @@ public class TestGroceryItemRepository
         }
     }
 
-    public class TestCreateGroceryItem
+    public class TestCreateAsync
     {
         [Fact]
-        public async Task CreateGroceryItem_ReturnCreatedGroceryItem()
+        public async Task CreateAsync_ReturnCreatedGroceryItem()
         {
             // Assert
             var mockContext = new Mock<IMongoFeirappContext>();
@@ -312,7 +312,7 @@ public class TestGroceryItemRepository
         }
 
         [Fact]
-        public async Task CreateGroceryItem_InvokeGroceryItemCollection()
+        public async Task CreateAsync_InvokeGroceryItemCollection()
         {
             // Assert
             var mockContext = new Mock<IMongoFeirappContext>();
@@ -360,10 +360,10 @@ public class TestGroceryItemRepository
         }
     }
 
-    public class TestUpdateGroceryItem
+    public class TestUpdateAsync
     {
         [Fact]
-        public async Task UpdateGroceryItem_InvokeGroceryItemsCollection()
+        public async Task UpdateAsync_InvokeGroceryItemsCollection()
         {
             // Arrange
             var mockContext = new Mock<IMongoFeirappContext>();
@@ -415,10 +415,10 @@ public class TestGroceryItemRepository
         }
     }
 
-    public class TaskDeleteGroceryItem
+    public class TaskDeleteAsync
     {
         [Fact]
-        public async Task DeleteGroceryItem_InvokeGroceryItemCollection()
+        public async Task DeleteAsync_InvokeGroceryItemCollection()
         {
             // Arrange
             var mockContext = new Mock<IMongoFeirappContext>();
