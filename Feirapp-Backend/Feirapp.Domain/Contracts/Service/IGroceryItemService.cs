@@ -1,20 +1,18 @@
-using Feirapp.Domain.Contracts.Repository;
 using Feirapp.Domain.Models;
-using Feirapp.Entities;
 
 namespace Feirapp.Domain.Contracts.Service;
 
 public interface IGroceryItemService
 {
-    Task<List<GroceryItemModel>> GetAllGroceryItems();
+    Task<List<GroceryItemModel>> GetAllAsync(CancellationToken cancellationToken = default);
 
-    Task<List<GroceryItemModel>> GetRandomGroceryItems(int quantity);
+    Task<List<GroceryItemModel>> GetRandomGroceryItemsAsync(int quantity, CancellationToken cancellationToken = default);
 
-    Task<GroceryItemModel> GetGroceryItemById(string groceryId);
+    Task<GroceryItemModel> GetById(string groceryId, CancellationToken cancellationToken = default);
 
-    Task<GroceryItemModel> CreateGroceryItem(GroceryItemModel groceryItem);
+    Task<GroceryItemModel> InsertAsync(GroceryItemModel groceryItem, CancellationToken cancellationToken = default);
 
-    Task UpdateGroceryItem(GroceryItemModel groceryItem);
+    Task UpdateAsync(GroceryItemModel groceryItem, CancellationToken cancellationToken = default);
 
-    Task DeleteGroceryItem(string groceryId);
+    Task DeleteAsync(string groceryId, CancellationToken cancellationToken = default);
 }

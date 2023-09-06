@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -23,7 +24,7 @@ public class TestGroceryItemController
             // Arrange
             var mockGroceryItemService = new Mock<IGroceryItemService>();
             mockGroceryItemService
-                .Setup(service => service.GetAllGroceryItems())
+                .Setup(service => service.GetAllAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(GroceryItemFixture.GetGroceryItems());
             var sut = new GroceryItemController(mockGroceryItemService.Object);
 
@@ -40,7 +41,7 @@ public class TestGroceryItemController
             // Arrange
             var mockGroceryItemService = new Mock<IGroceryItemService>();
             mockGroceryItemService
-                .Setup(service => service.GetAllGroceryItems())
+                .Setup(service => service.GetAllAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(GroceryItemFixture.GetGroceryItems());
             var sut = new GroceryItemController(mockGroceryItemService.Object);
 
@@ -48,7 +49,7 @@ public class TestGroceryItemController
             await sut.GetAll();
 
             // Assert
-            mockGroceryItemService.Verify(service => service.GetAllGroceryItems(), Times.Once);
+            mockGroceryItemService.Verify(service => service.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -57,7 +58,7 @@ public class TestGroceryItemController
             // Arrange
             var mockGroceryItemService = new Mock<IGroceryItemService>();
             mockGroceryItemService
-                .Setup(service => service.GetAllGroceryItems())
+                .Setup(service => service.GetAllAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(GroceryItemFixture.GetGroceryItems());
             var sut = new GroceryItemController(mockGroceryItemService.Object);
 
@@ -76,7 +77,7 @@ public class TestGroceryItemController
             // Arrange
             var mockGroceryItemService = new Mock<IGroceryItemService>();
             mockGroceryItemService
-                .Setup(service => service.GetAllGroceryItems())
+                .Setup(service => service.GetAllAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<GroceryItemModel>());
             var sut = new GroceryItemController(mockGroceryItemService.Object);
 
@@ -98,7 +99,7 @@ public class TestGroceryItemController
             // Arrange
             var mockGroceryItemService = new Mock<IGroceryItemService>();
             mockGroceryItemService
-                .Setup(service => service.GetAllGroceryItems())
+                .Setup(service => service.GetAllAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(GroceryItemFixture.GetGroceryItems());
             var sut = new GroceryItemController(mockGroceryItemService.Object);
 
@@ -115,7 +116,7 @@ public class TestGroceryItemController
             // Arrange
             var mockGroceryItemService = new Mock<IGroceryItemService>();
             mockGroceryItemService
-                .Setup(service => service.GetRandomGroceryItems(It.IsAny<int>()))
+                .Setup(service => service.GetRandomGroceryItemsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(GroceryItemFixture.GetGroceryItems());
             var sut = new GroceryItemController(mockGroceryItemService.Object);
 
@@ -133,7 +134,7 @@ public class TestGroceryItemController
             // Arrange
             var mockGroceryItemService = new Mock<IGroceryItemService>();
             mockGroceryItemService
-                .Setup(service => service.GetAllGroceryItems())
+                .Setup(service => service.GetAllAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(GroceryItemFixture.GetGroceryItems());
             var sut = new GroceryItemController(mockGroceryItemService.Object);
 
@@ -141,7 +142,7 @@ public class TestGroceryItemController
             await sut.GetRandomGroceryItems(1);
 
             // Assert
-            mockGroceryItemService.Verify(service => service.GetRandomGroceryItems(It.IsAny<int>()), Times.Once);
+            mockGroceryItemService.Verify(service => service.GetRandomGroceryItemsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -150,7 +151,7 @@ public class TestGroceryItemController
             // Arrange
             var mockGroceryItemService = new Mock<IGroceryItemService>();
             mockGroceryItemService
-                .Setup(service => service.GetAllGroceryItems())
+                .Setup(service => service.GetAllAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(GroceryItemFixture.GetGroceryItems());
             var sut = new GroceryItemController(mockGroceryItemService.Object);
 
@@ -171,7 +172,7 @@ public class TestGroceryItemController
             // Arrange
             var mockService = new Mock<IGroceryItemService>();
             mockService
-                .Setup(service => service.GetGroceryItemById(It.IsAny<string>()))
+                .Setup(service => service.GetById(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GroceryItemModel());
             var sut = new GroceryItemController(mockService.Object);
 
@@ -188,12 +189,12 @@ public class TestGroceryItemController
             // Arrange
             var mockService = new Mock<IGroceryItemService>();
             mockService
-                .Setup(service => service.GetGroceryItemById(It.IsAny<string>()))
+                .Setup(service => service.GetById(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GroceryItemModel());
             var sut = new GroceryItemController(mockService.Object);
 
             // Act
-            var result = await sut.GetById(string.Empty);
+            var result = await sut.GetById(string.Empty, CancellationToken.None);
 
             // Assert
             result.Should().BeOfType<OkObjectResult>();
@@ -207,7 +208,7 @@ public class TestGroceryItemController
             // Arrange
             var mockService = new Mock<IGroceryItemService>();
             mockService
-                .Setup(service => service.GetGroceryItemById(It.IsAny<string>()))
+                .Setup(service => service.GetById(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GroceryItemModel());
 
             var sut = new GroceryItemController(mockService.Object);
@@ -216,7 +217,7 @@ public class TestGroceryItemController
             await sut.GetById(string.Empty);
 
             // Assert
-            mockService.Verify(service => service.GetGroceryItemById(It.IsAny<string>()), Times.Once);
+            mockService.Verify(service => service.GetById(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -225,7 +226,7 @@ public class TestGroceryItemController
             // Arrange
             var mockService = new Mock<IGroceryItemService>();
             mockService
-                .Setup(service => service.GetGroceryItemById(It.IsAny<string>()));
+                .Setup(service => service.GetById(It.IsAny<string>(), It.IsAny<CancellationToken>()));
             var sut = new GroceryItemController(mockService.Object);
 
             // Act
@@ -260,7 +261,7 @@ public class TestGroceryItemController
             // Arrange
             var mockGroceryService = new Mock<IGroceryItemService>();
             mockGroceryService
-                .Setup(service => service.CreateGroceryItem(It.IsAny<GroceryItemModel>()))
+                .Setup(service => service.InsertAsync(It.IsAny<GroceryItemModel>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GroceryItemModel());
             var sut = new GroceryItemController(mockGroceryService.Object);
 
@@ -279,7 +280,7 @@ public class TestGroceryItemController
             // Arrange
             var mockGroceryService = new Mock<IGroceryItemService>();
             mockGroceryService
-                .Setup(service => service.CreateGroceryItem(It.IsAny<GroceryItemModel>()))
+                .Setup(service => service.InsertAsync(It.IsAny<GroceryItemModel>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new GroceryItemModel());
             var sut = new GroceryItemController(mockGroceryService.Object);
 
@@ -288,7 +289,7 @@ public class TestGroceryItemController
 
             // Assert
             mockGroceryService.Verify(
-                service => service.CreateGroceryItem(It.IsAny<GroceryItemModel>()),
+                service => service.InsertAsync(It.IsAny<GroceryItemModel>(), It.IsAny<CancellationToken>()),
                 Times.Once
             );
         }
@@ -316,14 +317,14 @@ public class TestGroceryItemController
             // Arrange
             var mockService = new Mock<IGroceryItemService>();
             mockService
-                .Setup(service => service.UpdateGroceryItem(It.IsAny<GroceryItemModel>()));
+                .Setup(service => service.UpdateAsync(It.IsAny<GroceryItemModel>(), It.IsAny<CancellationToken>()));
             var sut = new GroceryItemController(mockService.Object);
 
             // Act
             await sut.Update(new GroceryItemModel());
 
             // Assert
-            mockService.Verify(service => service.UpdateGroceryItem(It.IsAny<GroceryItemModel>()));
+            mockService.Verify(service => service.UpdateAsync(It.IsAny<GroceryItemModel>(), It.IsAny<CancellationToken>()));
         }
     }
 
@@ -354,7 +355,7 @@ public class TestGroceryItemController
             await sut.Delete(new string('*', 10));
 
             // Assert
-            mockService.Verify(service => service.DeleteGroceryItem(It.IsAny<string>()), Times.Once);
+            mockService.Verify(service => service.DeleteAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]

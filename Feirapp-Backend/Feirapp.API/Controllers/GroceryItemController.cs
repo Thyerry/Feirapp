@@ -18,9 +18,9 @@ public class GroceryItemController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(List<GroceryItemModel>), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
-    public async Task<IActionResult> GetAll(CancellationToken cancellation = default)
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
     {
-        var groceryItems = await _service.GetAllGroceryItems();
+        var groceryItems = await _service.GetAllAsync(cancellationToken);
         if (!groceryItems.Any())
             return NotFound();
         return Ok(groceryItems);
@@ -33,7 +33,7 @@ public class GroceryItemController : ControllerBase
     {
         if (quantity <= 0)
             return BadRequest();
-        var randomGroceryItems = await _service.GetRandomGroceryItems(quantity);
+        var randomGroceryItems = await _service.GetRandomGroceryItemsAsync(quantity, cancellationToken);
         return Ok(randomGroceryItems);
     }
 
@@ -41,7 +41,7 @@ public class GroceryItemController : ControllerBase
     [ProducesResponseType(typeof(GroceryItemModel), 201)]
     public async Task<IActionResult> Insert(GroceryItemModel groceryItem, CancellationToken cancellationToken = default)
     {
-        var result = await _service.CreateGroceryItem(groceryItem);
+        var result = await _service.InsertAsync(groceryItem, cancellationToken);
         return Created(nameof(GroceryItemModel), result);
     }
 
@@ -50,7 +50,7 @@ public class GroceryItemController : ControllerBase
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetById(string groceryId, CancellationToken cancellationToken = default)
     {
-        var result = await _service.GetGroceryItemById(groceryId);
+        var result = await _service.GetById(groceryId, cancellationToken);
         if (result == null!)
             return NotFound();
         return Ok(result);
@@ -61,7 +61,7 @@ public class GroceryItemController : ControllerBase
     [ProducesResponseType(typeof(GroceryItemModel), 400)]
     public async Task<IActionResult> Update(GroceryItemModel groceryItem, CancellationToken cancellationToken = default)
     {
-        await _service.UpdateGroceryItem(groceryItem);
+        await _service.UpdateAsync(groceryItem, cancellationToken);
         return Accepted();
     }
 
@@ -72,7 +72,7 @@ public class GroceryItemController : ControllerBase
     {
         if (string.IsNullOrEmpty(groceryId))
             return BadRequest();
-        await _service.DeleteGroceryItem(groceryId);
+        await _service.DeleteAsync(groceryId, cancellationToken);
         return Accepted();
     }
 }

@@ -49,7 +49,7 @@ public class TestGroceryItemRepository
             var sut = new GroceryItemRepository(mockDbContext.Object);
 
             // Act
-            var result = await sut.GetAllAsync();
+            var result = await sut.GetAllAsync(CancellationToken.None);
 
             // Assert
             result.Should().BeOfType<List<GroceryItem>>();
@@ -86,7 +86,7 @@ public class TestGroceryItemRepository
             var sut = new GroceryItemRepository(mockDbContext.Object);
 
             // Act
-            await sut.GetAllAsync();
+            await sut.GetAllAsync(CancellationToken.None);
 
             // Assert
             mockCollection.Verify(db => db.FindAsync(
@@ -132,7 +132,7 @@ public class TestGroceryItemRepository
             var sut = new GroceryItemRepository(mockDbContext.Object);
 
             // Act
-            var result = await sut.GetRandomGroceryItems(1);
+            var result = await sut.GetRandomGroceryItems(1, CancellationToken.None);
 
             // Assert
             result.Should().BeOfType<List<GroceryItem>>();
@@ -171,7 +171,7 @@ public class TestGroceryItemRepository
             var sut = new GroceryItemRepository(mockDbContext.Object);
 
             // Act
-            await sut.GetRandomGroceryItems(1);
+            await sut.GetRandomGroceryItems(1, CancellationToken.None);
 
             // Assert
             mockCollection.Verify(c => c.AggregateAsync(
@@ -216,7 +216,7 @@ public class TestGroceryItemRepository
             var sut = new GroceryItemRepository(mockDbContext.Object);
 
             // Act
-            var result = await sut.GetByIdAsync(string.Empty);
+            var result = await sut.GetByIdAsync(string.Empty, CancellationToken.None);
 
             // Assert
             result.Should().BeOfType<GroceryItem>();
@@ -254,7 +254,7 @@ public class TestGroceryItemRepository
             var sut = new GroceryItemRepository(mockDbContext.Object);
 
             // Act
-            await sut.GetByIdAsync(string.Empty);
+            await sut.GetByIdAsync(string.Empty, CancellationToken.None);
 
             // Assert
             mockCollection.Verify(c => c.FindAsync(
@@ -305,7 +305,7 @@ public class TestGroceryItemRepository
             var sut = new GroceryItemRepository(mockContext.Object);
 
             // Act
-            var result = await sut.InsertAsync(new GroceryItem());
+            var result = await sut.InsertAsync(new GroceryItem(), CancellationToken.None);
 
             // Assert
             result.Should().BeOfType<GroceryItem>();
@@ -349,7 +349,7 @@ public class TestGroceryItemRepository
             var sut = new GroceryItemRepository(mockContext.Object);
 
             // Act
-            await sut.InsertAsync(new GroceryItem());
+            await sut.InsertAsync(new GroceryItem(), CancellationToken.None);
 
             // Assert
             mockCollection.Verify(c => c.InsertOneAsync(
@@ -402,7 +402,7 @@ public class TestGroceryItemRepository
             var sut = new GroceryItemRepository(mockContext.Object);
 
             // Act
-            await sut.UpdateAsync(groceryList.FirstOrDefault());
+            await sut.UpdateAsync(groceryList.FirstOrDefault(), CancellationToken.None);
 
             // Assert
             mockCollection.Verify(c => c.UpdateOneAsync(
@@ -429,7 +429,7 @@ public class TestGroceryItemRepository
             var sut = new GroceryItemRepository(mockContext.Object);
 
             // Act
-            await sut.DeleteAsync(string.Empty);
+            await sut.DeleteAsync(string.Empty, CancellationToken.None);
 
             // Assert
             mockCollection.Verify(collection => collection.DeleteOneAsync(

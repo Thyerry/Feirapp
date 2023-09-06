@@ -16,43 +16,43 @@ public class GroceryItemService : IGroceryItemService
         _groceryItemRepository = groceryItemRepository;
     }
 
-    public async Task<List<GroceryItemModel>> GetAllGroceryItems()
+    public async Task<List<GroceryItemModel>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return (await _groceryItemRepository.GetAllAsync()).ToModelList();
+        return (await _groceryItemRepository.GetAllAsync(cancellationToken)).ToModelList();
     }
 
-    public async Task<List<GroceryItemModel>> GetRandomGroceryItems(int quantity)
+    public async Task<List<GroceryItemModel>> GetRandomGroceryItemsAsync(int quantity, CancellationToken cancellationToken)
     {
-        return (await _groceryItemRepository.GetRandomGroceryItems(quantity)).ToModelList();
+        return (await _groceryItemRepository.GetRandomGroceryItems(quantity, cancellationToken)).ToModelList();
     }
 
-    public async Task<GroceryItemModel> CreateGroceryItem(GroceryItemModel groceryItem)
+    public async Task<GroceryItemModel> InsertAsync(GroceryItemModel groceryItem, CancellationToken cancellationToken)
     {
         var validator = new CreateGroceryItemValidator();
-        var validationResult = await validator.ValidateAsync(groceryItem);
+        var validationResult = await validator.ValidateAsync(groceryItem, cancellationToken);
         if (validationResult.Errors.Count > 0)
             throw new ValidationException(validationResult.Errors);
 
-        return (await _groceryItemRepository.InsertAsync(groceryItem.ToEntity())).ToModel();
+        return (await _groceryItemRepository.InsertAsync(groceryItem.ToEntity(), cancellationToken)).ToModel();
     }
 
-    public async Task<GroceryItemModel> GetGroceryItemById(string groceryId)
+    public async Task<GroceryItemModel> GetById(string groceryId, CancellationToken cancellationToken)
     {
-        return (await _groceryItemRepository.GetByIdAsync(groceryId)).ToModel();
+        return (await _groceryItemRepository.GetByIdAsync(groceryId, cancellationToken)).ToModel();
     }
 
-    public async Task UpdateGroceryItem(GroceryItemModel groceryItem)
+    public async Task UpdateAsync(GroceryItemModel groceryItem, CancellationToken cancellationToken)
     {
         var validator = new UpdateGroceryItemValidator();
-        var validationResult = await validator.ValidateAsync(groceryItem);
+        var validationResult = await validator.ValidateAsync(groceryItem, cancellationToken);
         if (validationResult.Errors.Count > 0)
             throw new ValidationException(validationResult.Errors);
 
-        await _groceryItemRepository.UpdateAsync(groceryItem.ToEntity());
+        await _groceryItemRepository.UpdateAsync(groceryItem.ToEntity(), cancellationToken);
     }
 
-    public async Task DeleteGroceryItem(string groceryId)
+    public async Task DeleteAsync(string groceryId, CancellationToken cancellationToken)
     {
-        await _groceryItemRepository.DeleteAsync(groceryId);
+        await _groceryItemRepository.DeleteAsync(groceryId, cancellationToken);
     }
 }

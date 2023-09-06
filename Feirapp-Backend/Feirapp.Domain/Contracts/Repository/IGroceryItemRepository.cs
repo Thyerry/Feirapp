@@ -4,17 +4,17 @@ namespace Feirapp.Domain.Contracts.Repository;
 
 public interface IGroceryItemRepository
 {
-    Task<GroceryItem> GetByIdAsync(string id);
+    Task<GroceryItem> GetByIdAsync(string id, CancellationToken cancellationToken = default);
 
-    Task<List<GroceryItem>> GetAllAsync();
+    Task<List<GroceryItem>> GetAllAsync(CancellationToken cancellationToken = default);
 
-    Task<List<GroceryItem>> GetRandomGroceryItems(int quantity);
+    Task<List<GroceryItem>> GetRandomGroceryItems(int quantity, CancellationToken cancellationToken = default);
 
-    Task<GroceryItem> InsertAsync(GroceryItem groceryItem);
+    Task<GroceryItem> InsertAsync(GroceryItem groceryItem, CancellationToken cancellationToken = default);
 
-    Task<List<GroceryItem>> InsertGroceryItemBatch(List<GroceryItem> groceryItems);
+    Task<List<GroceryItem>> InsertGroceryItemBatch(List<GroceryItem> groceryItems, CancellationToken cancellationToken = default);
 
-    Task UpdateAsync(GroceryItem groceryItem);
+    Task UpdateAsync(GroceryItem groceryItem, CancellationToken cancellationToken = default);
 
-    Task DeleteAsync(string id);
+    Task DeleteAsync(string id, CancellationToken cancellationToken = default);
 }

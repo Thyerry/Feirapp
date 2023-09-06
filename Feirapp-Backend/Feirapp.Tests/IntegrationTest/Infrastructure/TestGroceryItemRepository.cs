@@ -5,6 +5,7 @@ using Feirapp.Tests.Fixtures;
 using Feirapp.Tests.Helpers;
 using FluentAssertions;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -29,7 +30,7 @@ public class TestGroceryItemRepository : IDisposable
         var expected = GroceryItemFixture.CreateRandomGroceryItem();
 
         //Act
-        var actual = await repository.InsertAsync(expected);
+        var actual = await repository.InsertAsync(expected, CancellationToken.None);
 
         //Assert
         actual.Should().BeEquivalentTo(expected);
@@ -43,10 +44,10 @@ public class TestGroceryItemRepository : IDisposable
         var groceryItems = GroceryItemFixture.CreateListGroceryItem(GroceryItemsCount);
 
         //Act
-        await repository.InsertGroceryItemBatch(groceryItems);
+        await repository.InsertGroceryItemBatch(groceryItems, CancellationToken.None);
 
         //Assert
-        var actual = await repository.GetAllAsync();
+        var actual = await repository.GetAllAsync(CancellationToken.None);
         actual.Count.Should().Be(GroceryItemsCount);
     }
 
@@ -56,10 +57,10 @@ public class TestGroceryItemRepository : IDisposable
         //Arrange
         var repository = new GroceryItemRepository(_context);
         var groceryItems = GroceryItemFixture.CreateListGroceryItem(GroceryItemsCount);
-        await repository.InsertGroceryItemBatch(groceryItems);
+        await repository.InsertGroceryItemBatch(groceryItems, CancellationToken.None);
 
         //Act
-        var actual = await repository.GetAllAsync();
+        var actual = await repository.GetAllAsync(CancellationToken.None);
 
         //Assert
         actual.Count.Should().Be(GroceryItemsCount);
