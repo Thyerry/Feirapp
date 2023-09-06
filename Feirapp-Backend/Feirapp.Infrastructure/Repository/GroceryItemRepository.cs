@@ -1,9 +1,9 @@
-using Feirapp.DAL.DataContext;
-using Feirapp.Domain.Contracts;
-using Feirapp.Domain.Models;
+using Feirapp.Domain.Contracts.Repository;
+using Feirapp.Entities;
+using Feirapp.Infrastructure.DataContext;
 using MongoDB.Driver;
 
-namespace Feirapp.DAL.Repositories;
+namespace Feirapp.Infrastructure.Repository;
 
 public class GroceryItemRepository : IGroceryItemRepository, IDisposable
 {
@@ -54,17 +54,18 @@ public class GroceryItemRepository : IGroceryItemRepository, IDisposable
         var groceryItemToUpdate = await GetGroceryItemById(groceryItem.Id);
 
         groceryItem.PriceHistory = UpdatePriceHistory(groceryItem, groceryItemToUpdate);
-        
+
         await _groceryItemCollection.UpdateOneAsync(
             g => g.Id == groceryItem.Id,
             Builders<GroceryItem>.Update
                 .Set(n => n.Name, groceryItem.Name)
                 .Set(n => n.Price, groceryItem.Price)
-                .Set(n => n.BrandName, groceryItem.BrandName)
+                .Set(n => n.Brand, groceryItem.Brand)
                 .Set(n => n.PurchaseDate, groceryItem.PurchaseDate)
-                .Set(n => n.GroceryCategory, groceryItem.GroceryCategory)
-                .Set(n => n.GroceryImageUrl, groceryItem.GroceryImageUrl)
-                .Set(n => n.GroceryStoreName, groceryItem.GroceryStoreName)
+                .Set(n => n.Category, groceryItem.Category)
+                .Set(n => n.MeasureUnit, groceryItem.MeasureUnit)
+                .Set(n => n.ImageUrl, groceryItem.ImageUrl)
+                .Set(n => n.GroceryStore, groceryItem.GroceryStore)
                 .Set(n => n.PriceHistory, groceryItem.PriceHistory),
             new UpdateOptions { IsUpsert = false });
 
@@ -81,7 +82,7 @@ public class GroceryItemRepository : IGroceryItemRepository, IDisposable
         await _groceryItemCollection.InsertManyAsync(groceryItems);
     }
 
-    private static List<PriceLog>? UpdatePriceHistory(GroceryItem groceryItem, GroceryItem groceryItemToUpdate)
+    private static List<PriceLog> UpdatePriceHistory(GroceryItem groceryItem, GroceryItem groceryItemToUpdate)
     {
         groceryItem.PriceHistory = groceryItemToUpdate.PriceHistory;
 
@@ -89,7 +90,7 @@ public class GroceryItemRepository : IGroceryItemRepository, IDisposable
         {
             var newPriceLog = new PriceLog() { Price = groceryItem.Price, LogDate = groceryItem.PurchaseDate };
 
-            if (groceryItem.PriceHistory.FirstOrDefault().Price == 0.0)
+            if (groceryItem.PriceHistory.FirstOrDefault().Price == 0)
                 groceryItem.PriceHistory = new List<PriceLog>() { newPriceLog };
             else
                 groceryItem.PriceHistory.Add(newPriceLog);

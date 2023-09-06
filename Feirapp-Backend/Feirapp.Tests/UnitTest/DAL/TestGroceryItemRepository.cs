@@ -1,6 +1,6 @@
-using Feirapp.DAL.DataContext;
-using Feirapp.DAL.Repositories;
 using Feirapp.Domain.Models;
+using Feirapp.Infrastructure.DataContext;
+using Feirapp.Infrastructure.Repository;
 using Feirapp.Tests.Fixtures;
 using FluentAssertions;
 using MongoDB.Driver;
@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Feirapp.Entities;
 using Xunit;
 
 namespace Feirapp.Tests.UnitTest.DAL;
@@ -25,7 +26,7 @@ public class TestGroceryItemRepository
             var mockDbContext = new Mock<IMongoFeirappContext>();
             var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
             var mockCursor = new Mock<IAsyncCursor<GroceryItem>>();
-            var groceryList = GroceryItemFixture.GetGroceryItems();
+            var groceryList = GroceryItemFixture.CreateListGroceryItem();
 
             mockCursor
                 .Setup(c => c.Current)
@@ -63,7 +64,7 @@ public class TestGroceryItemRepository
             var mockDbContext = new Mock<IMongoFeirappContext>();
             var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
             var mockCursor = new Mock<IAsyncCursor<GroceryItem>>();
-            var groceryList = GroceryItemFixture.GetGroceryItems();
+            var groceryList = GroceryItemFixture.CreateListGroceryItem();
 
             mockCursor
                 .Setup(c => c.Current)
@@ -107,7 +108,7 @@ public class TestGroceryItemRepository
             var mockDbContext = new Mock<IMongoFeirappContext>();
             var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
             var mockCursor = new Mock<IAsyncCursor<GroceryItem>>();
-            var groceryList = GroceryItemFixture.GetGroceryItems();
+            var groceryList = GroceryItemFixture.CreateListGroceryItem();
 
             mockCursor
                 .Setup(c => c.Current)
@@ -146,7 +147,7 @@ public class TestGroceryItemRepository
             var mockDbContext = new Mock<IMongoFeirappContext>();
             var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
             var mockCursor = new Mock<IAsyncCursor<GroceryItem>>();
-            var groceryList = GroceryItemFixture.GetGroceryItems();
+            var groceryList = GroceryItemFixture.CreateListGroceryItem();
 
             mockCursor
                 .Setup(c => c.Current)
@@ -192,7 +193,7 @@ public class TestGroceryItemRepository
             var mockDbContext = new Mock<IMongoFeirappContext>();
             var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
             var mockCursor = new Mock<IAsyncCursor<GroceryItem>>();
-            var groceryList = GroceryItemFixture.GetGroceryItems();
+            var groceryList = GroceryItemFixture.CreateListGroceryItem();
 
             mockCursor
                 .Setup(c => c.Current)
@@ -230,7 +231,7 @@ public class TestGroceryItemRepository
             var mockDbContext = new Mock<IMongoFeirappContext>();
             var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
             var mockCursor = new Mock<IAsyncCursor<GroceryItem>>();
-            var groceryList = GroceryItemFixture.GetGroceryItems();
+            var groceryList = GroceryItemFixture.CreateListGroceryItem();
 
             mockCursor
                 .Setup(c => c.Current)
@@ -275,7 +276,7 @@ public class TestGroceryItemRepository
             var mockDbContext = new Mock<IMongoFeirappContext>();
             var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
             var mockCursor = new Mock<IAsyncCursor<GroceryItem>>();
-            var groceryList = GroceryItemFixture.GetGroceryItems();
+            var groceryList = GroceryItemFixture.CreateListGroceryItem();
 
             mockCursor
                 .Setup(c => c.Current)
@@ -312,7 +313,7 @@ public class TestGroceryItemRepository
             var mockDbContext = new Mock<IMongoFeirappContext>();
             var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
             var mockCursor = new Mock<IAsyncCursor<GroceryItem>>();
-            var groceryList = GroceryItemFixture.GetGroceryItems();
+            var groceryList = GroceryItemFixture.CreateListGroceryItem();
 
             mockCursor
                 .Setup(c => c.Current)
@@ -356,7 +357,7 @@ public class TestGroceryItemRepository
             var mockContext = new Mock<IMongoFeirappContext>();
             var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
             var mockCursor = new Mock<IAsyncCursor<GroceryItem>>();
-            var groceryList = GroceryItemFixture.GetGroceryItems();
+            var groceryList = GroceryItemFixture.CreateListGroceryItem();
 
             mockCursor
                 .Setup(c => c.Current)
@@ -400,7 +401,7 @@ public class TestGroceryItemRepository
             var mockContext = new Mock<IMongoFeirappContext>();
             var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
             var mockCursor = new Mock<IAsyncCursor<GroceryItem>>();
-            var groceryList = GroceryItemFixture.GetGroceryItems();
+            var groceryList = GroceryItemFixture.CreateListGroceryItem();
 
             mockCursor
                 .Setup(c => c.Current)
@@ -451,7 +452,7 @@ public class TestGroceryItemRepository
             var mockContext = new Mock<IMongoFeirappContext>();
             var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
             var mockCursor = new Mock<IAsyncCursor<GroceryItem>>();
-            var groceryList = GroceryItemFixture.GetGroceryItems();
+            var groceryList = GroceryItemFixture.CreateListGroceryItem();
 
             mockCursor
                 .Setup(c => c.Current)
@@ -497,7 +498,7 @@ public class TestGroceryItemRepository
             var mockContext = new Mock<IMongoFeirappContext>();
             var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
             var mockCursor = new Mock<IAsyncCursor<GroceryItem>>();
-            var groceryList = GroceryItemFixture.GetGroceryItems();
+            var groceryList = GroceryItemFixture.CreateListGroceryItem();
 
             mockCursor
                 .Setup(c => c.Current)
@@ -595,7 +596,7 @@ public class TestGroceryItemRepository
             var mockContext = new Mock<IMongoFeirappContext>();
             var mockCollection = new Mock<IMongoCollection<GroceryItem>>();
             var mockCursor = new Mock<IAsyncCursor<GroceryItem>>();
-            var groceryList = GroceryItemFixture.GetGroceryItems();
+            var groceryList = GroceryItemFixture.CreateListGroceryItem();
 
             mockCursor
                 .Setup(c => c.Current)
@@ -628,7 +629,7 @@ public class TestGroceryItemRepository
             var sut = new GroceryItemRepository(mockContext.Object);
             var parameterGroceryItem = new GroceryItem()
             {
-                Price = 5.5,
+                Price = new decimal(5.5),
                 PriceHistory = new List<PriceLog> { new() { Price = 0, LogDate = DateTime.UtcNow } }
             };
             // Act

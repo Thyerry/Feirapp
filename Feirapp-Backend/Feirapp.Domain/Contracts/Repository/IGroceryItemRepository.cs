@@ -1,18 +1,16 @@
-using Feirapp.Domain.Models;
+using Feirapp.Entities;
 
-namespace Feirapp.Domain.Contracts;
+namespace Feirapp.Domain.Contracts.Repository;
 
-public interface IGroceryItemService
+public interface IGroceryItemRepository
 {
     Task<List<GroceryItem>> GetAllGroceryItems();
 
     Task<List<GroceryItem>> GetRandomGroceryItems(int quantity);
 
-    Task<List<GroceryItem>> GetGroceryItemByName(string groceryName);
+    Task<GroceryItem> CreateGroceryItem(GroceryItem groceryItem);
 
     Task<GroceryItem> GetGroceryItemById(string groceryId);
-
-    Task<GroceryItem> CreateGroceryItem(GroceryItem groceryItem);
 
     Task<GroceryItem> UpdateGroceryItem(GroceryItem groceryItem);
 

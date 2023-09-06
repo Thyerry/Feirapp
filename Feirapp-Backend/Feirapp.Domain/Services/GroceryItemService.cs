@@ -1,6 +1,9 @@
-using Feirapp.Domain.Contracts;
+using Feirapp.Domain.Contracts.Repository;
+using Feirapp.Domain.Contracts.Service;
+using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Models;
-using Feirapp.Service.Validators.GroceryItemValidators;
+using Feirapp.Domain.Validators.GroceryItemValidators;
+using Feirapp.Entities;
 using FluentValidation;
 
 namespace Feirapp.Service.Services;
@@ -14,28 +17,23 @@ public class GroceryItemService : IGroceryItemService
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     }
 
-    public async Task<List<GroceryItem>> GetAllGroceryItems()
-    {
-        return await _repository.GetAllGroceryItems();
+    public async Task<List<GroceryItemModel>> GetAllGroceryItems()
+    { 
+        return (await _repository.GetAllGroceryItems()).ToModelList();
     }
 
-    public async Task<List<GroceryItem>> GetRandomGroceryItems(int quantity)
+    public async Task<List<GroceryItemModel>> GetRandomGroceryItems(int quantity)
     {
-        return await _repository.GetRandomGroceryItems(quantity);
+        return (await _repository.GetRandomGroceryItems(quantity)).ToModelList();
     }
 
-    public async Task<List<GroceryItem>> GetGroceryItemByName(string groceryName)
-    {
-        return await _repository.GetGroceryItemsByName(groceryName.ToUpper());
-    }
-
-    public async Task<GroceryItem> CreateGroceryItem(GroceryItem groceryItem)
+    public async Task<GroceryItemModel> CreateGroceryItem(GroceryItemModel groceryItem)
     {
         var validator = new CreateGroceryItemValidator();
         var validationResult = await validator.ValidateAsync(groceryItem);
         if (validationResult.Errors.Count > 0)
             throw new ValidationException(validationResult.Errors);
-        groceryItem.PriceHistory = new List<PriceLog>
+        groceryItem.PriceHistory = new List<PriceLogModel>
         {
             new()
             {
@@ -43,22 +41,22 @@ public class GroceryItemService : IGroceryItemService
                 LogDate = groceryItem.PurchaseDate
             }
         };
-        return await _repository.CreateGroceryItem(FormatTextFields(groceryItem));
+        return (await _repository.CreateGroceryItem(groceryItem.ToEntity())).ToModel();
     }
 
-    public async Task<GroceryItem> GetGroceryItemById(string groceryId)
+    public async Task<GroceryItemModel> GetGroceryItemById(string groceryId)
     {
-        return await _repository.GetGroceryItemById(groceryId);
+        return (await _repository.GetGroceryItemById(groceryId)).ToModel();
     }
 
-    public async Task<GroceryItem> UpdateGroceryItem(GroceryItem groceryItem)
+    public async Task<GroceryItemModel> UpdateGroceryItem(GroceryItemModel groceryItem)
     {
         var validator = new UpdateGroceryItemValidator();
         var validationResult = await validator.ValidateAsync(groceryItem);
         if (validationResult.Errors.Count > 0)
             throw new ValidationException(validationResult.Errors);
 
-        return await _repository.UpdateGroceryItem(FormatTextFields(groceryItem));
+        return (await _repository.UpdateGroceryItem(FormatTextFields(groceryItem.ToEntity()))).ToModel();
     }
 
     public async Task DeleteGroceryItem(string groceryId)
@@ -73,11 +71,12 @@ public class GroceryItemService : IGroceryItemService
             Id = groceryItem.Id ?? null,
             Name = groceryItem.Name!.ToUpper(),
             Price = groceryItem.Price,
-            BrandName = groceryItem.BrandName!.ToUpper(),
-            GroceryCategory = groceryItem.GroceryCategory,
-            GroceryImageUrl = groceryItem.GroceryImageUrl,
+            Brand = groceryItem.Brand!.ToUpper(),
+            Category = groceryItem.Category,
+            MeasureUnit = groceryItem.MeasureUnit,
+            ImageUrl = groceryItem.ImageUrl,
             PurchaseDate = groceryItem.PurchaseDate,
-            GroceryStoreName = groceryItem.GroceryStoreName!.ToUpper(),
+            GroceryStore = groceryItem.GroceryStore!.ToUpper(),
             PriceHistory = groceryItem.PriceHistory
         };
     }

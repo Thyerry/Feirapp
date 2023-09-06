@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
-namespace Feirapp.DAL.DataContext;
+namespace Feirapp.Infrastructure.DataContext;
 
 public interface IMongoFeirappContext
 {

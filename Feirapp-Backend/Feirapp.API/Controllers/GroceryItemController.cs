@@ -1,4 +1,4 @@
-using Feirapp.Domain.Contracts;
+using Feirapp.Domain.Contracts.Service;
 using Feirapp.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +16,7 @@ public class GroceryItemController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(List<GroceryItem>), 200)]
+    [ProducesResponseType(typeof(List<GroceryItemModel>), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetAllGroceryItems()
     {
@@ -27,7 +27,7 @@ public class GroceryItemController : ControllerBase
     }
 
     [HttpGet("Random/{quantity:int}")]
-    [ProducesResponseType(typeof(List<GroceryItem>), 200)]
+    [ProducesResponseType(typeof(List<GroceryItemModel>), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetRandomGroceryItems(int quantity)
     {
@@ -37,27 +37,16 @@ public class GroceryItemController : ControllerBase
         return Ok(randomGroceryItems);
     }
 
-    [HttpGet("Name/{groceryItemName}", Name = "GetGroceryItemsByName")]
-    [ProducesResponseType(typeof(List<GroceryItem>), 200)]
-    [ProducesResponseType(typeof(NotFoundResult), 404)]
-    public async Task<IActionResult> GetGroceryItemsByName([FromRoute] string groceryItemName)
-    {
-        var groceryItems = await _service.GetGroceryItemByName(groceryItemName);
-        if (!groceryItems.Any())
-            return NotFound();
-        return Ok(groceryItems);
-    }
-
     [HttpPost(Name = "CreateGroceryItem")]
-    [ProducesResponseType(typeof(GroceryItem), 201)]
-    public async Task<IActionResult> CreateGroceryItem(GroceryItem groceryItem)
+    [ProducesResponseType(typeof(GroceryItemModel), 201)]
+    public async Task<IActionResult> CreateGroceryItem(GroceryItemModel groceryItem)
     {
         var result = await _service.CreateGroceryItem(groceryItem);
-        return Created(nameof(GroceryItem), result);
+        return Created(nameof(GroceryItemModel), result);
     }
 
     [HttpGet("{groceryId:length(24)}", Name = "GetGroceryItemById")]
-    [ProducesResponseType(typeof(GroceryItem), 200)]
+    [ProducesResponseType(typeof(GroceryItemModel), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetGroceryItemById(string groceryId)
     {
@@ -68,9 +57,9 @@ public class GroceryItemController : ControllerBase
     }
 
     [HttpPut]
-    [ProducesResponseType(typeof(GroceryItem), 200)]
-    [ProducesResponseType(typeof(GroceryItem), 400)]
-    public async Task<IActionResult> UpdateGroceryItem(GroceryItem groceryItem)
+    [ProducesResponseType(typeof(GroceryItemModel), 200)]
+    [ProducesResponseType(typeof(GroceryItemModel), 400)]
+    public async Task<IActionResult> UpdateGroceryItem(GroceryItemModel groceryItem)
     {
         var result = await _service.UpdateGroceryItem(groceryItem);
         return Ok(result);

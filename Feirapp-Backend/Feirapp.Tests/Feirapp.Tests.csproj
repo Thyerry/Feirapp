@@ -28,16 +28,10 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Feirapp.API\Feirapp.API.csproj" />
-        <ProjectReference Include="..\Feirapp.DAL\Feirapp.DAL.csproj" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Feirapp.API\Feirapp.API.csproj" />
-        <ProjectReference Include="..\Feirapp.DAL\Feirapp.DAL.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="IntegrationTest\DAL\" />
     </ItemGroup>
 
 </Project>

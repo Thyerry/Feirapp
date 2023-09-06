@@ -1,4 +1,4 @@
-namespace Feirapp.DAL.DataContext;
+namespace Feirapp.Infrastructure.DataContext;
 
 public class MongoSettings
 {

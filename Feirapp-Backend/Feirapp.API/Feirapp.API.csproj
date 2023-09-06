@@ -7,14 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Riok.Mapperly" Version="2.8.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Feirapp.DAL\Feirapp.DAL.csproj" />
         <ProjectReference Include="..\Feirapp.Domain\Feirapp.Domain.csproj" />
-        <ProjectReference Include="..\Feirapp.Service\Feirapp.Service.csproj" />
+        <ProjectReference Include="..\Feirapp.Infrastructure\Feirapp.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿using Feirapp.DAL.DataContext;
+﻿using Feirapp.Infrastructure.DataContext;
 
 namespace Feirapp.Tests.Helpers;
 

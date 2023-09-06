@@ -1,51 +1,49 @@
 using Bogus;
-using Feirapp.Domain.Enums;
 using Feirapp.Domain.Models;
 using MongoDB.Bson;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Feirapp.Entities;
+using Feirapp.Entities.Enums;
 
 namespace Feirapp.Tests.Fixtures;
 
 public class GroceryItemFixture
 {
-    public static List<GroceryItem> GetGroceryItems()
+    public static List<GroceryItemModel> GetGroceryItems()
     {
-        return new List<GroceryItem>
+        return new List<GroceryItemModel>
         {
             new()
             {
                 Name = "Item 1",
-                Price = 1.1,
-                BrandName = "Brand 1",
+                Price = 1.1m,
+                Brand = "Brand 1",
                 Id = new ObjectId().ToString(),
-                GroceryCategory = GroceryCategoryEnum.DRINK,
                 PurchaseDate = DateTime.Now,
-                GroceryStoreName = "Store 1",
-                PriceHistory = new List<PriceLog>(){new (){ Price= 0, LogDate = DateTime.Now}}
+                GroceryStore = "Store 1",
+                PriceHistory = new List<PriceLogModel>(){new (){ Price = 0, LogDate = DateTime.Now}}
             },
             new()
             {
                 Name = "Item 2",
-                Price = 2.2,
-                BrandName = "Brand 2",
+                Price = 2.2m,
+                Brand = "Brand 2",
                 Id = new ObjectId().ToString(),
-                GroceryCategory = GroceryCategoryEnum.MEAT,
                 PurchaseDate = DateTime.Now,
-                GroceryStoreName = "Store 2",
-                PriceHistory = new List<PriceLog>(){new (){ Price= 2.2, LogDate = DateTime.Now}}
+                GroceryStore = "Store 2",
+                PriceHistory = new List<PriceLogModel>(){new (){ Price= 2.2m, LogDate = DateTime.Now}}
             },
             new()
             {
                 Name = "Item 3",
-                Price = 3.3,
-                BrandName = "Brand 3",
+                Price = 3.3m,
+                Brand = "Brand 3",
                 Id = new ObjectId().ToString(),
-                GroceryCategory = GroceryCategoryEnum.CANNED,
                 PurchaseDate = DateTime.Now,
-                GroceryStoreName = "Store 3",
-                PriceHistory = new List<PriceLog>(){new (){ Price= 3.3, LogDate = DateTime.Now}}
+                GroceryStore = "Store 3",
+                PriceHistory = new List<PriceLogModel>(){new (){ Price= 3.3m, LogDate = DateTime.Now}}
             }
         };
     }
@@ -57,35 +55,32 @@ public class GroceryItemFixture
             new()
             {
                 Name = "Item 1",
-                Price = 1.1,
-                BrandName = "Brand 1",
+                Price = 1.1m,
+                Brand = "Brand 1",
                 Id = new ObjectId().ToString(),
-                GroceryCategory = GroceryCategoryEnum.DRINK,
                 PurchaseDate = DateTime.Now,
-                GroceryStoreName = "Store 1",
-                PriceHistory = new List<PriceLog>(){new (){ Price= 1.1, LogDate = DateTime.Now}}
+                GroceryStore = "Store 1",
+                PriceHistory = new List<PriceLog>(){new (){ Price= 1.1m, LogDate = DateTime.Now}}
             },
             new()
             {
                 Name = "Item 2",
-                Price = 2.2,
-                BrandName = "Brand 2",
+                Price = 2.2m,
+                Brand = "Brand 2",
                 Id = new ObjectId().ToString(),
-                GroceryCategory = GroceryCategoryEnum.MEAT,
                 PurchaseDate = DateTime.Now,
-                GroceryStoreName = "Store 2",
-                PriceHistory = new List<PriceLog>(){new (){ Price= 2.2, LogDate = DateTime.Now}}
+                GroceryStore = "Store 2",
+                PriceHistory = new List<PriceLog>(){new (){ Price= 2.2m, LogDate = DateTime.Now}}
             },
             new()
             {
                 Name = "Item 3",
-                Price = 3.3,
-                BrandName = "Brand 3",
+                Price = 3.3m,
+                Brand = "Brand 3",
                 Id = new ObjectId().ToString(),
-                GroceryCategory = GroceryCategoryEnum.CANNED,
                 PurchaseDate = DateTime.Now,
-                GroceryStoreName = "Store 3",
-                PriceHistory = new List<PriceLog>(){new (){ Price= 3.3, LogDate = DateTime.Now}}
+                GroceryStore = "Store 3",
+                PriceHistory = new List<PriceLog>(){new (){ Price= 3.3m, LogDate = DateTime.Now}}
             }
         };
     }
@@ -93,7 +88,7 @@ public class GroceryItemFixture
     public static GroceryItem CreateRandomGroceryItem()
     {
         var fakePriceLog = new Faker<PriceLog>()
-            .RuleFor(pl => pl.Price, f => f.Random.Float() * 100)
+            .RuleFor(pl => pl.Price, f => (decimal)f.Random.Float() * 100)
             .RuleFor(pl => pl.LogDate, f =>
             {
                 var date = f.Date.Past();
@@ -102,11 +97,10 @@ public class GroceryItemFixture
 
         var fakeGroceryItem = new Faker<GroceryItem>()
             .RuleFor(gi => gi.Name, f => f.Commerce.ProductName())
-            .RuleFor(gi => gi.Price, f => f.Random.Float() * 100)
-            .RuleFor(gi => gi.GroceryCategory, f => f.PickRandom<GroceryCategoryEnum>())
-            .RuleFor(gi => gi.BrandName, f => f.Company.CompanyName())
-            .RuleFor(gi => gi.GroceryStoreName, f => f.Company.CompanyName())
-            .RuleFor(gi => gi.GroceryImageUrl, f => f.Internet.Avatar())
+            .RuleFor(gi => gi.Price, f => (decimal)f.Random.Float() * 100)
+            .RuleFor(gi => gi.Brand, f => f.Company.CompanyName())
+            .RuleFor(gi => gi.GroceryStore, f => f.Company.CompanyName())
+            .RuleFor(gi => gi.ImageUrl, f => f.Internet.Avatar())
             .RuleFor(gi => gi.PriceHistory, f => fakePriceLog.Generate(3).ToList())
             .RuleFor(gi => gi.PurchaseDate, f =>
             {
@@ -120,7 +114,7 @@ public class GroceryItemFixture
     public static List<GroceryItem> CreateListGroceryItem(int howMany = 1)
     {
         var fakePriceLog = new Faker<PriceLog>()
-            .RuleFor(pl => pl.Price, f => f.Random.Float() * 100)
+            .RuleFor(pl => pl.Price, f => (decimal)f.Random.Float() * 100)
             .RuleFor(pl => pl.LogDate, f =>
             {
                 var date = f.Date.Past();
@@ -129,11 +123,10 @@ public class GroceryItemFixture
 
         var fakeGroceryItem = new Faker<GroceryItem>()
             .RuleFor(gi => gi.Name, f => f.Commerce.ProductName())
-            .RuleFor(gi => gi.Price, f => f.Random.Float() * 100)
-            .RuleFor(gi => gi.GroceryCategory, f => f.PickRandom<GroceryCategoryEnum>())
-            .RuleFor(gi => gi.BrandName, f => f.Company.CompanyName())
-            .RuleFor(gi => gi.GroceryStoreName, f => f.Company.CompanyName())
-            .RuleFor(gi => gi.GroceryImageUrl, f => f.Internet.Avatar())
+            .RuleFor(gi => gi.Price, f => (decimal)f.Random.Float() * 100)
+            .RuleFor(gi => gi.Brand, f => f.Company.CompanyName())
+            .RuleFor(gi => gi.GroceryStore, f => f.Company.CompanyName())
+            .RuleFor(gi => gi.ImageUrl, f => f.Internet.Avatar())
             .RuleFor(gi => gi.PriceHistory, f => fakePriceLog.Generate(3).ToList())
             .RuleFor(gi => gi.PurchaseDate, f =>
             {

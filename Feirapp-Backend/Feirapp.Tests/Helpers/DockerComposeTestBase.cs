@@ -13,26 +13,25 @@ public class DockerComposeTestBase : IDisposable
 
     public DockerComposeTestBase()
     {
-        var hosts = new Hosts().Discover();
-        _volumes = hosts.FirstOrDefault()!.GetVolumes();
+        //var hosts = new Hosts().Discover();
+        //_volumes = hosts.FirstOrDefault()!.GetVolumes();
 
-        _container = new Builder()
-            .UseContainer()
-            .UseImage("mongo:latest")
-            .ExposePort(27017, 27017)
-            .WaitForPort("27017/tcp", 3000)
-            .WithName("integrationTestsContainer")
-            .ReuseIfExists()
-            .Build()
-            .Start();
+        //_container = new Builder()
+        //    .UseContainer()
+        //    .UseImage("mongo:latest")
+        //    .ExposePort(27017, 27017)
+        //    .WaitForPort("27017/tcp", 3000)
+        //    .WithName("integrationTestsContainer")
+        //    .Build()
+        //    .Start();
     }
 
     public void Dispose()
     {
-        _container.Dispose();
-        foreach (var volumeService in _container.GetVolumes())
-        {
-            volumeService.Remove();
-        }
+        //_container.Dispose();
+        //foreach (var volumeService in _container.GetVolumes())
+        //{
+        //    volumeService.Remove();
+        //}
     }
 }

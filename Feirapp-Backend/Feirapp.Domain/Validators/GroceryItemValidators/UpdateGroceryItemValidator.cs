@@ -1,10 +1,10 @@
-using Feirapp.Domain.Enums;
 using Feirapp.Domain.Models;
+using Feirapp.Entities.Enums;
 using FluentValidation;
 
-namespace Feirapp.Service.Validators.GroceryItemValidators;
+namespace Feirapp.Domain.Validators.GroceryItemValidators;
 
-public class UpdateGroceryItemValidator : AbstractValidator<GroceryItem>
+public class UpdateGroceryItemValidator : AbstractValidator<GroceryItemModel>
 {
     public UpdateGroceryItemValidator()
     {
@@ -20,11 +20,7 @@ public class UpdateGroceryItemValidator : AbstractValidator<GroceryItem>
             .GreaterThan(0)
             .WithMessage("O Preço deve ser maior que 0");
 
-        RuleFor(item => item.GroceryCategory)
-            .NotEqual(item => GroceryCategoryEnum.EMPTY)
-            .WithMessage("Selecione uma categoria");
-
-        RuleFor(item => item.GroceryStoreName)
+        RuleFor(item => item.GroceryStore)
             .NotEmpty()
             .WithMessage("O Nome do Mercado não pode ser vazio");
     }

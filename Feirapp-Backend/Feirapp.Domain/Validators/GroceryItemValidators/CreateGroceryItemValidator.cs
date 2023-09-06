@@ -1,9 +1,9 @@
 using Feirapp.Domain.Models;
 using FluentValidation;
 
-namespace Feirapp.Service.Validators.GroceryItemValidators;
+namespace Feirapp.Domain.Validators.GroceryItemValidators;
 
-public class CreateGroceryItemValidator : AbstractValidator<GroceryItem>
+public class CreateGroceryItemValidator : AbstractValidator<GroceryItemModel>
 {
     public CreateGroceryItemValidator()
     {
