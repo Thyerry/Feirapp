@@ -12,7 +12,7 @@ public interface IGroceryItemRepository
 
     Task<GroceryItem> InsertAsync(GroceryItem groceryItem, CancellationToken cancellationToken = default);
 
-    Task<List<GroceryItem>> InsertGroceryItemBatch(List<GroceryItem> groceryItems, CancellationToken cancellationToken = default);
+    Task<List<GroceryItem>> InsertGroceryItemBatchAsync(List<GroceryItem> groceryItems, CancellationToken cancellationToken = default);
 
     Task UpdateAsync(GroceryItem groceryItem, CancellationToken cancellationToken = default);
 

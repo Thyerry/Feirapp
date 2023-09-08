@@ -47,6 +47,18 @@ void ConfigurationAndServices(IServiceCollection services, IConfiguration config
 {
     services.Configure<MongoSettings>(configuration.GetSection(nameof(MongoSettings)));
     services.AddTransient<IMongoFeirappContext, MongoFeirappContext>();
+    
+    #region Services
+
     services.AddTransient<IGroceryItemService, GroceryItemService>();
+    services.AddTransient<IGroceryCategoryService, GroceryCategoryService>();
+
+    #endregion Services
+
+    #region Repositories
+
     services.AddTransient<IGroceryItemRepository, GroceryItemRepository>();
+    services.AddTransient<IGroceryCategoryRepository, GroceryCategoryRepository>();
+
+    #endregion Repositories
 }

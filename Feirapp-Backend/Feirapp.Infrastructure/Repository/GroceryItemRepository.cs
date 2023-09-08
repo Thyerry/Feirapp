@@ -63,7 +63,7 @@ public class GroceryItemRepository : IGroceryItemRepository, IDisposable
         await _collection.DeleteOneAsync(groceryItem => groceryItem.Id == groceryId, cancellationToken: cancellationToken);
     }
 
-    public async Task<List<GroceryItem>> InsertGroceryItemBatch(List<GroceryItem> groceryItems, CancellationToken cancellationToken)
+    public async Task<List<GroceryItem>> InsertGroceryItemBatchAsync(List<GroceryItem> groceryItems, CancellationToken cancellationToken)
     {
         await _collection.InsertManyAsync(groceryItems, cancellationToken: cancellationToken);
         return groceryItems;

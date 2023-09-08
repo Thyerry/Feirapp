@@ -1,11 +1,12 @@
 using Feirapp.Domain.Contracts.Service;
 using Feirapp.Domain.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Feirapp.API.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class GroceryItemController : ControllerBase
 {
     private readonly IGroceryItemService _service;
@@ -28,6 +29,7 @@ public class GroceryItemController : ControllerBase
 
     [HttpGet("Random/{quantity:int}")]
     [ProducesResponseType(typeof(List<GroceryItemModel>), 200)]
+    [ProducesResponseType(typeof(BadRequest), 400)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetRandomGroceryItems(int quantity, CancellationToken cancellationToken = default)
     {
@@ -45,13 +47,17 @@ public class GroceryItemController : ControllerBase
         return Created(nameof(GroceryItemModel), result);
     }
 
-    [HttpGet("{groceryId:length(24)}")]
+    [HttpGet("{id:length(24)}")]
     [ProducesResponseType(typeof(GroceryItemModel), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
-    public async Task<IActionResult> GetById(string groceryId, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken = default)
     {
-        var result = await _service.GetById(groceryId, cancellationToken);
-        if (result == null!)
+        if (string.IsNullOrWhiteSpace(id))
+            return BadRequest("Invalid id");
+
+        var result = await _service.GetById(id, cancellationToken);
+
+        if (result == null)
             return NotFound();
         return Ok(result);
     }
