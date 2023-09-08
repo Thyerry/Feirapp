@@ -11,11 +11,11 @@ public class GroceryCategory : BaseEntity
     public string Description { get; set; }
 
     [BsonElement("cest")]
-    public string CEST { get; set; }
+    public string Cest { get; set; }
 
     [BsonElement("item")]
     public string ItemNumber { get; set; }
 
     [BsonElement("ncm")]
-    public string NCM { get; set; }
+    public string Ncm { get; set; }
 }

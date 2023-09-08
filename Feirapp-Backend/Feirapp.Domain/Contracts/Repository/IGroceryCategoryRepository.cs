@@ -9,6 +9,7 @@ public interface IGroceryCategoryRepository
     Task<GroceryCategory> GetByIdAsync(string id, CancellationToken cancellationToken = default);
 
     Task<GroceryCategory> InsertAsync(GroceryCategory groceryCategory, CancellationToken cancellationToken = default);
+    Task<List<GroceryCategory>> InsertBatchAsync(List<GroceryCategory> groceryCategories, CancellationToken cancellationToken = default);
 
     Task UpdateAsync(GroceryCategory groceryCategory, CancellationToken cancellationToken = default);
 

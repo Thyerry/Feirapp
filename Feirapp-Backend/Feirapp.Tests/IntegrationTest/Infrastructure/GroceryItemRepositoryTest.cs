@@ -5,6 +5,7 @@ using Feirapp.Tests.Fixtures;
 using Feirapp.Tests.Helpers;
 using FluentAssertions;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -23,7 +24,38 @@ public class GroceryItemRepositoryTest : IDisposable
     }
 
     [Fact]
-    public async Task InsertAsync_InsertItOnDatabase_ShouldBeInsertedOnDatabase()
+    public async Task GetAllAsync_ReturnAllGroceryItemsInserted()
+    {
+        //Arrange
+        var repository = new GroceryItemRepository(_context);
+        var groceryItems = GroceryItemFixture.CreateList(GroceryItemsCount);
+        await repository.InsertBatchAsync(groceryItems, CancellationToken.None);
+
+        //Act
+        var actual = await repository.GetAllAsync(CancellationToken.None);
+
+        //Assert
+        actual.Count.Should().Be(GroceryItemsCount);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_ReturnGroceryItemWithThatId()
+    {
+        //Arrange
+        var repository = new GroceryItemRepository(_context);
+        var groceryCategories = GroceryItemFixture.CreateList(10);
+        await repository.InsertBatchAsync(groceryCategories, CancellationToken.None);
+        var expected = (await repository.GetAllAsync(CancellationToken.None)).MinBy(x => Guid.NewGuid());
+
+        //Act
+        var actual = await repository.GetByIdAsync(expected.Id, CancellationToken.None);
+
+        //Assert
+        actual.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task InsertAsync_InsertOnDatabaseSuccessfully()
     {
         //Arrange
         var repository = new GroceryItemRepository(_context);
@@ -37,14 +69,14 @@ public class GroceryItemRepositoryTest : IDisposable
     }
 
     [Fact]
-    public async Task InsertGroceryItemBatchAsync_ValidBatch_ShouldInsertAllGroceryItems()
+    public async Task InsertBatchAsync_InsertOnDatabaseSuccessfully()
     {
         //Arrange
         var repository = new GroceryItemRepository(_context);
-        var groceryItems = GroceryItemFixture.CreateListGroceryItem(GroceryItemsCount);
+        var groceryItems = GroceryItemFixture.CreateList(GroceryItemsCount);
 
         //Act
-        await repository.InsertGroceryItemBatchAsync(groceryItems, CancellationToken.None);
+        await repository.InsertBatchAsync(groceryItems, CancellationToken.None);
 
         //Assert
         var actual = await repository.GetAllAsync(CancellationToken.None);
@@ -52,18 +84,37 @@ public class GroceryItemRepositoryTest : IDisposable
     }
 
     [Fact]
-    public async Task GetAllAsync_ReturnAllGroceryItemsInserted()
+    public async Task UpdateAsync_UpdateDocumentOnDatabaseSuccessfully()
     {
         //Arrange
         var repository = new GroceryItemRepository(_context);
-        var groceryItems = GroceryItemFixture.CreateListGroceryItem(GroceryItemsCount);
-        await repository.InsertGroceryItemBatchAsync(groceryItems, CancellationToken.None);
+        var insertGroceryItem = GroceryItemFixture.CreateRandomGroceryItem();
+        await repository.InsertAsync(insertGroceryItem, CancellationToken.None);
+        var expected = GroceryItemFixture.CreateRandomGroceryItem();
+        expected.Id = insertGroceryItem.Id;
 
         //Act
-        var actual = await repository.GetAllAsync(CancellationToken.None);
+        await repository.UpdateAsync(expected, CancellationToken.None);
 
         //Assert
-        actual.Count.Should().Be(GroceryItemsCount);
+        var actual = await repository.GetByIdAsync(insertGroceryItem.Id!, CancellationToken.None);
+        actual.Should().BeEquivalentTo(expected);
+    }
+    [Fact]
+    public async Task DeleteAsync_DeleteFromDatabaseSuccessfully()
+    {
+        //Arrange
+        var repository = new GroceryItemRepository(_context);
+        var groceryItem = GroceryItemFixture.CreateRandomGroceryItem();
+        await repository.InsertAsync(groceryItem, CancellationToken.None);
+        var deleteId = groceryItem.Id;
+
+        //Act
+        await repository.DeleteAsync(deleteId, CancellationToken.None);
+
+        //Assert
+        var actual = await repository.GetByIdAsync(deleteId, CancellationToken.None);
+        actual.Should().BeNull();
     }
 
     public void Dispose()

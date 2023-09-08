@@ -44,18 +44,11 @@ public class GroceryItemRepository : IGroceryItemRepository, IDisposable
 
     public async Task UpdateAsync(GroceryItem groceryItem, CancellationToken cancellationToken)
     {
-        var groceryItemToUpdate = await GetByIdAsync(groceryItem.Id, cancellationToken);
-        await _collection.UpdateOneAsync(
-            g => g.Id == groceryItem.Id,
-            Builders<GroceryItem>.Update
-                .Set(n => n.Name, groceryItem.Name)
-                .Set(n => n.Price, groceryItem.Price)
-                .Set(n => n.Brand, groceryItem.Brand)
-                .Set(n => n.PurchaseDate, groceryItem.PurchaseDate)
-                .Set(n => n.MeasureUnit, groceryItem.MeasureUnit)
-                .Set(n => n.ImageUrl, groceryItem.ImageUrl)
-                .Set(n => n.GroceryStore, groceryItem.GroceryStore),
-            new UpdateOptions { IsUpsert = false }, cancellationToken: cancellationToken);
+        await _collection.ReplaceOneAsync(
+            Builders<GroceryItem>.Filter.Eq(g => g.Id, groceryItem.Id),
+            groceryItem,
+            cancellationToken: cancellationToken
+        );
     }
 
     public async Task DeleteAsync(string groceryId, CancellationToken cancellationToken)
@@ -63,7 +56,7 @@ public class GroceryItemRepository : IGroceryItemRepository, IDisposable
         await _collection.DeleteOneAsync(groceryItem => groceryItem.Id == groceryId, cancellationToken: cancellationToken);
     }
 
-    public async Task<List<GroceryItem>> InsertGroceryItemBatchAsync(List<GroceryItem> groceryItems, CancellationToken cancellationToken)
+    public async Task<List<GroceryItem>> InsertBatchAsync(List<GroceryItem> groceryItems, CancellationToken cancellationToken)
     {
         await _collection.InsertManyAsync(groceryItems, cancellationToken: cancellationToken);
         return groceryItems;

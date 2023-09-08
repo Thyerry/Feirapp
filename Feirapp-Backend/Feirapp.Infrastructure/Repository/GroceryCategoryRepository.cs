@@ -16,26 +16,41 @@ public class GroceryCategoryRepository : IGroceryCategoryRepository
 
     public async Task<List<GroceryCategory>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return (await _collection.FindAsync(q => true,
+            cancellationToken: cancellationToken))
+            .ToList();
     }
 
     public async Task<GroceryCategory> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return (await _collection.FindAsync(q => q.Id == id,
+            cancellationToken: cancellationToken))
+            .FirstOrDefault();
     }
 
     public async Task<GroceryCategory> InsertAsync(GroceryCategory groceryCategory, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        await _collection.InsertOneAsync(groceryCategory, cancellationToken: cancellationToken);
+        return groceryCategory;
+    }
+
+    public async Task<List<GroceryCategory>> InsertBatchAsync(List<GroceryCategory> groceryCategories, CancellationToken cancellationToken = default)
+    {
+        await _collection.InsertManyAsync(groceryCategories, cancellationToken: cancellationToken);
+        return groceryCategories;
     }
 
     public async Task UpdateAsync(GroceryCategory groceryCategory, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        await _collection.ReplaceOneAsync(
+            Builders<GroceryCategory>.Filter.Eq(g => g.Id, groceryCategory.Id),
+            groceryCategory,
+            cancellationToken: cancellationToken
+            );
     }
 
     public async Task DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        await _collection.DeleteOneAsync(q => q.Id == id, cancellationToken);
     }
 }
