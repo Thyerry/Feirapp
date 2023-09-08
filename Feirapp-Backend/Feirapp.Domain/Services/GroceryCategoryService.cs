@@ -1,6 +1,9 @@
 ﻿using Feirapp.Domain.Contracts.Repository;
 using Feirapp.Domain.Contracts.Service;
+using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Models;
+using Feirapp.Domain.Validators;
+using FluentValidation;
 
 namespace Feirapp.Domain.Services;
 
@@ -13,29 +16,37 @@ public class GroceryCategoryService : IGroceryCategoryService
         _repository = repository;
     }
 
-
-    public Task<GroceryCategoryModel> GetByIdAsync(string id, CancellationToken cancellationToken = default)
+    public async Task<GroceryCategoryModel> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var result = await _repository.GetByIdAsync(id, cancellationToken);
+        return result.ToModel();
     }
 
-    public Task<List<GroceryCategoryModel>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<List<GroceryCategoryModel>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var result = await _repository.GetAllAsync(cancellationToken);
+        return result.ToModelList();
     }
 
-    public Task<GroceryCategoryModel> InsertAsync(GroceryCategoryModel groceryCategory, CancellationToken cancellationToken = default)
+    public async Task<GroceryCategoryModel> InsertAsync(GroceryCategoryModel groceryCategory, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var validator = new InsertGroceryCategoryValidator();
+        await validator.ValidateAndThrowAsync(groceryCategory, cancellationToken);
+
+        var result = await _repository.InsertAsync(groceryCategory.ToEntity(), cancellationToken);
+        return result.ToModel();
     }
 
-    public Task UpdateAsync(GroceryCategoryModel groceryCategory, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(GroceryCategoryModel groceryCategory, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var validator = new UpdateGroceryCategoryValidator();
+        await validator.ValidateAndThrowAsync(groceryCategory, cancellationToken);
+
+        await _repository.UpdateAsync(groceryCategory.ToEntity(), cancellationToken);
     }
 
-    public Task DeleteAsync(string id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        await _repository.DeleteAsync(id, cancellationToken);
     }
 }

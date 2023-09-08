@@ -13,27 +13,28 @@ public class GroceryCategoryRepository : IGroceryCategoryRepository
     {
         _collection = context.GetCollection<GroceryCategory>(nameof(GroceryCategory));
     }
-    public Task<List<GroceryCategory>> GetAllGroceryCategories()
+
+    public async Task<List<GroceryCategory>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public Task<GroceryCategory> GetGroceryCategoryById(string id)
+    public async Task<GroceryCategory> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public Task<GroceryCategory> CreateGroceryCategory(GroceryCategory groceryCategory)
+    public async Task<GroceryCategory> InsertAsync(GroceryCategory groceryCategory, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public Task UpdateGroceryCategory(GroceryCategory groceryCategory)
+    public async Task UpdateAsync(GroceryCategory groceryCategory, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public Task DeleteGroceryCategory(string id)
+    public async Task DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }

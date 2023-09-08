@@ -8,5 +8,8 @@ namespace Feirapp.Domain.Mappers;
 public static partial class GroceryCategoryMapper
 {
     public static partial GroceryCategoryModel ToModel(this GroceryCategory groceryCategory);
+
+    public static partial List<GroceryCategoryModel> ToModelList(this List<GroceryCategory> groceryCategory);
+
     public static partial GroceryCategory ToEntity(this GroceryCategoryModel groceryCategoryModel);
 }

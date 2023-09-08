@@ -2,7 +2,7 @@ using Feirapp.Domain.Contracts.Repository;
 using Feirapp.Domain.Contracts.Service;
 using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Models;
-using Feirapp.Domain.Validators.GroceryItemValidators;
+using Feirapp.Domain.Validators;
 using FluentValidation;
 
 namespace Feirapp.Domain.Services;
@@ -28,7 +28,7 @@ public class GroceryItemService : IGroceryItemService
 
     public async Task<GroceryItemModel> InsertAsync(GroceryItemModel groceryItem, CancellationToken cancellationToken)
     {
-        var validator = new CreateGroceryItemValidator();
+        var validator = new InsertGroceryItemValidator();
         var validationResult = await validator.ValidateAsync(groceryItem, cancellationToken);
         if (validationResult.Errors.Count > 0)
             throw new ValidationException(validationResult.Errors);

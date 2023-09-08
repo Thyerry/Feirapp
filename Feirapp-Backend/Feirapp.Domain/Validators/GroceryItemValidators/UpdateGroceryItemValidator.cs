@@ -1,8 +1,7 @@
 using Feirapp.Domain.Models;
-using Feirapp.Entities.Enums;
 using FluentValidation;
 
-namespace Feirapp.Domain.Validators.GroceryItemValidators;
+namespace Feirapp.Domain.Validators;
 
 public class UpdateGroceryItemValidator : AbstractValidator<GroceryItemModel>
 {

@@ -1,11 +1,11 @@
 using Feirapp.Domain.Models;
 using FluentValidation;
 
-namespace Feirapp.Domain.Validators.GroceryItemValidators;
+namespace Feirapp.Domain.Validators;
 
-public class CreateGroceryItemValidator : AbstractValidator<GroceryItemModel>
+public class InsertGroceryItemValidator : AbstractValidator<GroceryItemModel>
 {
-    public CreateGroceryItemValidator()
+    public InsertGroceryItemValidator()
     {
         RuleFor(item => item.Name)
             .NotEmpty()
