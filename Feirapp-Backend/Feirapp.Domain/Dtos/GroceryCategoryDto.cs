@@ -1,6 +1,6 @@
-﻿namespace Feirapp.Domain.Models;
+﻿namespace Feirapp.Domain.Dtos;
 
-public class GroceryCategoryModel
+public class GroceryCategoryDto
 {
     public string? Id { get; set; }
     public string? Name { get; set; }

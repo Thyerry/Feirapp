@@ -11,5 +11,5 @@ public class GroceryItemDto
     public string StoreName { get; set; } = string.Empty;
     public string ImageUrl { get; set; } = string.Empty;
     public GroceryCategoryDto? Category { get; set; }
-    public List<PriceLogModel>? PriceHistory { get; set; }
+    public List<PriceLogDto>? PriceHistory { get; set; }
 }
