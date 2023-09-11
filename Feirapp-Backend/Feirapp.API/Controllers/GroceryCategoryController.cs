@@ -1,5 +1,5 @@
 ﻿using Feirapp.Domain.Contracts.Service;
-using Feirapp.Domain.Models;
+using Feirapp.Domain.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Feirapp.API.Controllers;
@@ -16,17 +16,17 @@ public class GroceryCategoryController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(List<GroceryCategoryModel>), 200)]
+    [ProducesResponseType(typeof(List<GroceryCategoryDto>), 200)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
     {
         return Ok(await _service.GetAllAsync(cancellationToken));
     }
 
     [HttpGet("{id:length(24)}")]
-    [ProducesResponseType(typeof(GroceryCategoryModel), 200)]
+    [ProducesResponseType(typeof(GroceryCategoryDto), 200)]
     [ProducesResponseType(typeof(BadRequestObjectResult), 400)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
-    public async Task<IActionResult> GetById([FromRoute] string id, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(id))
             return BadRequest("Invalid id");
@@ -40,24 +40,24 @@ public class GroceryCategoryController : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType(typeof(GroceryCategoryModel), 201)]
-    public async Task<IActionResult> Insert([FromBody] GroceryCategoryModel groceryCategoryModel, CancellationToken cancellationToken = default)
+    [ProducesResponseType(typeof(GroceryCategoryDto), 201)]
+    public async Task<IActionResult> Insert([FromBody] GroceryCategoryDto groceryCategoryDto, CancellationToken cancellationToken = default)
     {
-        var result = await _service.InsertAsync(groceryCategoryModel, cancellationToken);
-        return Created(nameof(GroceryCategoryModel), result);
+        var result = await _service.InsertAsync(groceryCategoryDto, cancellationToken);
+        return Created(nameof(GroceryCategoryDto), result);
     }
 
     [HttpPut]
     [ProducesResponseType(typeof(AcceptedResult), 201)]
-    public async Task<IActionResult> Update([FromBody] GroceryCategoryModel groceryCategoryModel, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Update([FromBody] GroceryCategoryDto groceryCategoryDto, CancellationToken cancellationToken = default)
     {
-        await _service.UpdateAsync(groceryCategoryModel, cancellationToken);
+        await _service.UpdateAsync(groceryCategoryDto, cancellationToken);
         return Accepted();
     }
-
+    
     [HttpDelete("{id:length(24)}")]
     [ProducesResponseType(typeof(AcceptedResult), 201)]
-    public async Task<IActionResult> Delete([FromRoute] string id, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(id))
             return BadRequest("Invalid id");

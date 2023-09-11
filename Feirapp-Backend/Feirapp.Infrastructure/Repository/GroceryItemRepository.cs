@@ -1,5 +1,5 @@
+using Feirapp.DocumentModels;
 using Feirapp.Domain.Contracts.Repository;
-using Feirapp.Entities;
 using Feirapp.Infrastructure.DataContext;
 using MongoDB.Driver;
 
@@ -8,10 +8,12 @@ namespace Feirapp.Infrastructure.Repository;
 public class GroceryItemRepository : IGroceryItemRepository, IDisposable
 {
     private readonly IMongoCollection<GroceryItem> _collection;
+    private readonly IMongoCollection<GroceryCategory> _categoryCollection;
 
     public GroceryItemRepository(IMongoFeirappContext context)
     {
         _collection = context.GetCollection<GroceryItem>(nameof(GroceryItem));
+        _categoryCollection = context.GetCollection<GroceryCategory>(nameof(GroceryCategory));
     }
 
     public async Task<List<GroceryItem>> GetAllAsync(CancellationToken cancellationToken)
@@ -39,7 +41,7 @@ public class GroceryItemRepository : IGroceryItemRepository, IDisposable
     public async Task<GroceryItem> GetByIdAsync(string groceryId, CancellationToken cancellationToken)
     {
         var result = (await _collection.FindAsync(p => p.Id == groceryId, cancellationToken: cancellationToken)).ToList();
-        return result.FirstOrDefault();
+        return result.FirstOrDefault()!;
     }
 
     public async Task UpdateAsync(GroceryItem groceryItem, CancellationToken cancellationToken)

@@ -1,16 +1,16 @@
-﻿using Feirapp.Domain.Models;
+﻿using Feirapp.Domain.Dtos;
 
 namespace Feirapp.Domain.Contracts.Service;
 
 public interface IGroceryCategoryService
 {
-    Task<GroceryCategoryModel> GetByIdAsync(string id, CancellationToken cancellationToken = default);
+    Task<GroceryCategoryDto> GetByIdAsync(string id, CancellationToken cancellationToken = default);
 
-    Task<List<GroceryCategoryModel>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<List<GroceryCategoryDto>> GetAllAsync(CancellationToken cancellationToken = default);
 
-    Task<GroceryCategoryModel> InsertAsync(GroceryCategoryModel groceryCategory, CancellationToken cancellationToken = default);
+    Task<GroceryCategoryDto> InsertAsync(GroceryCategoryDto groceryCategory, CancellationToken cancellationToken = default);
 
-    Task UpdateAsync(GroceryCategoryModel groceryCategory, CancellationToken cancellationToken = default);
+    Task UpdateAsync(GroceryCategoryDto groceryCategory, CancellationToken cancellationToken = default);
 
     Task DeleteAsync(string id, CancellationToken cancellationToken = default);
 }

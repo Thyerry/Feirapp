@@ -1,4 +1,4 @@
-﻿namespace Feirapp.Entities.Enums;
+﻿namespace Feirapp.DocumentModels.Enums;
 
 public enum MeasureUnitEnum
 {

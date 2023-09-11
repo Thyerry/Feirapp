@@ -1,5 +1,5 @@
 using Feirapp.Domain.Contracts.Service;
-using Feirapp.Domain.Models;
+using Feirapp.Domain.Dtos;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +17,7 @@ public class GroceryItemController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(List<GroceryItemModel>), 200)]
+    [ProducesResponseType(typeof(List<GroceryItemDto>), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
     {
@@ -28,7 +28,7 @@ public class GroceryItemController : ControllerBase
     }
 
     [HttpGet("Random/{quantity:int}")]
-    [ProducesResponseType(typeof(List<GroceryItemModel>), 200)]
+    [ProducesResponseType(typeof(List<GroceryItemDto>), 200)]
     [ProducesResponseType(typeof(BadRequest), 400)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetRandomGroceryItems(int quantity, CancellationToken cancellationToken = default)
@@ -40,15 +40,15 @@ public class GroceryItemController : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType(typeof(GroceryItemModel), 201)]
-    public async Task<IActionResult> Insert(GroceryItemModel groceryItem, CancellationToken cancellationToken = default)
+    [ProducesResponseType(typeof(GroceryItemDto), 201)]
+    public async Task<IActionResult> Insert(GroceryItemDto groceryItem, CancellationToken cancellationToken = default)
     {
         var result = await _service.InsertAsync(groceryItem, cancellationToken);
-        return Created(nameof(GroceryItemModel), result);
+        return Created(nameof(GroceryItemDto), result);
     }
 
     [HttpGet("{id:length(24)}")]
-    [ProducesResponseType(typeof(GroceryItemModel), 200)]
+    [ProducesResponseType(typeof(GroceryItemDto), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken = default)
     {
@@ -63,9 +63,9 @@ public class GroceryItemController : ControllerBase
     }
 
     [HttpPut]
-    [ProducesResponseType(typeof(GroceryItemModel), 200)]
-    [ProducesResponseType(typeof(GroceryItemModel), 400)]
-    public async Task<IActionResult> Update(GroceryItemModel groceryItem, CancellationToken cancellationToken = default)
+    [ProducesResponseType(typeof(GroceryItemDto), 200)]
+    [ProducesResponseType(typeof(GroceryItemDto), 400)]
+    public async Task<IActionResult> Update(GroceryItemDto groceryItem, CancellationToken cancellationToken = default)
     {
         await _service.UpdateAsync(groceryItem, cancellationToken);
         return Accepted();

@@ -17,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Feirapp.Entities\Feirapp.Entities.csproj" />
+      <ProjectReference Include="..\Feirapp.Entities\Feirapp.DocumentModels.csproj" />
     </ItemGroup>
 
 </Project>

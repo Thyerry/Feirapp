@@ -15,13 +15,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2 - Domain", "2 - Domain", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3 - Infrastructure", "3 - Infrastructure", "{65B61302-CB54-4911-A43E-31D658B775E3}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4 - Entities", "4 - Entities", "{69D7E3F1-AEC7-4AE3-85A3-F925CF03FC53}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4 - Document Models", "4 - Document Models", "{69D7E3F1-AEC7-4AE3-85A3-F925CF03FC53}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5 - Tests", "5 - Tests", "{F29A9AA5-2FE8-4C92-889B-9CC41DDBAED2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Feirapp.Infrastructure", "Feirapp.Infrastructure\Feirapp.Infrastructure.csproj", "{05593F28-BFF6-4E75-AA37-01F8BE321C9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Feirapp.Infrastructure", "Feirapp.Infrastructure\Feirapp.Infrastructure.csproj", "{05593F28-BFF6-4E75-AA37-01F8BE321C9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Feirapp.Entities", "Feirapp.Entities\Feirapp.Entities.csproj", "{09F3844A-D572-4F14-8BEC-56EA76723345}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Feirapp.DocumentModels", "Feirapp.Entities\Feirapp.DocumentModels.csproj", "{09F3844A-D572-4F14-8BEC-56EA76723345}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,6 +1,6 @@
 ﻿using Feirapp.API.Controllers;
 using Feirapp.Domain.Contracts.Service;
-using Feirapp.Domain.Models;
+using Feirapp.Domain.Dtos;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -13,7 +13,7 @@ namespace Feirapp.Tests.UnitTest.API;
 
 public class GroceryCategoryControllerTest
 {
-    private readonly GroceryCategoryModel GroceryCategoryModel = new GroceryCategoryModel();
+    private readonly GroceryCategoryDto _groceryCategoryDto = new GroceryCategoryDto();
     private const string ValidGroceryCategoryId = "groceryCategoryId";
     private const string BadRequestMessage = "Invalid id";
     private const string EmptyString = "";
@@ -49,7 +49,7 @@ public class GroceryCategoryControllerTest
         // Arrange
         var mockService = new Mock<IGroceryCategoryService>();
         mockService.Setup(service => service.GetAllAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<GroceryCategoryModel>());
+            .ReturnsAsync(new List<GroceryCategoryDto>());
 
         var sut = new GroceryCategoryController(mockService.Object);
 
@@ -57,7 +57,7 @@ public class GroceryCategoryControllerTest
         var result = (OkObjectResult)await sut.GetAll();
 
         // Assert
-        result.Value.Should().BeOfType<List<GroceryCategoryModel>>();
+        result.Value.Should().BeOfType<List<GroceryCategoryDto>>();
     }
 
     [Fact]
@@ -84,7 +84,7 @@ public class GroceryCategoryControllerTest
         // Arrange
         var mockService = new Mock<IGroceryCategoryService>();
         mockService.Setup(service => service.GetByIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(GroceryCategoryModel);
+            .ReturnsAsync(_groceryCategoryDto);
 
         var sut = new GroceryCategoryController(mockService.Object);
         // Act
@@ -102,7 +102,7 @@ public class GroceryCategoryControllerTest
         // Arrange
         var mockService = new Mock<IGroceryCategoryService>();
         mockService.Setup(service => service.GetByIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(GroceryCategoryModel);
+            .ReturnsAsync(_groceryCategoryDto);
 
         var sut = new GroceryCategoryController(mockService.Object);
 
@@ -110,7 +110,7 @@ public class GroceryCategoryControllerTest
         var result = (OkObjectResult)await sut.GetById(ValidGroceryCategoryId);
 
         // Assert
-        result.Value.Should().BeOfType<GroceryCategoryModel>();
+        result.Value.Should().BeOfType<GroceryCategoryDto>();
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public class GroceryCategoryControllerTest
         // Arrange
         var mockService = new Mock<IGroceryCategoryService>();
         mockService.Setup(service => service.GetByIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(GroceryCategoryModel);
+            .ReturnsAsync(_groceryCategoryDto);
 
         var sut = new GroceryCategoryController(mockService.Object);
         // Act
@@ -134,7 +134,7 @@ public class GroceryCategoryControllerTest
         // Arrange
         var mockService = new Mock<IGroceryCategoryService>();
         mockService.Setup(service => service.GetByIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(GroceryCategoryModel);
+            .ReturnsAsync(_groceryCategoryDto);
 
         var sut = new GroceryCategoryController(mockService.Object);
 
@@ -179,7 +179,7 @@ public class GroceryCategoryControllerTest
         var sut = new GroceryCategoryController(mockService.Object);
 
         // Act
-        var result = await sut.Insert(GroceryCategoryModel, CancellationToken.None);
+        var result = await sut.Insert(_groceryCategoryDto, CancellationToken.None);
 
         // Assert
         result.Should().BeOfType<CreatedResult>();
@@ -192,16 +192,16 @@ public class GroceryCategoryControllerTest
     {
         // Arrange
         var mockService = new Mock<IGroceryCategoryService>();
-        mockService.Setup(service => service.InsertAsync(It.IsAny<GroceryCategoryModel>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(GroceryCategoryModel);
+        mockService.Setup(service => service.InsertAsync(It.IsAny<GroceryCategoryDto>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(_groceryCategoryDto);
 
         var sut = new GroceryCategoryController(mockService.Object);
 
         // Act
-        var result = (CreatedResult)await sut.Insert(GroceryCategoryModel, CancellationToken.None);
+        var result = (CreatedResult)await sut.Insert(_groceryCategoryDto, CancellationToken.None);
 
         // Assert
-        result.Value.Should().BeOfType<GroceryCategoryModel>();
+        result.Value.Should().BeOfType<GroceryCategoryDto>();
     }
 
     [Fact]
@@ -209,17 +209,17 @@ public class GroceryCategoryControllerTest
     {
         // Arrange
         var mockService = new Mock<IGroceryCategoryService>();
-        mockService.Setup(service => service.InsertAsync(It.IsAny<GroceryCategoryModel>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(GroceryCategoryModel);
+        mockService.Setup(service => service.InsertAsync(It.IsAny<GroceryCategoryDto>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(_groceryCategoryDto);
 
         var sut = new GroceryCategoryController(mockService.Object);
 
         // Act
-        await sut.Insert(GroceryCategoryModel, CancellationToken.None);
+        await sut.Insert(_groceryCategoryDto, CancellationToken.None);
 
         // Assert
         mockService.Verify(service =>
-            service.InsertAsync(It.IsAny<GroceryCategoryModel>(), It.IsAny<CancellationToken>()),
+            service.InsertAsync(It.IsAny<GroceryCategoryDto>(), It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -235,7 +235,7 @@ public class GroceryCategoryControllerTest
         var sut = new GroceryCategoryController(mockService.Object);
 
         // Act
-        var result = await sut.Update(GroceryCategoryModel, CancellationToken.None);
+        var result = await sut.Update(_groceryCategoryDto, CancellationToken.None);
 
         // Assert
         result.Should().BeOfType<AcceptedResult>();
@@ -249,16 +249,16 @@ public class GroceryCategoryControllerTest
         // Arrange
         var mockService = new Mock<IGroceryCategoryService>();
         mockService.Setup(service =>
-            service.UpdateAsync(It.IsAny<GroceryCategoryModel>(), It.IsAny<CancellationToken>()));
+            service.UpdateAsync(It.IsAny<GroceryCategoryDto>(), It.IsAny<CancellationToken>()));
 
         var sut = new GroceryCategoryController(mockService.Object);
 
         // Act
-        await sut.Update(GroceryCategoryModel, CancellationToken.None);
+        await sut.Update(_groceryCategoryDto, CancellationToken.None);
 
         // Assert
         mockService.Verify(service =>
-            service.UpdateAsync(It.IsAny<GroceryCategoryModel>(), It.IsAny<CancellationToken>()),
+            service.UpdateAsync(It.IsAny<GroceryCategoryDto>(), It.IsAny<CancellationToken>()),
             Times.Once
             );
     }

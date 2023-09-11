@@ -1,9 +1,9 @@
-using Feirapp.Domain.Models;
+using Feirapp.Domain.Dtos;
 using FluentValidation;
 
 namespace Feirapp.Domain.Validators;
 
-public class UpdateGroceryItemValidator : AbstractValidator<GroceryItemModel>
+public class UpdateGroceryItemValidator : AbstractValidator<GroceryItemDto>
 {
     public UpdateGroceryItemValidator()
     {
@@ -19,7 +19,7 @@ public class UpdateGroceryItemValidator : AbstractValidator<GroceryItemModel>
             .GreaterThan(0)
             .WithMessage("O Preço deve ser maior que 0");
 
-        RuleFor(item => item.GroceryStore)
+        RuleFor(item => item.StoreName)
             .NotEmpty()
             .WithMessage("O Nome do Mercado não pode ser vazio");
     }

@@ -1,5 +1,5 @@
 ﻿using Feirapp.Domain.Contracts.Repository;
-using Feirapp.Entities;
+using Feirapp.DocumentModels;
 using Feirapp.Infrastructure.DataContext;
 using MongoDB.Driver;
 

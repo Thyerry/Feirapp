@@ -1,4 +1,4 @@
-using Feirapp.Entities;
+using Feirapp.DocumentModels;
 
 namespace Feirapp.Domain.Contracts.Repository;
 

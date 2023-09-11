@@ -1,6 +1,6 @@
-﻿using System;
-using Bogus;
-using Feirapp.Entities;
+﻿using Bogus;
+using Feirapp.DocumentModels;
+using MongoDB.Bson;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,6 +9,7 @@ namespace Feirapp.Tests.Fixtures
     public class GroceryCategoryFixture
     {
         public static GroceryCategory CreateRandomGroceryCategory() => CreateListGroceryCategory().FirstOrDefault()!;
+
         public static List<GroceryCategory> CreateListGroceryCategory(int quantity = 1)
         {
             var fakeGroceryItem = new Faker<GroceryCategory>()

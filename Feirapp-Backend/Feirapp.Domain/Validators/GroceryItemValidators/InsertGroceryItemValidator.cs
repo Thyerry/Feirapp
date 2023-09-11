@@ -1,9 +1,9 @@
-using Feirapp.Domain.Models;
+using Feirapp.Domain.Dtos;
 using FluentValidation;
 
 namespace Feirapp.Domain.Validators;
 
-public class InsertGroceryItemValidator : AbstractValidator<GroceryItemModel>
+public class InsertGroceryItemValidator : AbstractValidator<GroceryItemDto>
 {
     public InsertGroceryItemValidator()
     {

@@ -1,5 +1,5 @@
-﻿using Feirapp.Domain.Models;
-using Feirapp.Entities;
+﻿using Feirapp.Domain.Dtos;
+using Feirapp.DocumentModels;
 using Riok.Mapperly.Abstractions;
 
 namespace Feirapp.Domain.Mappers;
@@ -7,7 +7,7 @@ namespace Feirapp.Domain.Mappers;
 [Mapper]
 public static partial class GroceryItemMapper
 {
-    public static partial GroceryItemModel ToModel(this GroceryItem groceryItem);
-    public static partial List<GroceryItemModel> ToModelList(this List<GroceryItem> groceryItem);
-    public static partial GroceryItem ToEntity(this GroceryItemModel groceryItemModel);
+    public static partial GroceryItemDto ToDto(this GroceryItem groceryItem);
+    public static partial List<GroceryItemDto> ToDtoList(this List<GroceryItem> groceryItem);
+    public static partial GroceryItem ToModel(this GroceryItemDto groceryItemModel);
 }

@@ -1,7 +1,7 @@
 ﻿using Feirapp.Domain.Contracts.Repository;
 using Feirapp.Domain.Contracts.Service;
 using Feirapp.Domain.Mappers;
-using Feirapp.Domain.Models;
+using Feirapp.Domain.Dtos;
 using Feirapp.Domain.Validators;
 using FluentValidation;
 
@@ -16,33 +16,33 @@ public class GroceryCategoryService : IGroceryCategoryService
         _repository = repository;
     }
 
-    public async Task<GroceryCategoryModel> GetByIdAsync(string id, CancellationToken cancellationToken = default)
+    public async Task<GroceryCategoryDto> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
         var result = await _repository.GetByIdAsync(id, cancellationToken);
-        return result.ToModel();
+        return result.ToDto();
     }
 
-    public async Task<List<GroceryCategoryModel>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<List<GroceryCategoryDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var result = await _repository.GetAllAsync(cancellationToken);
-        return result.ToModelList();
+        return result.ToDtoList();
     }
 
-    public async Task<GroceryCategoryModel> InsertAsync(GroceryCategoryModel groceryCategory, CancellationToken cancellationToken = default)
+    public async Task<GroceryCategoryDto> InsertAsync(GroceryCategoryDto groceryCategory, CancellationToken cancellationToken = default)
     {
         var validator = new InsertGroceryCategoryValidator();
         await validator.ValidateAndThrowAsync(groceryCategory, cancellationToken);
 
-        var result = await _repository.InsertAsync(groceryCategory.ToEntity(), cancellationToken);
-        return result.ToModel();
+        var result = await _repository.InsertAsync(groceryCategory.ToModel(), cancellationToken);
+        return result.ToDto();
     }
 
-    public async Task UpdateAsync(GroceryCategoryModel groceryCategory, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(GroceryCategoryDto groceryCategory, CancellationToken cancellationToken = default)
     {
         var validator = new UpdateGroceryCategoryValidator();
         await validator.ValidateAndThrowAsync(groceryCategory, cancellationToken);
 
-        await _repository.UpdateAsync(groceryCategory.ToEntity(), cancellationToken);
+        await _repository.UpdateAsync(groceryCategory.ToModel(), cancellationToken);
     }
 
     public async Task DeleteAsync(string id, CancellationToken cancellationToken = default)

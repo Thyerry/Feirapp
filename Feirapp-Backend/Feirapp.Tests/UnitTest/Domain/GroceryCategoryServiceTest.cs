@@ -1,7 +1,7 @@
 ﻿using Feirapp.Domain.Contracts.Repository;
-using Feirapp.Domain.Models;
+using Feirapp.Domain.Dtos;
 using Feirapp.Domain.Services;
-using Feirapp.Entities;
+using Feirapp.DocumentModels;
 using FluentAssertions;
 using FluentValidation;
 using Moq;
@@ -17,9 +17,9 @@ public class GroceryCategoryServiceTest
     private const string ValidId = "123456789012345678901234";
     internal readonly List<GroceryCategory> GroceryCategoryEntityList = new List<GroceryCategory>();
     internal readonly GroceryCategory GroceryCategoryEntity = new GroceryCategory();
-    internal readonly GroceryCategoryModel InvalidValidGroceryCategoryModel = new GroceryCategoryModel();
+    internal readonly GroceryCategoryDto InvalidValidGroceryCategoryDto = new GroceryCategoryDto();
 
-    internal readonly GroceryCategoryModel ValidGroceryCategoryModel = new GroceryCategoryModel()
+    internal readonly GroceryCategoryDto ValidGroceryCategoryDto = new GroceryCategoryDto()
     {
         Cest = "1234567",
         Description = "description",
@@ -43,7 +43,7 @@ public class GroceryCategoryServiceTest
         var result = await sut.GetAllAsync(CancellationToken.None);
 
         // Assert
-        result.Should().BeOfType<List<GroceryCategoryModel>>();
+        result.Should().BeOfType<List<GroceryCategoryDto>>();
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class GroceryCategoryServiceTest
         var result = await sut.GetByIdAsync(ValidId, CancellationToken.None);
 
         // Assert
-        result.Should().BeOfType<GroceryCategoryModel>();
+        result.Should().BeOfType<GroceryCategoryDto>();
     }
 
     [Fact]
@@ -112,10 +112,10 @@ public class GroceryCategoryServiceTest
         mockRepository.Setup(repo => repo.InsertAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(GroceryCategoryEntity);
         // Act
-        var result = await sut.InsertAsync(ValidGroceryCategoryModel, CancellationToken.None);
+        var result = await sut.InsertAsync(ValidGroceryCategoryDto, CancellationToken.None);
 
         // Assert
-        result.Should().BeOfType<GroceryCategoryModel>();
+        result.Should().BeOfType<GroceryCategoryDto>();
     }
 
     [Fact]
@@ -128,7 +128,7 @@ public class GroceryCategoryServiceTest
         mockRepository.Setup(repo => repo.InsertAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(GroceryCategoryEntity);
         // Act
-        await sut.InsertAsync(ValidGroceryCategoryModel, CancellationToken.None);
+        await sut.InsertAsync(ValidGroceryCategoryDto, CancellationToken.None);
 
         // Assert
         mockRepository.Verify(repo => repo.InsertAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()), Times.Once);
@@ -144,7 +144,7 @@ public class GroceryCategoryServiceTest
         mockRepository.Setup(repo => repo.InsertAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(GroceryCategoryEntity);
         // Act
-        var act = async () => await sut.InsertAsync(InvalidValidGroceryCategoryModel, CancellationToken.None);
+        var act = async () => await sut.InsertAsync(InvalidValidGroceryCategoryDto, CancellationToken.None);
 
         // Assert
         await act.Should().ThrowAsync<ValidationException>();
@@ -163,7 +163,7 @@ public class GroceryCategoryServiceTest
         var sut = new GroceryCategoryService(mockRepository.Object);
         mockRepository.Setup(repo => repo.UpdateAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()));
         // Act
-        await sut.UpdateAsync(ValidGroceryCategoryModel, CancellationToken.None);
+        await sut.UpdateAsync(ValidGroceryCategoryDto, CancellationToken.None);
 
         // Assert
         mockRepository.Verify(repo => repo.UpdateAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()), Times.Once);
@@ -179,7 +179,7 @@ public class GroceryCategoryServiceTest
         mockRepository.Setup(repo => repo.InsertAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(GroceryCategoryEntity);
         // Act
-        var act = async () => await sut.UpdateAsync(InvalidValidGroceryCategoryModel, CancellationToken.None);
+        var act = async () => await sut.UpdateAsync(InvalidValidGroceryCategoryDto, CancellationToken.None);
 
         // Assert
         await act.Should().ThrowAsync<ValidationException>();

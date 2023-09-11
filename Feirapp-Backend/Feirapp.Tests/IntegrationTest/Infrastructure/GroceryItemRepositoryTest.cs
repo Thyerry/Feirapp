@@ -1,4 +1,4 @@
-﻿using Feirapp.Entities;
+﻿using Feirapp.DocumentModels;
 using Feirapp.Infrastructure.DataContext;
 using Feirapp.Infrastructure.Repository;
 using Feirapp.Tests.Fixtures;
