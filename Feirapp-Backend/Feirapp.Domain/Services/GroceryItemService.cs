@@ -1,7 +1,7 @@
 using Feirapp.Domain.Contracts.Repository;
 using Feirapp.Domain.Contracts.Service;
-using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Dtos;
+using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Validators;
 using FluentValidation;
 
@@ -28,14 +28,16 @@ public class GroceryItemService : IGroceryItemService
         return (await _groceryItemRepository.GetRandomGroceryItems(quantity, cancellationToken)).ToDtoList();
     }
 
-    public async Task<GroceryItemDto> InsertAsync(GroceryItemDto groceryItemModel, CancellationToken cancellationToken)
+    public async Task<GroceryItemDto> InsertAsync(GroceryItemDto groceryItemDto, CancellationToken cancellationToken)
     {
         var validator = new InsertGroceryItemValidator();
-        await validator.ValidateAndThrowAsync(groceryItemModel, cancellationToken);
+        await validator.ValidateAndThrowAsync(groceryItemDto, cancellationToken);
 
-        var groceryCategory = await _groceryCategoryRepository.GetByIdAsync("string", cancellationToken);
+        var groceryCategory =
+            (await _groceryCategoryRepository.SearchAsync(groceryItemDto.Category.ToModel(), cancellationToken))
+            .FirstOrDefault();
 
-        return (await _groceryItemRepository.InsertAsync(groceryItemModel.ToModel(), cancellationToken)).ToDto();
+        return (await _groceryItemRepository.InsertAsync(groceryItemDto.ToModel(), cancellationToken)).ToDto();
     }
 
     public async Task<GroceryItemDto> GetById(string groceryId, CancellationToken cancellationToken)

@@ -9,4 +9,9 @@ public class GroceryCategory : BaseDocumentModel
     [BsonElement("cest")] public string Cest { get; set; } = string.Empty;
     [BsonElement("item")] public string ItemNumber { get; set; } = string.Empty;
     [BsonElement("ncm")] public string Ncm { get; set; } = string.Empty;
+
+    public override string ToString()
+    {
+        return $"{Cest} - {Name}";
+    }
 }

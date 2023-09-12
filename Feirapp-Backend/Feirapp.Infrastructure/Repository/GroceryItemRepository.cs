@@ -8,12 +8,10 @@ namespace Feirapp.Infrastructure.Repository;
 public class GroceryItemRepository : IGroceryItemRepository, IDisposable
 {
     private readonly IMongoCollection<GroceryItem> _collection;
-    private readonly IMongoCollection<GroceryCategory> _categoryCollection;
 
     public GroceryItemRepository(IMongoFeirappContext context)
     {
         _collection = context.GetCollection<GroceryItem>(nameof(GroceryItem));
-        _categoryCollection = context.GetCollection<GroceryCategory>(nameof(GroceryCategory));
     }
 
     public async Task<List<GroceryItem>> GetAllAsync(CancellationToken cancellationToken)

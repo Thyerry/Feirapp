@@ -1,7 +1,8 @@
-﻿using Feirapp.Domain.Contracts.Repository;
-using Feirapp.DocumentModels;
+﻿using Feirapp.DocumentModels;
+using Feirapp.Domain.Contracts.Repository;
 using Feirapp.Infrastructure.DataContext;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 
 namespace Feirapp.Infrastructure.Repository;
 
@@ -43,7 +44,7 @@ public class GroceryCategoryRepository : IGroceryCategoryRepository
     public async Task UpdateAsync(GroceryCategory groceryCategory, CancellationToken cancellationToken = default)
     {
         await _collection.ReplaceOneAsync(
-            Builders<GroceryCategory>.Filter.Eq(g => g.Id, groceryCategory.Id),
+            gc => gc.Id == groceryCategory.Id,
             groceryCategory,
             cancellationToken: cancellationToken
             );
@@ -52,5 +53,27 @@ public class GroceryCategoryRepository : IGroceryCategoryRepository
     public async Task DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
         await _collection.DeleteOneAsync(q => q.Id == id, cancellationToken);
+    }
+
+    public async Task<List<GroceryCategory>> SearchAsync(GroceryCategory groceryCategory, CancellationToken cancellationToken = default)
+    {
+        var query = _collection.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(groceryCategory.Name))
+            return await query.Where(gc => gc.Name == groceryCategory.Name).ToListAsync(CancellationToken.None);
+
+        if (!string.IsNullOrWhiteSpace(groceryCategory.Cest))
+        {
+            query = query.Where(gc => gc.Cest == groceryCategory.Cest);
+
+            if (!string.IsNullOrWhiteSpace(groceryCategory.ItemNumber)) 
+                query = query.Where(gc => gc.ItemNumber == groceryCategory.ItemNumber);
+        }
+
+        if (!string.IsNullOrWhiteSpace(groceryCategory.Ncm))
+            query = query.Where(gc => gc.Ncm == groceryCategory.Ncm);
+
+        var result = await query.ToListAsync(cancellationToken);
+        return result;
     }
 }

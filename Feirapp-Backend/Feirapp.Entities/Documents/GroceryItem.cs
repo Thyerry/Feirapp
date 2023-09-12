@@ -15,4 +15,9 @@ public class GroceryItem : BaseDocumentModel
     [BsonElement("imageUrl")] public string ImageUrl { get; set; } = string.Empty;
     [BsonElement("category")] public GroceryCategory Category { get; set; } = new GroceryCategory();
     [BsonElement("priceHistory")] public List<PriceLog> PriceHistory { get; set; } = new List<PriceLog>();
+
+    public override string ToString()
+    {
+        return $"{Name}";
+    }
 }
