@@ -54,7 +54,7 @@ public class GroceryCategoryController : ControllerBase
         await _service.UpdateAsync(groceryCategoryDto, cancellationToken);
         return Accepted();
     }
-    
+
     [HttpDelete("{id:length(24)}")]
     [ProducesResponseType(typeof(AcceptedResult), 201)]
     public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken = default)
@@ -65,4 +65,20 @@ public class GroceryCategoryController : ControllerBase
         await _service.DeleteAsync(id, cancellationToken);
         return Accepted();
     }
+
+    [HttpGet("search")]
+    [ProducesResponseType(typeof(List<GroceryCategoryDto>), 200)]
+    public async Task<IActionResult> Search([FromBody] GroceryCategoryDto groceryCategory, CancellationToken cancellationToken)
+    {
+        return Ok(await _service.SearchAsync(groceryCategory, cancellationToken));
+    }
+
+    [HttpPost("batch")]
+    [ProducesResponseType(typeof(List<GroceryCategoryDto>), 201)]
+    public async Task<IActionResult> InsertBatch(List<GroceryCategoryDto> groceryCategoryDtos, CancellationToken cancellationToken = default)
+    {
+        var result = await _service.InsertBatch(groceryCategoryDtos, cancellationToken);
+        return Created(nameof(List<GroceryCategoryDto>), result);
+    }
+
 }

@@ -18,11 +18,21 @@ public class GroceryItemServiceTests
 {
     public static GroceryItem ValidGroceryItem = GroceryItemFixture.CreateRandomGroceryItem();
 
-    public static GroceryItemDto ValidGroceryItemModel = new GroceryItemDto()
+    public static GroceryCategoryDto ValidGroceryCategoryDto = new GroceryCategoryDto()
+    {
+        Name = "Name",
+        Cest = "1234567",
+        Description = "lorem ipsum",
+        ItemNumber = "1.0",
+        Ncm = "12345678"
+    };
+
+    public static GroceryItemDto ValidGroceryItemDto = new GroceryItemDto()
     {
         Name = "Name",
         Price = 30.5m,
         PurchaseDate = DateTime.Now,
+        Category = ValidGroceryCategoryDto,
         Cean = new string('1', 7),
         Brand = "brand",
         StoreName = "Store",
@@ -170,12 +180,16 @@ public class GroceryItemServiceTests
         mockGroceryItemRepository
             .Setup(repo => repo.InsertAsync(It.IsAny<GroceryItem>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(ValidGroceryItem);
+
         var mockGroceryCategoryRepository = new Mock<IGroceryCategoryRepository>();
+        mockGroceryCategoryRepository
+            .Setup(repo => repo.SearchAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<GroceryCategory>());
 
         var sut = new GroceryItemService(mockGroceryItemRepository.Object, mockGroceryCategoryRepository.Object);
 
         // Act
-        var result = await sut.InsertAsync(ValidGroceryItemModel, CancellationToken.None);
+        var result = await sut.InsertAsync(ValidGroceryItemDto, CancellationToken.None);
 
         // Assert
         result.Should().BeOfType<GroceryItemDto>();
@@ -189,12 +203,16 @@ public class GroceryItemServiceTests
         mockGroceryItemRepository
             .Setup(repo => repo.InsertAsync(It.IsAny<GroceryItem>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(ValidGroceryItem);
+
         var mockGroceryCategoryRepository = new Mock<IGroceryCategoryRepository>();
+        mockGroceryCategoryRepository
+            .Setup(repo => repo.SearchAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<GroceryCategory>());
 
         var sut = new GroceryItemService(mockGroceryItemRepository.Object, mockGroceryCategoryRepository.Object);
 
         // Act
-        await sut.InsertAsync(ValidGroceryItemModel, CancellationToken.None);
+        await sut.InsertAsync(ValidGroceryItemDto, CancellationToken.None);
 
         // Assert
         mockGroceryItemRepository.Verify(repo => repo.InsertAsync(It.IsAny<GroceryItem>(), It.IsAny<CancellationToken>()), Times.Once);
@@ -208,7 +226,11 @@ public class GroceryItemServiceTests
         mockGroceryItemRepository
             .Setup(repo => repo.InsertAsync(It.IsAny<GroceryItem>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(ValidGroceryItem);
+
         var mockGroceryCategoryRepository = new Mock<IGroceryCategoryRepository>();
+        mockGroceryCategoryRepository
+            .Setup(repo => repo.SearchAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<GroceryCategory>());
 
         var sut = new GroceryItemService(mockGroceryItemRepository.Object, mockGroceryCategoryRepository.Object);
 
@@ -230,17 +252,17 @@ public class GroceryItemServiceTests
 
         var mockGroceryCategoryRepository = new Mock<IGroceryCategoryRepository>();
         mockGroceryCategoryRepository
-            .Setup(repo => repo.GetByIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new GroceryCategory());
+            .Setup(repo => repo.SearchAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<GroceryCategory>());
 
         var sut = new GroceryItemService(mockGroceryItemRepository.Object, mockGroceryCategoryRepository.Object);
 
         // Act
-        await sut.InsertAsync(ValidGroceryItemModel, CancellationToken.None);
+        await sut.InsertAsync(ValidGroceryItemDto, CancellationToken.None);
 
         // Assert
         mockGroceryCategoryRepository
-            .Verify(repo => repo.GetByIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once());
+            .Verify(repo => repo.SearchAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()), Times.Once());
     }
 
     #endregion InsertAsync

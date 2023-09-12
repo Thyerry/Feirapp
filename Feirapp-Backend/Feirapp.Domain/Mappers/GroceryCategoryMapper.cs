@@ -1,5 +1,5 @@
-﻿using Feirapp.Domain.Dtos;
-using Feirapp.DocumentModels;
+﻿using Feirapp.DocumentModels;
+using Feirapp.Domain.Dtos;
 using Riok.Mapperly.Abstractions;
 
 namespace Feirapp.Domain.Mappers;
@@ -12,4 +12,6 @@ public static partial class GroceryCategoryMapper
     public static partial List<GroceryCategoryDto> ToDtoList(this List<GroceryCategory> groceryCategory);
 
     public static partial GroceryCategory ToModel(this GroceryCategoryDto groceryCategoryDto);
+
+    public static partial List<GroceryCategory> ToModelList(this List<GroceryCategoryDto> groceryCategory);
 }

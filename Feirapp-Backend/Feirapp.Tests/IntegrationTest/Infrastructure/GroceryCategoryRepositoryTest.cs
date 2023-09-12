@@ -243,7 +243,7 @@ public class GroceryCategoryRepositoryTest : IDisposable
         var firstResult = actualList[0];
         var secondResult = actualList[1];
 
-        firstResult.Cest.Should().Be(secondResult.Cest);
+        firstResult.Ncm.Should().Be(secondResult.Ncm);
     }
 
     #endregion SearchAsync

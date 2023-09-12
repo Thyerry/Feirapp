@@ -1,7 +1,9 @@
-﻿using Feirapp.Domain.Contracts.Repository;
+﻿using System.Diagnostics;
+using Feirapp.DocumentModels;
+using Feirapp.Domain.Contracts.Repository;
 using Feirapp.Domain.Contracts.Service;
-using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Dtos;
+using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Validators;
 using FluentValidation;
 
@@ -48,5 +50,22 @@ public class GroceryCategoryService : IGroceryCategoryService
     public async Task DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
         await _repository.DeleteAsync(id, cancellationToken);
+    }
+
+    public async Task<List<GroceryCategoryDto>> SearchAsync(GroceryCategoryDto groceryCategory, CancellationToken cancellationToken = default)
+    {
+        return (await _repository.SearchAsync(groceryCategory.ToModel(), cancellationToken)).ToDtoList();
+    }
+
+    public async Task<List<GroceryCategoryDto>> InsertBatch(List<GroceryCategoryDto> groceryCategoryDtos, CancellationToken cancellationToken = default)
+    {
+        var validator = new InsertGroceryCategoryValidator();
+        foreach (var category in groceryCategoryDtos)
+        {
+            await validator.ValidateAndThrowAsync(category, cancellationToken);
+        }
+
+        var result = await _repository.InsertBatchAsync(groceryCategoryDtos.ToModelList(), cancellationToken);
+        return result.ToDtoList();
     }
 }

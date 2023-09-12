@@ -33,9 +33,11 @@ public class GroceryItemService : IGroceryItemService
         var validator = new InsertGroceryItemValidator();
         await validator.ValidateAndThrowAsync(groceryItemDto, cancellationToken);
 
-        var groceryCategory =
-            (await _groceryCategoryRepository.SearchAsync(groceryItemDto.Category.ToModel(), cancellationToken))
-            .FirstOrDefault();
+        var groceryItem = groceryItemDto.ToModel();
+
+        groceryItem.Category =
+            (await _groceryCategoryRepository.SearchAsync(groceryItem.Category, cancellationToken))
+            .FirstOrDefault()!;
 
         return (await _groceryItemRepository.InsertAsync(groceryItemDto.ToModel(), cancellationToken)).ToDto();
     }

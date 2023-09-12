@@ -1,5 +1,4 @@
 ﻿using Feirapp.DocumentModels;
-using Feirapp.Domain.Dtos;
 
 namespace Feirapp.Domain.Contracts.Repository;
 
@@ -16,5 +15,6 @@ public interface IGroceryCategoryRepository
     Task UpdateAsync(GroceryCategory groceryCategory, CancellationToken cancellationToken = default);
 
     Task DeleteAsync(string id, CancellationToken cancellationToken = default);
+
     Task<List<GroceryCategory>> SearchAsync(GroceryCategory groceryCategory, CancellationToken cancellationToken = default);
 }
