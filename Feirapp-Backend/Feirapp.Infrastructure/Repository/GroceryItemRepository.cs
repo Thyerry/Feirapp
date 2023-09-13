@@ -12,6 +12,14 @@ public class GroceryItemRepository : IGroceryItemRepository, IDisposable
     public GroceryItemRepository(IMongoFeirappContext context)
     {
         _collection = context.GetCollection<GroceryItem>(nameof(GroceryItem));
+
+        FieldDefinition<GroceryItem> nameField = "name";
+        FieldDefinition<GroceryItem> priceField = "price";
+        FieldDefinition<GroceryItem> storeField = "store";
+
+        var indexedKeyDefinition = Builders<GroceryItem>.IndexKeys.Text(nameField).Text(storeField).Ascending(priceField);
+        _collection.Indexes.CreateOne(new CreateIndexModel<GroceryItem>(indexedKeyDefinition));
+
     }
 
     public async Task<List<GroceryItem>> GetAllAsync(CancellationToken cancellationToken)

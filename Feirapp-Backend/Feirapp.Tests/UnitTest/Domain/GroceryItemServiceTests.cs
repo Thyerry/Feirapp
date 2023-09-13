@@ -31,7 +31,7 @@ public class GroceryItemServiceTests
     {
         Name = "Name",
         Price = 30.5m,
-        PurchaseDate = DateTime.Now,
+        PurchaseDate = DateTime.UtcNow,
         Category = ValidGroceryCategoryDto,
         Cean = new string('1', 7),
         Brand = "brand",

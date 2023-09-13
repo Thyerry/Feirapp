@@ -39,12 +39,15 @@ public class GroceryCategoryService : IGroceryCategoryService
         return result.ToDto();
     }
 
-    public async Task UpdateAsync(GroceryCategoryDto groceryCategory, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(GroceryCategoryDto groceryCategoryDto, CancellationToken cancellationToken = default)
     {
         var validator = new UpdateGroceryCategoryValidator();
-        await validator.ValidateAndThrowAsync(groceryCategory, cancellationToken);
+        await validator.ValidateAndThrowAsync(groceryCategoryDto, cancellationToken);
 
-        await _repository.UpdateAsync(groceryCategory.ToModel(), cancellationToken);
+        var groceryCategory = groceryCategoryDto.ToModel();
+        groceryCategory.LastUpdate = DateTime.UtcNow;
+
+        await _repository.UpdateAsync(groceryCategory, cancellationToken);
     }
 
     public async Task DeleteAsync(string id, CancellationToken cancellationToken = default)
@@ -65,7 +68,14 @@ public class GroceryCategoryService : IGroceryCategoryService
             await validator.ValidateAndThrowAsync(category, cancellationToken);
         }
 
-        var result = await _repository.InsertBatchAsync(groceryCategoryDtos.ToModelList(), cancellationToken);
+        var groceryCategories = groceryCategoryDtos.ToModelList().Select(g =>
+        {
+            g.Creation = DateTime.UtcNow;
+            g.LastUpdate = DateTime.UtcNow;
+            return g;
+        }).ToList();
+
+        var result = await _repository.InsertBatchAsync(groceryCategories, cancellationToken);
         return result.ToDtoList();
     }
 }

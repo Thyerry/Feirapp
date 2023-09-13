@@ -10,7 +10,7 @@ public interface IGroceryCategoryService
 
     Task<GroceryCategoryDto> InsertAsync(GroceryCategoryDto groceryCategory, CancellationToken cancellationToken = default);
 
-    Task UpdateAsync(GroceryCategoryDto groceryCategory, CancellationToken cancellationToken = default);
+    Task UpdateAsync(GroceryCategoryDto groceryCategoryDto, CancellationToken cancellationToken = default);
 
     Task DeleteAsync(string id, CancellationToken cancellationToken = default);
 

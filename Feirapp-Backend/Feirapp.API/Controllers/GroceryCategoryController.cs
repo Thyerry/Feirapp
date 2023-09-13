@@ -68,7 +68,7 @@ public class GroceryCategoryController : ControllerBase
 
     [HttpGet("search")]
     [ProducesResponseType(typeof(List<GroceryCategoryDto>), 200)]
-    public async Task<IActionResult> Search([FromBody] GroceryCategoryDto groceryCategory, CancellationToken cancellationToken)
+    public async Task<IActionResult> Search([FromQuery] GroceryCategoryDto groceryCategory, CancellationToken cancellationToken)
     {
         return Ok(await _service.SearchAsync(groceryCategory, cancellationToken));
     }

@@ -13,6 +13,11 @@ public class GroceryCategoryRepository : IGroceryCategoryRepository
     public GroceryCategoryRepository(IMongoFeirappContext context)
     {
         _collection = context.GetCollection<GroceryCategory>(nameof(GroceryCategory));
+
+        FieldDefinition<GroceryCategory> cestField = "cest";
+
+        var indexedKeyDefinition = Builders<GroceryCategory>.IndexKeys.Ascending(cestField);
+        _collection.Indexes.CreateOne(new CreateIndexModel<GroceryCategory>(indexedKeyDefinition));
     }
 
     public async Task<List<GroceryCategory>> GetAllAsync(CancellationToken cancellationToken = default)
