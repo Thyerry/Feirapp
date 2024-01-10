@@ -15,12 +15,12 @@ namespace Feirapp.Tests.UnitTest.Domain;
 public class GroceryCategoryServiceTest
 {
     private const string ValidId = "123456789012345678901234";
-    internal readonly List<GroceryCategory> GroceryCategoryEntityList = new List<GroceryCategory>();
-    internal readonly GroceryCategory GroceryCategoryEntity = new GroceryCategory();
-    internal readonly GroceryCategoryDto InvalidValidGroceryCategoryDto = new GroceryCategoryDto();
-
-    internal readonly GroceryCategoryDto ValidGroceryCategoryDto = new GroceryCategoryDto()
+    internal readonly List<GroceryCategory> GroceryCategoryEntityList = new ();
+    internal readonly GroceryCategory GroceryCategoryEntity = new ();
+    internal readonly GroceryCategoryDto InvalidValidGroceryCategoryDto = new ();
+    internal readonly GroceryCategoryDto ValidGroceryCategoryDto = new ()
     {
+        Id = ValidId,
         Cest = "1234567",
         Description = "description",
         ItemNumber = "1.0",

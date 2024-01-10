@@ -17,6 +17,6 @@ public class GroceryItem : BaseDocumentModel
 
     public override string ToString()
     {
-        return $"{Name}";
+        return $"{Name} - {StoreName}";
     }
 }

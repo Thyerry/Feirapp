@@ -25,15 +25,13 @@ public class DockerComposeTestBase : IDisposable
             .ReuseIfExists()
             .Build();
 
-        this._container.Start();
+        _container.Start();
     }
 
     public void Dispose()
     {
         _container.Dispose();
         foreach (var volumeService in _container.GetVolumes())
-        {
             volumeService.Remove();
-        }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Feirapp.DocumentModels;
-using Feirapp.Domain.Mappers;
 using Feirapp.Infrastructure.DataContext;
 using Feirapp.Infrastructure.Repository;
 using Feirapp.Tests.Fixtures;
@@ -19,9 +18,9 @@ public class GroceryCategoryRepositoryTest : IDisposable
 {
     private readonly IMongoFeirappContext _context;
 
-    public static List<GroceryCategory> SearchCategoryList = new List<GroceryCategory>()
+    public static List<GroceryCategory> SearchCategoryList = new()
     {
-        new ()
+        new GroceryCategory
         {
             Name = "Objeto 1",
             Description = "Descrição 1",
@@ -29,7 +28,7 @@ public class GroceryCategoryRepositoryTest : IDisposable
             ItemNumber = "1",
             Ncm = "1234"
         },
-        new ()
+        new GroceryCategory
         {
             Name = "Objeto 2",
             Description = "Descrição 2",
@@ -37,7 +36,7 @@ public class GroceryCategoryRepositoryTest : IDisposable
             ItemNumber = "1",
             Ncm = "5432"
         },
-        new ()
+        new GroceryCategory
         {
             Name = "Objeto 3",
             Description = "Descrição 3",
@@ -45,7 +44,7 @@ public class GroceryCategoryRepositoryTest : IDisposable
             ItemNumber = "1",
             Ncm = "1234"
         },
-        new ()
+        new GroceryCategory
         {
             Name = "Objeto 4",
             Description = "Descrição 4",
@@ -53,7 +52,7 @@ public class GroceryCategoryRepositoryTest : IDisposable
             ItemNumber = "1",
             Ncm = "7890"
         },
-        new ()
+        new GroceryCategory
         {
             Name = "Objeto 5",
             Description = "Descrição 5",
@@ -61,7 +60,7 @@ public class GroceryCategoryRepositoryTest : IDisposable
             ItemNumber = "2",
             Ncm = "5432"
         },
-        new ()
+        new GroceryCategory
         {
             Name = "Objeto 6",
             Description = "Descrição 6",
@@ -69,15 +68,15 @@ public class GroceryCategoryRepositoryTest : IDisposable
             ItemNumber = "1",
             Ncm = "1111"
         },
-        new ()
+        new GroceryCategory
         {
             Name = "Objeto 7",
             Description = "Descrição 7",
             Cest = "22222",
             ItemNumber = "1",
             Ncm = "2222"
-        },  
-        new ()
+        },
+        new GroceryCategory
         {
             Name = "Objeto 8",
             Description = "Descrição 8",
@@ -85,7 +84,7 @@ public class GroceryCategoryRepositoryTest : IDisposable
             ItemNumber = "1",
             Ncm = "3333"
         },
-        new ()
+        new GroceryCategory
         {
             Name = "Objeto 9",
             Description = "Descrição 9",
@@ -93,7 +92,7 @@ public class GroceryCategoryRepositoryTest : IDisposable
             ItemNumber = "1",
             Ncm = "4444"
         },
-        new ()
+        new GroceryCategory
         {
             Id = "123456789012345678901234",
             Name = "Objeto 10",
@@ -101,7 +100,7 @@ public class GroceryCategoryRepositoryTest : IDisposable
             Cest = "55555",
             ItemNumber = "1",
             Ncm = "5555"
-        }   
+        }
     };
 
     public GroceryCategoryRepositoryTest()
