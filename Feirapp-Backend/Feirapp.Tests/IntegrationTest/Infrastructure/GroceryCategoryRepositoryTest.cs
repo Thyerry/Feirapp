@@ -18,7 +18,7 @@ public class GroceryCategoryRepositoryTest : IDisposable
 {
     private readonly IMongoFeirappContext _context;
 
-    public static List<GroceryCategory> SearchCategoryList = new List<GroceryCategory>()
+    public static List<GroceryCategory> SearchCategoryList = new()
     {
         new()
         {
