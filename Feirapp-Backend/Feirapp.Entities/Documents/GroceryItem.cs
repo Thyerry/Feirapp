@@ -2,7 +2,7 @@
 
 namespace Feirapp.DocumentModels.Documents;
 
-public class GroceryItem : BaseDocumentModel
+public class GroceryItem : BaseDocument
 {
     [BsonElement("name")] public string Name { get; set; } = string.Empty;
     [BsonElement("price")] public decimal Price { get; set; }

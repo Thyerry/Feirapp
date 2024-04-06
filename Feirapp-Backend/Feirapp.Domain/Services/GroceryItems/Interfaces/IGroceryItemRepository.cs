@@ -1,6 +1,6 @@
 using Feirapp.DocumentModels.Documents;
 
-namespace Feirapp.Domain.Contracts.Repository;
+namespace Feirapp.Domain.Services.GroceryItems.Interfaces;
 
 public interface IGroceryItemRepository
 {

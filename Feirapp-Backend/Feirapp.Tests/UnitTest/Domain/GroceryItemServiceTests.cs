@@ -1,7 +1,7 @@
 using Feirapp.DocumentModels.Documents;
-using Feirapp.Domain.Contracts.Repository;
-using Feirapp.Domain.Dtos;
-using Feirapp.Domain.Services;
+using Feirapp.Domain.Services.GroceryItems.Dtos;
+using Feirapp.Domain.Services.GroceryItems.Implementations;
+using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Tests.Fixtures;
 using FluentAssertions;
 using FluentValidation;
@@ -18,23 +18,15 @@ public class GroceryItemServiceTests
 {
     public static GroceryItem ValidGroceryItem = GroceryItemFixture.CreateRandomGroceryItem();
 
-    public static GroceryCategoryDto ValidGroceryCategoryDto = new GroceryCategoryDto()
-    {
-        Name = "Name",
-        Cest = "1234567",
-        Description = "lorem ipsum",
-        ItemNumber = "1.0",
-        Ncm = "12345678"
-    };
-
     public static GroceryItemDto ValidGroceryItemDto = new GroceryItemDto()
     {
         Name = "Name",
         Price = 30.5m,
         PurchaseDate = DateTime.UtcNow,
-        Category = ValidGroceryCategoryDto,
-        Cean = new string('1', 7),
+        Barcode = new string('1', 7),
         Brand = "brand",
+        Cest = "1212312",
+        Ncm = "1234123412",
         StoreName = "Store",
         ImageUrl = "www.jpg",
     };
@@ -51,9 +43,8 @@ public class GroceryItemServiceTests
         mockGroceryItemRepository
             .Setup(repository => repository.GetAllAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<GroceryItem>());
-        var mockGroceryCategoryRepository = new Mock<IGroceryCategoryRepository>();
 
-        var sut = new GroceryItemService(mockGroceryItemRepository.Object, mockGroceryCategoryRepository.Object);
+        var sut = new GroceryItemService(mockGroceryItemRepository.Object);
 
         // Act
         var result = await sut.GetAllAsync(CancellationToken.None);
@@ -70,9 +61,8 @@ public class GroceryItemServiceTests
         mockGroceryItemRepository
             .Setup(repository => repository.GetAllAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<GroceryItem>());
-        var mockGroceryCategoryRepository = new Mock<IGroceryCategoryRepository>();
 
-        var sut = new GroceryItemService(mockGroceryItemRepository.Object, mockGroceryCategoryRepository.Object);
+        var sut = new GroceryItemService(mockGroceryItemRepository.Object);
 
         // Act
         await sut.GetAllAsync(CancellationToken.None);
@@ -96,9 +86,8 @@ public class GroceryItemServiceTests
         mockGroceryItemRepository
             .Setup(repository => repository.GetRandomGroceryItems(It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<GroceryItem>());
-        var mockGroceryCategoryRepository = new Mock<IGroceryCategoryRepository>();
 
-        var sut = new GroceryItemService(mockGroceryItemRepository.Object, mockGroceryCategoryRepository.Object);
+        var sut = new GroceryItemService(mockGroceryItemRepository.Object);
 
         // Act
         var result = await sut.GetRandomGroceryItemsAsync(new int(), CancellationToken.None);
@@ -115,9 +104,8 @@ public class GroceryItemServiceTests
         mockGroceryItemRepository
             .Setup(repository => repository.GetRandomGroceryItems(It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<GroceryItem>());
-        var mockGroceryCategoryRepository = new Mock<IGroceryCategoryRepository>();
 
-        var sut = new GroceryItemService(mockGroceryItemRepository.Object, mockGroceryCategoryRepository.Object);
+        var sut = new GroceryItemService(mockGroceryItemRepository.Object);
 
         // Act
         await sut.GetRandomGroceryItemsAsync(new int(), CancellationToken.None);
@@ -139,9 +127,8 @@ public class GroceryItemServiceTests
         mockGroceryItemRepository
             .Setup(repo => repo.GetByIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(ValidGroceryItem);
-        var mockGroceryCategoryRepository = new Mock<IGroceryCategoryRepository>();
 
-        var sut = new GroceryItemService(mockGroceryItemRepository.Object, mockGroceryCategoryRepository.Object);
+        var sut = new GroceryItemService(mockGroceryItemRepository.Object);
 
         // Act
         var result = await sut.GetById(ValidGroceryItem.Id, CancellationToken.None);
@@ -158,9 +145,8 @@ public class GroceryItemServiceTests
         mockGroceryItemRepository
             .Setup(repo => repo.GetByIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(ValidGroceryItem);
-        var mockGroceryCategoryRepository = new Mock<IGroceryCategoryRepository>();
 
-        var sut = new GroceryItemService(mockGroceryItemRepository.Object, mockGroceryCategoryRepository.Object);
+        var sut = new GroceryItemService(mockGroceryItemRepository.Object);
 
         // Act
         await sut.GetById(ValidGroceryItem.Id, It.IsAny<CancellationToken>());
@@ -183,12 +169,7 @@ public class GroceryItemServiceTests
             .Setup(repo => repo.InsertAsync(It.IsAny<GroceryItem>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(ValidGroceryItem);
 
-        var mockGroceryCategoryRepository = new Mock<IGroceryCategoryRepository>();
-        mockGroceryCategoryRepository
-            .Setup(repo => repo.SearchAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<GroceryCategory>());
-
-        var sut = new GroceryItemService(mockGroceryItemRepository.Object, mockGroceryCategoryRepository.Object);
+        var sut = new GroceryItemService(mockGroceryItemRepository.Object);
 
         // Act
         var result = await sut.InsertAsync(ValidGroceryItemDto, CancellationToken.None);
@@ -206,12 +187,7 @@ public class GroceryItemServiceTests
             .Setup(repo => repo.InsertAsync(It.IsAny<GroceryItem>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(ValidGroceryItem);
 
-        var mockGroceryCategoryRepository = new Mock<IGroceryCategoryRepository>();
-        mockGroceryCategoryRepository
-            .Setup(repo => repo.SearchAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<GroceryCategory>());
-
-        var sut = new GroceryItemService(mockGroceryItemRepository.Object, mockGroceryCategoryRepository.Object);
+        var sut = new GroceryItemService(mockGroceryItemRepository.Object);
 
         // Act
         await sut.InsertAsync(ValidGroceryItemDto, CancellationToken.None);
@@ -230,42 +206,13 @@ public class GroceryItemServiceTests
             .Setup(repo => repo.InsertAsync(It.IsAny<GroceryItem>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(ValidGroceryItem);
 
-        var mockGroceryCategoryRepository = new Mock<IGroceryCategoryRepository>();
-        mockGroceryCategoryRepository
-            .Setup(repo => repo.SearchAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<GroceryCategory>());
-
-        var sut = new GroceryItemService(mockGroceryItemRepository.Object, mockGroceryCategoryRepository.Object);
+        var sut = new GroceryItemService(mockGroceryItemRepository.Object);
 
         // Act
         var act = async () => await sut.InsertAsync(GroceryItemModel, CancellationToken.None);
 
         // Assert
         await act.Should().ThrowAsync<ValidationException>();
-    }
-
-    [Fact]
-    public async Task InsertAsync_ValidGroceryItem_InvokeGroceryCategoryRepository()
-    {
-        // Arrange
-        var mockGroceryItemRepository = new Mock<IGroceryItemRepository>();
-        mockGroceryItemRepository
-            .Setup(repo => repo.InsertAsync(It.IsAny<GroceryItem>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(ValidGroceryItem);
-
-        var mockGroceryCategoryRepository = new Mock<IGroceryCategoryRepository>();
-        mockGroceryCategoryRepository
-            .Setup(repo => repo.SearchAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<GroceryCategory>());
-
-        var sut = new GroceryItemService(mockGroceryItemRepository.Object, mockGroceryCategoryRepository.Object);
-
-        // Act
-        await sut.InsertAsync(ValidGroceryItemDto, CancellationToken.None);
-
-        // Assert
-        mockGroceryCategoryRepository
-            .Verify(repo => repo.SearchAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()), Times.Once());
     }
 
     #endregion InsertAsync
@@ -280,9 +227,8 @@ public class GroceryItemServiceTests
         var mockGroceryItemRepository = new Mock<IGroceryItemRepository>();
         mockGroceryItemRepository
             .Setup(repo => repo.UpdateAsync(It.IsAny<GroceryItem>(), It.IsAny<CancellationToken>()));
-        var mockGroceryCategoryRepository = new Mock<IGroceryCategoryRepository>();
 
-        var sut = new GroceryItemService(mockGroceryItemRepository.Object, mockGroceryCategoryRepository.Object);
+        var sut = new GroceryItemService(mockGroceryItemRepository.Object);
 
         // Act
         await sut.UpdateAsync(groceryItemModel, CancellationToken.None);
@@ -297,9 +243,8 @@ public class GroceryItemServiceTests
     {
         // Arrange
         var mockGroceryItemRepository = new Mock<IGroceryItemRepository>();
-        var mockGroceryCategoryRepository = new Mock<IGroceryCategoryRepository>();
 
-        var sut = new GroceryItemService(mockGroceryItemRepository.Object, mockGroceryCategoryRepository.Object);
+        var sut = new GroceryItemService(mockGroceryItemRepository.Object);
 
         // Act
         var act = async () => await sut.UpdateAsync(GroceryItemModel, CancellationToken.None);
@@ -317,9 +262,8 @@ public class GroceryItemServiceTests
     {
         // Arrange
         var mockGroceryItemRepository = new Mock<IGroceryItemRepository>();
-        var mockGroceryCategoryRepository = new Mock<IGroceryCategoryRepository>();
 
-        var sut = new GroceryItemService(mockGroceryItemRepository.Object, mockGroceryCategoryRepository.Object);
+        var sut = new GroceryItemService(mockGroceryItemRepository.Object);
 
         // Act
         await sut.DeleteAsync(string.Empty, CancellationToken.None);

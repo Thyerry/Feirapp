@@ -1,7 +1,6 @@
 using Feirapp.API.Helpers;
-using Feirapp.Domain.Contracts.Repository;
-using Feirapp.Domain.Contracts.Service;
-using Feirapp.Domain.Services;
+using Feirapp.Domain.Services.GroceryItems.Implementations;
+using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Infrastructure.DataContext;
 using Feirapp.Infrastructure.Repository;
 
@@ -45,14 +44,12 @@ void ConfigurationAndServices(IServiceCollection services, IConfiguration config
     #region Services
 
     services.AddTransient<IGroceryItemService, GroceryItemService>();
-    services.AddTransient<IGroceryCategoryService, GroceryCategoryService>();
 
     #endregion Services
 
     #region Repositories
 
     services.AddTransient<IGroceryItemRepository, GroceryItemRepository>();
-    services.AddTransient<IGroceryCategoryRepository, GroceryCategoryRepository>();
 
     #endregion Repositories
 }

@@ -1,6 +1,6 @@
 using Bogus;
 using Feirapp.DocumentModels.Documents;
-using Feirapp.Domain.Dtos;
+using Feirapp.Domain.Services.GroceryItems.Dtos;
 using MongoDB.Bson;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +39,8 @@ public class GroceryItemFixture
             .RuleFor(gi => gi.Brand, f => f.Company.CompanyName())
             .RuleFor(gi => gi.StoreName, f => f.Company.CompanyName())
             .RuleFor(gi => gi.ImageUrl, f => f.Internet.Avatar())
-            .RuleFor(gi => gi.Category, GroceryCategoryFixture.CreateRandomGroceryCategory())
+            .RuleFor(gi => gi.Cest, f => $"{f.Random.Number(1, 9_999_999):0000000}")
+            .RuleFor(gi => gi.Ncm, f => $"{f.Random.Number(1, 99_999_999):00000000}")
             .RuleFor(gi => gi.PriceHistory, fakePriceLog.Generate(3).ToList())
             .RuleFor(gi => gi.PurchaseDate, FixtureUtils.FakeDate)
             .RuleFor(gi => gi.Creation, FixtureUtils.FakeDate)

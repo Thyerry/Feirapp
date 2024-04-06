@@ -2,7 +2,7 @@
 
 namespace Feirapp.DocumentModels.Documents;
 
-public class BaseDocumentModel
+public class BaseDocument
 {
     [BsonId]
     [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]

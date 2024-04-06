@@ -1,8 +1,8 @@
 ﻿using Feirapp.DocumentModels.Documents;
-using Feirapp.Domain.Dtos;
+using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Riok.Mapperly.Abstractions;
 
-namespace Feirapp.Domain.Mappers;
+namespace Feirapp.Domain.Services.GroceryItems.Mappers;
 
 [Mapper]
 public partial class PriceLogMapper

@@ -1,4 +1,4 @@
-namespace Feirapp.Domain.Dtos;
+namespace Feirapp.Domain.Services.GroceryItems.Dtos;
 
 public class GroceryItemDto
 {

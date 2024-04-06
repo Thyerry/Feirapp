@@ -1,23 +1,18 @@
-using Feirapp.Domain.Contracts.Repository;
-using Feirapp.Domain.Contracts.Service;
-using Feirapp.Domain.Dtos;
-using Feirapp.Domain.Mappers;
-using Feirapp.Domain.Validators.GroceryItemValidators;
+using Feirapp.Domain.Services.GroceryItems.Dtos;
+using Feirapp.Domain.Services.GroceryItems.Interfaces;
+using Feirapp.Domain.Services.GroceryItems.Mappers;
+using Feirapp.Domain.Services.GroceryItems.Validators;
 using FluentValidation;
-using System.Diagnostics;
 
-namespace Feirapp.Domain.Services;
+namespace Feirapp.Domain.Services.GroceryItems.Implementations;
 
 public class GroceryItemService : IGroceryItemService
 {
     private readonly IGroceryItemRepository _groceryItemRepository;
-    private readonly IGroceryCategoryRepository _groceryCategoryRepository;
 
-    public GroceryItemService(IGroceryItemRepository groceryItemRepository,
-        IGroceryCategoryRepository groceryCategoryRepository)
+    public GroceryItemService(IGroceryItemRepository groceryItemRepository)
     {
         _groceryItemRepository = groceryItemRepository;
-        _groceryCategoryRepository = groceryCategoryRepository;
     }
 
     public async Task<List<GroceryItemDto>> GetAllAsync(CancellationToken cancellationToken)
@@ -37,15 +32,6 @@ public class GroceryItemService : IGroceryItemService
         await validator.ValidateAndThrowAsync(groceryItemDto, cancellationToken);
 
         var groceryItem = groceryItemDto.ToModel();
-
-        var category =
-            (await _groceryCategoryRepository.SearchAsync(groceryItem.Category, cancellationToken))
-            .FirstOrDefault()!;
-        if (category != null)
-            groceryItem.Category = category;
-        else
-            Debug.WriteLine(
-                $"Category with cest = {groceryItemDto.Category.Cest}, ncm = {groceryItemDto.Category.Ncm} and {groceryItemDto.Category.ItemNumber}, not found in database!");
 
         groceryItem.Creation = DateTime.UtcNow;
         groceryItem.LastUpdate = DateTime.UtcNow;

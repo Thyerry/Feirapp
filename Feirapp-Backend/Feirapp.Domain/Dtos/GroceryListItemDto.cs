@@ -1,18 +1,18 @@
-﻿using Feirapp.DocumentModels.Documents;
-using Feirapp.DocumentModels.Enums;
+﻿using Feirapp.DocumentModels.Enums;
+using Feirapp.Domain.Services.GroceryItems.Dtos;
 
 namespace Feirapp.Domain.Dtos;
 
-public class ListItemDto
+public class GroceryListItemDto
 {
     public decimal Quantity { get; set; }
     public decimal UnitaryPrice { get; set; }
     public decimal TotalPrice { get; set; }
-    public GroceryItem GroceryItem { get; set; }
+    public GroceryItemDto Item { get; set; } = null!;
     public MeasureUnitEnum MeasureUnit { get; set; }
 
     public override string ToString()
     {
-        return $"{GroceryItem.Name}";
+        return $"{Item.Name}";
     }
 }

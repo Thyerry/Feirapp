@@ -146,22 +146,7 @@ namespace Feirapp.Tests.Bdd.Features
 #line 4
         testRunner.When("the client provides the right Grocery Item data", ((string)(null)), table1, "When ");
 #line hidden
-                TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Name",
-                            "Description",
-                            "Cest",
-                            "Item Number",
-                            "Ncm"});
-                table2.AddRow(new string[] {
-                            "Padaria",
-                            "items de cozimento e uso de massas",
-                            "123456789",
-                            "12",
-                            "12346"});
 #line 10
-        testRunner.And("all of them having the following category", ((string)(null)), table2, "And ");
-#line hidden
-#line 13
         testRunner.Then("return the Grocery Item", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

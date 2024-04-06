@@ -1,6 +1,6 @@
 using Feirapp.API.Controllers;
-using Feirapp.Domain.Contracts.Service;
-using Feirapp.Domain.Dtos;
+using Feirapp.Domain.Services.GroceryItems.Dtos;
+using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Tests.Fixtures;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;

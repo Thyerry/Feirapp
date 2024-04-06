@@ -1,6 +1,6 @@
-using Feirapp.Domain.Dtos;
+using Feirapp.Domain.Services.GroceryItems.Dtos;
 
-namespace Feirapp.Domain.Contracts.Service;
+namespace Feirapp.Domain.Services.GroceryItems.Interfaces;
 
 public interface IGroceryItemService
 {
