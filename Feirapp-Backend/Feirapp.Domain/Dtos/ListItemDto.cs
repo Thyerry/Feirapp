@@ -1,6 +1,5 @@
-﻿using Feirapp.DocumentModels;
+﻿using Feirapp.DocumentModels.Documents;
 using Feirapp.DocumentModels.Enums;
-using System.Xml.Linq;
 
 namespace Feirapp.Domain.Dtos;
 

@@ -24,7 +24,7 @@ public class ExceptionHandlerMiddleware
             var response = context.Response;
             response.ContentType = "application/json";
 
-            var result = "";
+            string result;
             switch (exception)
             {
                 case ValidationException e:
@@ -37,6 +37,7 @@ public class ExceptionHandlerMiddleware
                     result = JsonSerializer.Serialize(new { message = exception.Message });
                     break;
             }
+
             await response.WriteAsync(result);
         }
     }

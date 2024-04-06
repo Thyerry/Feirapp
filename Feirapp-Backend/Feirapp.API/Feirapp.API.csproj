@@ -15,4 +15,8 @@
         <ProjectReference Include="..\Feirapp.Infrastructure\Feirapp.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Dockerfile" />
+    </ItemGroup>
+
 </Project>

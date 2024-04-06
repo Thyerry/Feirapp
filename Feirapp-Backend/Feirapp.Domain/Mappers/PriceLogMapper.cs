@@ -1,5 +1,5 @@
-﻿using Feirapp.Domain.Dtos;
-using Feirapp.DocumentModels;
+﻿using Feirapp.DocumentModels.Documents;
+using Feirapp.Domain.Dtos;
 using Riok.Mapperly.Abstractions;
 
 namespace Feirapp.Domain.Mappers;
@@ -8,5 +8,6 @@ namespace Feirapp.Domain.Mappers;
 public partial class PriceLogMapper
 {
     public partial PriceLogDto PriceLogToModel(PriceLog priceLog);
+
     public partial PriceLog ModelToPriceLog(PriceLogDto priceLogModel);
 }

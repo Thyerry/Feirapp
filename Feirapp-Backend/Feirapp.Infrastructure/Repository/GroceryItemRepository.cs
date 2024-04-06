@@ -1,4 +1,4 @@
-using Feirapp.DocumentModels;
+using Feirapp.DocumentModels.Documents;
 using Feirapp.Domain.Contracts.Repository;
 using Feirapp.Infrastructure.DataContext;
 using MongoDB.Driver;
@@ -17,9 +17,9 @@ public class GroceryItemRepository : IGroceryItemRepository, IDisposable
         FieldDefinition<GroceryItem> priceField = "price";
         FieldDefinition<GroceryItem> storeField = "store";
 
-        var indexedKeyDefinition = Builders<GroceryItem>.IndexKeys.Text(nameField).Text(storeField).Ascending(priceField);
+        var indexedKeyDefinition =
+            Builders<GroceryItem>.IndexKeys.Text(nameField).Text(storeField).Ascending(priceField);
         _collection.Indexes.CreateOne(new CreateIndexModel<GroceryItem>(indexedKeyDefinition));
-
     }
 
     public async Task<List<GroceryItem>> GetAllAsync(CancellationToken cancellationToken)
@@ -46,7 +46,8 @@ public class GroceryItemRepository : IGroceryItemRepository, IDisposable
 
     public async Task<GroceryItem> GetByIdAsync(string groceryId, CancellationToken cancellationToken)
     {
-        var result = (await _collection.FindAsync(p => p.Id == groceryId, cancellationToken: cancellationToken)).ToList();
+        var result =
+            (await _collection.FindAsync(p => p.Id == groceryId, cancellationToken: cancellationToken)).ToList();
         return result.FirstOrDefault()!;
     }
 
@@ -61,10 +62,12 @@ public class GroceryItemRepository : IGroceryItemRepository, IDisposable
 
     public async Task DeleteAsync(string groceryId, CancellationToken cancellationToken)
     {
-        await _collection.DeleteOneAsync(groceryItem => groceryItem.Id == groceryId, cancellationToken: cancellationToken);
+        await _collection.DeleteOneAsync(groceryItem => groceryItem.Id == groceryId,
+            cancellationToken: cancellationToken);
     }
 
-    public async Task<List<GroceryItem>> InsertBatchAsync(List<GroceryItem> groceryItems, CancellationToken cancellationToken)
+    public async Task<List<GroceryItem>> InsertBatchAsync(List<GroceryItem> groceryItems,
+        CancellationToken cancellationToken)
     {
         await _collection.InsertManyAsync(groceryItems, cancellationToken: cancellationToken);
         return groceryItems;

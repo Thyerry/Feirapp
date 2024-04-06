@@ -1,10 +1,9 @@
-﻿using System.Diagnostics;
-using Feirapp.DocumentModels;
-using Feirapp.Domain.Contracts.Repository;
+﻿using Feirapp.Domain.Contracts.Repository;
 using Feirapp.Domain.Contracts.Service;
 using Feirapp.Domain.Dtos;
 using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Validators;
+using Feirapp.Domain.Validators.GroceryCategoryValidators;
 using FluentValidation;
 
 namespace Feirapp.Domain.Services;
@@ -30,7 +29,8 @@ public class GroceryCategoryService : IGroceryCategoryService
         return result.ToDtoList();
     }
 
-    public async Task<GroceryCategoryDto> InsertAsync(GroceryCategoryDto groceryCategory, CancellationToken cancellationToken = default)
+    public async Task<GroceryCategoryDto> InsertAsync(GroceryCategoryDto groceryCategory,
+        CancellationToken cancellationToken = default)
     {
         var validator = new InsertGroceryCategoryValidator();
         await validator.ValidateAndThrowAsync(groceryCategory, cancellationToken);
@@ -55,12 +55,14 @@ public class GroceryCategoryService : IGroceryCategoryService
         await _repository.DeleteAsync(id, cancellationToken);
     }
 
-    public async Task<List<GroceryCategoryDto>> SearchAsync(GroceryCategoryDto groceryCategory, CancellationToken cancellationToken = default)
+    public async Task<List<GroceryCategoryDto>> SearchAsync(GroceryCategoryDto groceryCategory,
+        CancellationToken cancellationToken = default)
     {
         return (await _repository.SearchAsync(groceryCategory.ToModel(), cancellationToken)).ToDtoList();
     }
 
-    public async Task<List<GroceryCategoryDto>> InsertBatch(List<GroceryCategoryDto> groceryCategoryDtos, CancellationToken cancellationToken = default)
+    public async Task<List<GroceryCategoryDto>> InsertBatch(List<GroceryCategoryDto> groceryCategoryDtos,
+        CancellationToken cancellationToken = default)
     {
         var validator = new InsertGroceryCategoryValidator();
         foreach (var category in groceryCategoryDtos)

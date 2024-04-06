@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace Feirapp.DocumentModels;
+namespace Feirapp.DocumentModels.Documents;
 
 public class GroceryCategory : BaseDocumentModel
 {

@@ -1,4 +1,4 @@
-﻿using Feirapp.DocumentModels;
+﻿using Feirapp.DocumentModels.Documents;
 using Feirapp.Infrastructure.DataContext;
 using Feirapp.Infrastructure.Repository;
 using Feirapp.Tests.Fixtures;
@@ -100,6 +100,7 @@ public class GroceryItemRepositoryTest : IDisposable
         var actual = await repository.GetByIdAsync(insertGroceryItem.Id!, CancellationToken.None);
         actual.Should().BeEquivalentTo(expected);
     }
+
     [Fact]
     public async Task DeleteAsync_DeleteFromDatabaseSuccessfully()
     {

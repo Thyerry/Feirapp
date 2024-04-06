@@ -122,7 +122,7 @@ public class GroceryItemControllerTests
         var groceryItems = GroceryItemFixture.CreateGroceryItemsModels(10);
         var mockGroceryItemService = new Mock<IGroceryItemService>();
         mockGroceryItemService
-            .Setup(service => service.GetRandomGroceryItemsAsync(It.IsAny<int>(),It.IsAny<CancellationToken>()))
+            .Setup(service => service.GetRandomGroceryItemsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(groceryItems);
         var sut = new GroceryItemController(mockGroceryItemService.Object);
 
@@ -149,7 +149,8 @@ public class GroceryItemControllerTests
         await sut.GetRandomGroceryItems(1);
 
         // Assert
-        mockGroceryItemService.Verify(service => service.GetRandomGroceryItemsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
+        mockGroceryItemService.Verify(
+            service => service.GetRandomGroceryItemsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -306,7 +307,7 @@ public class GroceryItemControllerTests
         );
     }
 
-    #endregion Crete
+    #endregion Create
 
     #region Update
 
@@ -369,7 +370,8 @@ public class GroceryItemControllerTests
         await sut.Delete(new string('*', 10));
 
         // Assert
-        mockService.Verify(service => service.DeleteAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+        mockService.Verify(service => service.DeleteAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [Fact]

@@ -1,4 +1,4 @@
-using Feirapp.DocumentModels;
+using Feirapp.DocumentModels.Documents;
 using Feirapp.Domain.Contracts.Repository;
 using Feirapp.Domain.Dtos;
 using Feirapp.Domain.Services;
@@ -123,7 +123,8 @@ public class GroceryItemServiceTests
         await sut.GetRandomGroceryItemsAsync(new int(), CancellationToken.None);
 
         // Assert
-        mockGroceryItemRepository.Verify(repo => repo.GetRandomGroceryItems(It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
+        mockGroceryItemRepository.Verify(
+            repo => repo.GetRandomGroceryItems(It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     #endregion GetRandomGroceryItems
@@ -165,7 +166,8 @@ public class GroceryItemServiceTests
         await sut.GetById(ValidGroceryItem.Id, It.IsAny<CancellationToken>());
 
         // Assert
-        mockGroceryItemRepository.Verify(repo => repo.GetByIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+        mockGroceryItemRepository.Verify(repo => repo.GetByIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     #endregion GetByIdAsync
@@ -215,7 +217,8 @@ public class GroceryItemServiceTests
         await sut.InsertAsync(ValidGroceryItemDto, CancellationToken.None);
 
         // Assert
-        mockGroceryItemRepository.Verify(repo => repo.InsertAsync(It.IsAny<GroceryItem>(), It.IsAny<CancellationToken>()), Times.Once);
+        mockGroceryItemRepository.Verify(
+            repo => repo.InsertAsync(It.IsAny<GroceryItem>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -285,7 +288,8 @@ public class GroceryItemServiceTests
         await sut.UpdateAsync(groceryItemModel, CancellationToken.None);
 
         // Assert
-        mockGroceryItemRepository.Verify(repo => repo.UpdateAsync(It.IsAny<GroceryItem>(), It.IsAny<CancellationToken>()), Times.Once);
+        mockGroceryItemRepository.Verify(
+            repo => repo.UpdateAsync(It.IsAny<GroceryItem>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -321,7 +325,8 @@ public class GroceryItemServiceTests
         await sut.DeleteAsync(string.Empty, CancellationToken.None);
 
         // Arrange
-        mockGroceryItemRepository.Verify(repo => repo.DeleteAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+        mockGroceryItemRepository.Verify(repo => repo.DeleteAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     #endregion DeleteAsync

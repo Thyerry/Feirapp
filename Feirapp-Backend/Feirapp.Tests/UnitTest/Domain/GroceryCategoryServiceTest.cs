@@ -1,7 +1,7 @@
-﻿using Feirapp.Domain.Contracts.Repository;
+﻿using Feirapp.DocumentModels.Documents;
+using Feirapp.Domain.Contracts.Repository;
 using Feirapp.Domain.Dtos;
 using Feirapp.Domain.Services;
-using Feirapp.DocumentModels;
 using FluentAssertions;
 using FluentValidation;
 using Moq;
@@ -15,12 +15,13 @@ namespace Feirapp.Tests.UnitTest.Domain;
 public class GroceryCategoryServiceTest
 {
     private const string ValidId = "123456789012345678901234";
-    internal readonly List<GroceryCategory> GroceryCategoryEntityList = new List<GroceryCategory>();
-    internal readonly GroceryCategory GroceryCategoryEntity = new GroceryCategory();
-    internal readonly GroceryCategoryDto InvalidValidGroceryCategoryDto = new GroceryCategoryDto();
+    private readonly List<GroceryCategory> GroceryCategoryEntityList = new();
+    private readonly GroceryCategory GroceryCategoryEntity = new();
+    private readonly GroceryCategoryDto InvalidValidGroceryCategoryDto = new();
 
-    internal readonly GroceryCategoryDto ValidGroceryCategoryDto = new GroceryCategoryDto()
+    private readonly GroceryCategoryDto ValidGroceryCategoryDto = new()
     {
+        Id = ValidId,
         Cest = "1234567",
         Description = "description",
         ItemNumber = "1.0",
@@ -131,7 +132,8 @@ public class GroceryCategoryServiceTest
         await sut.InsertAsync(ValidGroceryCategoryDto, CancellationToken.None);
 
         // Assert
-        mockRepository.Verify(repo => repo.InsertAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()), Times.Once);
+        mockRepository.Verify(repo => repo.InsertAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [Fact]
@@ -166,7 +168,8 @@ public class GroceryCategoryServiceTest
         await sut.UpdateAsync(ValidGroceryCategoryDto, CancellationToken.None);
 
         // Assert
-        mockRepository.Verify(repo => repo.UpdateAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()), Times.Once);
+        mockRepository.Verify(repo => repo.UpdateAsync(It.IsAny<GroceryCategory>(), It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [Fact]

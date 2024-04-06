@@ -1,9 +1,9 @@
-﻿using Feirapp.DocumentModels;
+﻿using Feirapp.DocumentModels.Documents;
 using Feirapp.Domain.Contracts.Repository;
 using Feirapp.Infrastructure.DataContext;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
-
+    
 namespace Feirapp.Infrastructure.Repository;
 
 public class GroceryCategoryRepository : IGroceryCategoryRepository
@@ -22,25 +22,26 @@ public class GroceryCategoryRepository : IGroceryCategoryRepository
 
     public async Task<List<GroceryCategory>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return (await _collection.FindAsync(q => true,
-            cancellationToken: cancellationToken))
+        return (await _collection.FindAsync(q => true, cancellationToken: cancellationToken))
             .ToList();
     }
 
     public async Task<GroceryCategory> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
         return (await _collection.FindAsync(q => q.Id == id,
-            cancellationToken: cancellationToken))
+                cancellationToken: cancellationToken))
             .FirstOrDefault();
     }
 
-    public async Task<GroceryCategory> InsertAsync(GroceryCategory groceryCategory, CancellationToken cancellationToken = default)
+    public async Task<GroceryCategory> InsertAsync(GroceryCategory groceryCategory,
+        CancellationToken cancellationToken = default)
     {
         await _collection.InsertOneAsync(groceryCategory, cancellationToken: cancellationToken);
         return groceryCategory;
     }
 
-    public async Task<List<GroceryCategory>> InsertBatchAsync(List<GroceryCategory> groceryCategories, CancellationToken cancellationToken = default)
+    public async Task<List<GroceryCategory>> InsertBatchAsync(List<GroceryCategory> groceryCategories,
+        CancellationToken cancellationToken = default)
     {
         await _collection.InsertManyAsync(groceryCategories, cancellationToken: cancellationToken);
         return groceryCategories;
@@ -52,7 +53,7 @@ public class GroceryCategoryRepository : IGroceryCategoryRepository
             gc => gc.Id == groceryCategory.Id,
             groceryCategory,
             cancellationToken: cancellationToken
-            );
+        );
     }
 
     public async Task DeleteAsync(string id, CancellationToken cancellationToken = default)
@@ -60,7 +61,8 @@ public class GroceryCategoryRepository : IGroceryCategoryRepository
         await _collection.DeleteOneAsync(q => q.Id == id, cancellationToken);
     }
 
-    public async Task<List<GroceryCategory>> SearchAsync(GroceryCategory groceryCategory, CancellationToken cancellationToken = default)
+    public async Task<List<GroceryCategory>> SearchAsync(GroceryCategory groceryCategory,
+        CancellationToken cancellationToken = default)
     {
         var query = _collection.AsQueryable();
 
@@ -71,7 +73,7 @@ public class GroceryCategoryRepository : IGroceryCategoryRepository
         {
             query = query.Where(gc => gc.Cest == groceryCategory.Cest);
 
-            if (!string.IsNullOrWhiteSpace(groceryCategory.ItemNumber)) 
+            if (!string.IsNullOrWhiteSpace(groceryCategory.ItemNumber))
                 query = query.Where(gc => gc.ItemNumber == groceryCategory.ItemNumber);
         }
 

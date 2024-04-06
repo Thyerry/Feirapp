@@ -125,7 +125,8 @@ public class GroceryCategoryControllerTest
         // Act
         await sut.GetById(ValidGroceryCategoryId, CancellationToken.None);
         // Assert
-        mockService.Verify(service => service.GetByIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once());
+        mockService.Verify(service => service.GetByIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Once());
     }
 
     [Fact]
@@ -219,7 +220,7 @@ public class GroceryCategoryControllerTest
 
         // Assert
         mockService.Verify(service =>
-            service.InsertAsync(It.IsAny<GroceryCategoryDto>(), It.IsAny<CancellationToken>()),
+                service.InsertAsync(It.IsAny<GroceryCategoryDto>(), It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -258,9 +259,9 @@ public class GroceryCategoryControllerTest
 
         // Assert
         mockService.Verify(service =>
-            service.UpdateAsync(It.IsAny<GroceryCategoryDto>(), It.IsAny<CancellationToken>()),
+                service.UpdateAsync(It.IsAny<GroceryCategoryDto>(), It.IsAny<CancellationToken>()),
             Times.Once
-            );
+        );
     }
 
     #endregion Update
@@ -316,7 +317,7 @@ public class GroceryCategoryControllerTest
 
         // Assert
         mockService.Verify(service =>
-            service.DeleteAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
+                service.DeleteAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
             Times.Once
         );
     }

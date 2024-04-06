@@ -1,5 +1,5 @@
 using Bogus;
-using Feirapp.DocumentModels;
+using Feirapp.DocumentModels.Documents;
 using Feirapp.Domain.Dtos;
 using MongoDB.Bson;
 using System.Collections.Generic;

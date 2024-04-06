@@ -1,4 +1,4 @@
-﻿using Feirapp.DocumentModels;
+﻿using Feirapp.DocumentModels.Documents;
 using Feirapp.Domain.Dtos;
 using Riok.Mapperly.Abstractions;
 

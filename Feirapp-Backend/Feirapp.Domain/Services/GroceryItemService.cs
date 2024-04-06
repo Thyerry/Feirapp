@@ -1,10 +1,10 @@
-using System.Diagnostics;
 using Feirapp.Domain.Contracts.Repository;
 using Feirapp.Domain.Contracts.Service;
 using Feirapp.Domain.Dtos;
 using Feirapp.Domain.Mappers;
-using Feirapp.Domain.Validators;
+using Feirapp.Domain.Validators.GroceryItemValidators;
 using FluentValidation;
+using System.Diagnostics;
 
 namespace Feirapp.Domain.Services;
 
@@ -12,8 +12,9 @@ public class GroceryItemService : IGroceryItemService
 {
     private readonly IGroceryItemRepository _groceryItemRepository;
     private readonly IGroceryCategoryRepository _groceryCategoryRepository;
-    
-    public GroceryItemService(IGroceryItemRepository groceryItemRepository, IGroceryCategoryRepository groceryCategoryRepository)
+
+    public GroceryItemService(IGroceryItemRepository groceryItemRepository,
+        IGroceryCategoryRepository groceryCategoryRepository)
     {
         _groceryItemRepository = groceryItemRepository;
         _groceryCategoryRepository = groceryCategoryRepository;
@@ -24,7 +25,8 @@ public class GroceryItemService : IGroceryItemService
         return (await _groceryItemRepository.GetAllAsync(cancellationToken)).ToDtoList();
     }
 
-    public async Task<List<GroceryItemDto>> GetRandomGroceryItemsAsync(int quantity, CancellationToken cancellationToken)
+    public async Task<List<GroceryItemDto>> GetRandomGroceryItemsAsync(int quantity,
+        CancellationToken cancellationToken)
     {
         return (await _groceryItemRepository.GetRandomGroceryItems(quantity, cancellationToken)).ToDtoList();
     }
@@ -42,7 +44,8 @@ public class GroceryItemService : IGroceryItemService
         if (category != null)
             groceryItem.Category = category;
         else
-            Debug.WriteLine($"Category with cest = {groceryItemDto.Category.Cest}, ncm = {groceryItemDto.Category.Ncm} and {groceryItemDto.Category.ItemNumber}, not found in database!");
+            Debug.WriteLine(
+                $"Category with cest = {groceryItemDto.Category.Cest}, ncm = {groceryItemDto.Category.Ncm} and {groceryItemDto.Category.ItemNumber}, not found in database!");
 
         groceryItem.Creation = DateTime.UtcNow;
         groceryItem.LastUpdate = DateTime.UtcNow;
@@ -50,7 +53,8 @@ public class GroceryItemService : IGroceryItemService
         return (await _groceryItemRepository.InsertAsync(groceryItem, cancellationToken)).ToDto();
     }
 
-    public async Task<List<GroceryItemDto>> InsertBatchAsync(List<GroceryItemDto> groceryItemDtos, CancellationToken cancellationToken = default)
+    public async Task<List<GroceryItemDto>> InsertBatchAsync(List<GroceryItemDto> groceryItemDtos,
+        CancellationToken cancellationToken = default)
     {
         var validator = new InsertGroceryItemValidator();
         foreach (var item in groceryItemDtos)

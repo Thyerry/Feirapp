@@ -1,4 +1,4 @@
-using Feirapp.DocumentModels;
+using Feirapp.DocumentModels.Documents;
 
 namespace Feirapp.Domain.Contracts.Repository;
 
@@ -12,7 +12,8 @@ public interface IGroceryItemRepository
 
     Task<GroceryItem> InsertAsync(GroceryItem groceryItem, CancellationToken cancellationToken = default);
 
-    Task<List<GroceryItem>> InsertBatchAsync(List<GroceryItem> groceryItems, CancellationToken cancellationToken = default);
+    Task<List<GroceryItem>> InsertBatchAsync(List<GroceryItem> groceryItems,
+        CancellationToken cancellationToken = default);
 
     Task UpdateAsync(GroceryItem groceryItem, CancellationToken cancellationToken = default);
 
