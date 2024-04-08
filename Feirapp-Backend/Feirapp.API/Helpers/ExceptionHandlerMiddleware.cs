@@ -21,7 +21,7 @@ public class ExceptionHandlerMiddleware
         }
         catch (Exception exception)
         {
-            var response = context.Response;
+            var response = context.Response; 
             response.ContentType = "application/json";
 
             string result;
@@ -34,7 +34,7 @@ public class ExceptionHandlerMiddleware
 
                 default:
                     response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    result = JsonSerializer.Serialize(new { message = exception.Message });
+                    result = JsonSerializer.Serialize(new { message = "We're having some technical issues right now. Try again later." });
                     break;
             }
 

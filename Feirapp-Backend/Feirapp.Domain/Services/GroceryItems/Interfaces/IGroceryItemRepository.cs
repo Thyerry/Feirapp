@@ -1,21 +1,11 @@
-using Feirapp.DocumentModels.Documents;
+using Feirapp.Domain.Services.BaseRepository;
+using Feirapp.Entities.Entities;
 
 namespace Feirapp.Domain.Services.GroceryItems.Interfaces;
 
-public interface IGroceryItemRepository
+public interface IGroceryItemRepository : IBaseRepository<GroceryItem>
 {
-    Task<GroceryItem> GetByIdAsync(string id, CancellationToken cancellationToken = default);
+    Task<List<GroceryItem>> GetRandomGroceryItems(int quantity, CancellationToken ct = default);
 
-    Task<List<GroceryItem>> GetAllAsync(CancellationToken cancellationToken = default);
-
-    Task<List<GroceryItem>> GetRandomGroceryItems(int quantity, CancellationToken cancellationToken = default);
-
-    Task<GroceryItem> InsertAsync(GroceryItem groceryItem, CancellationToken cancellationToken = default);
-
-    Task<List<GroceryItem>> InsertBatchAsync(List<GroceryItem> groceryItems,
-        CancellationToken cancellationToken = default);
-
-    Task UpdateAsync(GroceryItem groceryItem, CancellationToken cancellationToken = default);
-
-    Task DeleteAsync(string id, CancellationToken cancellationToken = default);
+    Task<List<GroceryItem>> InsertBatchAsync(List<GroceryItem> groceryItems, CancellationToken ct = default);
 }

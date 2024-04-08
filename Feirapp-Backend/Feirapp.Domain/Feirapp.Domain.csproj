@@ -1,23 +1,26 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Remove="Class1.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="FluentValidation" Version="11.7.1" />
-      <PackageReference Include="MongoDB.Bson" Version="2.21.0" />
-      <PackageReference Include="Riok.Mapperly" Version="3.1.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Feirapp.Entities\Feirapp.DocumentModels.csproj" />
+      <ProjectReference Include="..\Feirapp.Entities\Feirapp.Entities.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Services\DataScrapper\Implementations\" />
+      <Folder Include="Services\DataScrapper\Dtos\" />
+      <Folder Include="Services\GroceryItems\Dtos\Commands\" />
+      <Folder Include="Services\GroceryItems\Dtos\Queries\" />
+      <Folder Include="Services\GroceryItems\Validators\" />
+      <Folder Include="Services\BaseRepository\" />
     </ItemGroup>
 
 </Project>

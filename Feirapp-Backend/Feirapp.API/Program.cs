@@ -1,12 +1,20 @@
 using Feirapp.API.Helpers;
 using Feirapp.Domain.Services.GroceryItems.Implementations;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
-using Feirapp.Infrastructure.DataContext;
+using Feirapp.Infrastructure.Configuration;
 using Feirapp.Infrastructure.Repository;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+#region DB Context Configuration
+
+builder.Services.AddDbContext<BaseContext>(options =>
+    options.UseMySql(builder.Configuration.GetConnectionString("MySqlConnection"), new MySqlServerVersion(new Version(8, 3, 0))));
+
+#endregion DB Context Configuration
 
 ConfigurationAndServices(builder.Services, builder.Configuration);
 
@@ -38,9 +46,6 @@ app.Run();
 
 void ConfigurationAndServices(IServiceCollection services, IConfiguration configuration)
 {
-    services.Configure<MongoSettings>(configuration.GetSection(nameof(MongoSettings)));
-    services.AddTransient<IMongoFeirappContext, MongoFeirappContext>();
-
     #region Services
 
     services.AddTransient<IGroceryItemService, GroceryItemService>();
