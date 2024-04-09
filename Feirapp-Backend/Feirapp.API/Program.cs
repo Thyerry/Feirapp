@@ -1,4 +1,7 @@
 using Feirapp.API.Helpers;
+using Feirapp.Domain.Services.DataScrapper.Dtos;
+using Feirapp.Domain.Services.DataScrapper.Implementations;
+using Feirapp.Domain.Services.DataScrapper.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Implementations;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Infrastructure.Configuration;
@@ -16,7 +19,7 @@ builder.Services.AddDbContext<BaseContext>(options =>
 
 #endregion DB Context Configuration
 
-ConfigurationAndServices(builder.Services, builder.Configuration);
+ConfigurationsAndServices(builder.Services, builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -44,11 +47,18 @@ app.MapControllers();
 
 app.Run();
 
-void ConfigurationAndServices(IServiceCollection services, IConfiguration configuration)
+void ConfigurationsAndServices(IServiceCollection services, IConfiguration configuration)
 {
+    #region Configurations
+
+    services.Configure<SefazPE>(configuration.GetSection(nameof(SefazPE)));
+
+    #endregion Configurations
+
     #region Services
 
     services.AddTransient<IGroceryItemService, GroceryItemService>();
+    services.AddTransient<IInvoiceReaderService, InvoiceReaderService>();
 
     #endregion Services
 

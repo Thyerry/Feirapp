@@ -7,7 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="FluentValidation" Version="11.7.1" />
+      <PackageReference Include="FluentValidation" Version="11.9.0" />
+      <PackageReference Include="HtmlAgilityPack" Version="1.11.60" />
+      <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
     </ItemGroup>
 
     <ItemGroup>
@@ -15,8 +17,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Services\DataScrapper\Implementations\" />
-      <Folder Include="Services\DataScrapper\Dtos\" />
       <Folder Include="Services\GroceryItems\Dtos\Commands\" />
       <Folder Include="Services\GroceryItems\Dtos\Queries\" />
       <Folder Include="Services\GroceryItems\Validators\" />
