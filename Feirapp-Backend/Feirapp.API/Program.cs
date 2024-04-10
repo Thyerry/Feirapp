@@ -51,7 +51,7 @@ void ConfigurationsAndServices(IServiceCollection services, IConfiguration confi
 {
     #region Configurations
 
-    services.Configure<SefazPE>(configuration.GetSection(nameof(SefazPE)));
+    services.Configure<SefazPE>(configuration.GetSection("DataScrappingResources:SefazPE"));
 
     #endregion Configurations
 

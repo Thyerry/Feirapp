@@ -1,6 +1,7 @@
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Entities.Entities;
 using Feirapp.Infrastructure.Configuration;
+using Feirapp.Infrastructure.Extensions;
 using Feirapp.Infrastructure.Repository.BaseRepository;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,7 +29,7 @@ public class GroceryItemRepository : BaseRepository<GroceryItem>, IGroceryItemRe
 
     public async Task<List<GroceryItem>> InsertBatchAsync(List<GroceryItem> groceryItems, CancellationToken ct)
     {
-        await _context.Database.BeginTransactionAsync(ct);
+        // await _context.Database.BeginTransactionAsync(ct);
         var store = groceryItems.Select(x => x.Store).FirstOrDefault();
 
         var ncms = groceryItems
@@ -58,10 +59,8 @@ public class GroceryItemRepository : BaseRepository<GroceryItem>, IGroceryItemRe
                 .FirstOrDefaultAsync(x => x.Barcode == groceryItem.Barcode && x.StoreId == groceryItem.StoreId, ct);
 
             if (dbItem == null)
-                await _context.GroceryItems.AddAsync(groceryItem, ct);
-            
-            if (dbItem == null || groceryItem.Price != dbItem?.Price)
             {
+                await _context.GroceryItems.AddAsync(groceryItem, ct);
                 await _context.PriceLogs.AddAsync(new PriceLog
                 {
                     GroceryItemId = groceryItem.Id,
@@ -69,9 +68,26 @@ public class GroceryItemRepository : BaseRepository<GroceryItem>, IGroceryItemRe
                     LogDate = groceryItem.PurchaseDate,
                 }, ct);
             }
+            
+            if (groceryItem.Price != dbItem?.Price && dbItem != null)
+            {
+                dbItem.Price = groceryItem.Price;
+                dbItem.LastUpdate = DateTime.Now;
+                _context.GroceryItems.Update(dbItem);
+                var priceLog = new PriceLog
+                {
+                    GroceryItemId = dbItem.Id,
+                    Price = dbItem.Price,
+                    LogDate = dbItem.PurchaseDate,
+                };
+                await _context.PriceLogs.AddIfNotExistsAsync(priceLog, 
+                    p => p.GroceryItemId == priceLog.GroceryItemId 
+                         && p.LogDate.Date.Equals(priceLog.LogDate.Date)
+                    , ct);
+            }
         }
 
-        await _context.Database.CommitTransactionAsync(ct);
+        // await _context.Database.CommitTransactionAsync(ct);
         await _context.SaveChangesAsync(ct);
         return groceryItems;
     }
