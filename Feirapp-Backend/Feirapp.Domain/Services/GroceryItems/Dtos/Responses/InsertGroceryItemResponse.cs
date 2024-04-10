@@ -7,7 +7,7 @@ public record InsertGroceryItemResponse
     long Id,
     string Name,
     decimal Price,
-    string? Barcode = null,
+    string Barcode = null,
     string? Description = null,
     string? ImageUrl = null,
     string? NcmCode = null,

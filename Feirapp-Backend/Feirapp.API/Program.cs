@@ -1,11 +1,14 @@
 using Feirapp.API.Helpers;
+using Feirapp.Domain.Services.BaseRepository;
 using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.DataScrapper.Implementations;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Implementations;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
+using Feirapp.Entities.Entities;
 using Feirapp.Infrastructure.Configuration;
 using Feirapp.Infrastructure.Repository;
+using Feirapp.Infrastructure.Repository.BaseRepository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,14 +60,17 @@ void ConfigurationsAndServices(IServiceCollection services, IConfiguration confi
 
     #region Services
 
-    services.AddTransient<IGroceryItemService, GroceryItemService>();
-    services.AddTransient<IInvoiceReaderService, InvoiceReaderService>();
-
+    services.AddScoped<IGroceryItemService, GroceryItemService>();
+    services.AddScoped<IInvoiceReaderService, InvoiceReaderService>();
+    
     #endregion Services
 
     #region Repositories
 
-    services.AddTransient<IGroceryItemRepository, GroceryItemRepository>();
+    services.AddScoped<IGroceryItemRepository, GroceryItemRepository>();
+    services.AddScoped<IBaseRepository<Store>, BaseRepository<Store>>();
+    services.AddScoped<IBaseRepository<Ncm>, BaseRepository<Ncm>>();
+    services.AddScoped<IBaseRepository<Cest>, BaseRepository<Cest>>();
 
     #endregion Repositories
 }

@@ -13,7 +13,7 @@ public interface IGroceryItemService
 
     //Task<GroceryItemDto> InsertAsync(GroceryItemDto groceryItemDto, CancellationToken cancellationToken = default);
 
-    Task<List<InsertGroceryItemResponse>> InsertBatchAsync(List<InsertGroceryItemCommand> insertCommands, CancellationToken ct = default);
+    Task InsertBatchAsync(List<InsertGroceryItemCommand> insertCommands, CancellationToken ct = default);
 
     //Task UpdateAsync(GroceryItemDto groceryItemDto, CancellationToken cancellationToken = default);
 

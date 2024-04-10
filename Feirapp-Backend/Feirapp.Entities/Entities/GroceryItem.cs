@@ -37,7 +37,7 @@ public class GroceryItem
     /// <summary>
     /// Gets or sets the barcode of the grocery item.
     /// </summary>
-    public string? Barcode { get; set; }
+    public string Barcode { get; set; }
 
     /// <summary>
     /// Gets or sets the price of the grocery item.
@@ -59,34 +59,11 @@ public class GroceryItem
     /// </summary>
     public MeasureUnitEnum MeasureUnit { get; set; }
 
-    /// <summary>
-    /// Gets or sets the NCM code of the grocery item.
-    /// </summary>
-    public string? NcmCode { get; set; }
-
-    /// <summary>
-    /// Gets or sets the NCM information of the grocery item.
-    /// </summary>
+    public string NcmCode { get; set; }
     public Ncm Ncm { get; set; }
-
-    /// <summary>
-    /// Gets or sets the CEST code of the grocery item.
-    /// </summary>
-    public string? CestCode { get; set; }
-
-    /// <summary>
-    /// Gets or sets the CEST information of the grocery item.
-    /// </summary>
+    public string CestCode { get; set; }
     public Cest Cest { get; set; }
-
-    /// <summary>
-    /// Gets or sets the store identifier where the grocery item is available.
-    /// </summary>
     public long StoreId { get; set; }
-
-    /// <summary>
-    /// Gets or sets the store where the grocery item is available.
-    /// </summary>
     public Store Store { get; set; }
 
     /// <summary>

@@ -10,17 +10,17 @@ namespace Feirapp.Domain.Services.DataScrapper.Implementations;
 public class InvoiceReaderService : IInvoiceReaderService
 {
     private readonly SefazPE _sefazPe;
-    private readonly IGroceryItemRepository _groceryItemRepository;
+    private readonly IGroceryItemService _groceryItemService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="InvoiceReaderService"/> class.
     /// </summary>
     /// <param name="options">The options for the SefazPE service.</param>
-    /// <param name="groceryItemRepository">The repository for grocery items.</param>
-    public InvoiceReaderService(IOptions<SefazPE> options, IGroceryItemRepository groceryItemRepository)
+    /// <param name="groceryItemService"></param>
+    public InvoiceReaderService(IOptions<SefazPE> options, IGroceryItemService groceryItemService)
     {
+        _groceryItemService = groceryItemService;
         _sefazPe = options.Value;
-        _groceryItemRepository = groceryItemRepository;
     }
     
     /// <summary>
@@ -51,8 +51,7 @@ public class InvoiceReaderService : IInvoiceReaderService
         );
 
         var groceryItems = GetGroceryItemList(groceryItemXmlList, purchaseDateXml);
-
-        await _groceryItemRepository.InsertBatchAsync(groceryItems.MapToEntity(store), ct);
+        await _groceryItemService.InsertBatchAsync(groceryItems.MapToInsertCommand(store), ct);
         
         return new InvoiceImportResponse(store, groceryItems);
     }

@@ -50,14 +50,6 @@ public class GroceryItemController : ControllerBase
     //    return Created(nameof(GroceryItemDto), result);
     //}
 
-    [HttpPost("batch")]
-    [ProducesResponseType(typeof(List<InsertGroceryItemResponse>), 201)]
-    public async Task<IActionResult> InsertBatch(List<InsertGroceryItemCommand> groceryItems, CancellationToken ct = default)
-    {
-        var result = await _groceryItemService.InsertBatchAsync(groceryItems, ct);
-        return Created(nameof(InsertGroceryItemResponse), result);
-    }
-
     //[HttpGet("{id}")]
     //[ProducesResponseType(typeof(GroceryItemDto), 200)]
     //[ProducesResponseType(typeof(NotFoundResult), 404)]

@@ -1,5 +1,6 @@
 ﻿using Feirapp.Domain.Services.BaseRepository;
 using Feirapp.Infrastructure.Configuration;
+using Feirapp.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Feirapp.Infrastructure.Repository.BaseRepository;
@@ -8,10 +9,10 @@ public class BaseRepository<T> : IBaseRepository<T>, IDisposable where T : class
 {
     private readonly BaseContext _context;
 
-    protected BaseRepository(BaseContext context)
+    public BaseRepository(BaseContext context)
     {
         var options = new DbContextOptions<BaseContext>();
-        _context = context ?? new BaseContext(options);
+        _context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
     public async Task<T> InsertAsync(T entity, CancellationToken ct)
@@ -40,7 +41,13 @@ public class BaseRepository<T> : IBaseRepository<T>, IDisposable where T : class
 
     public async Task<T> GetByIdAsync(long id, CancellationToken ct)
     {
-        return await _context.Set<T>().FindAsync(id) ?? throw new InvalidOperationException();
+        return await _context.Set<T>().FindAsync(id, ct) ?? throw new InvalidOperationException();
+    }
+
+    public async Task AddIfNotExistsAsync(T entity, Func<T, bool>? predicate, CancellationToken ct = default)
+    {
+        await _context.Set<T>().AddIfNotExistsAsync(entity, predicate, ct);
+        await _context.SaveChangesAsync(ct);
     }
 
     public void Dispose()

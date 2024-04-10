@@ -27,69 +27,26 @@ public class GroceryItemRepository : BaseRepository<GroceryItem>, IGroceryItemRe
         return result;
     }
 
-    public async Task<List<GroceryItem>> InsertBatchAsync(List<GroceryItem> groceryItems, CancellationToken ct)
+    public async Task<GroceryItem> GetByBarcodeAndStoreIdAsync(string itemBarcode, long itemStoreId, CancellationToken ct)
     {
-        // await _context.Database.BeginTransactionAsync(ct);
-        var store = groceryItems.Select(x => x.Store).FirstOrDefault();
+        return await _context.GroceryItems
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Barcode == itemBarcode && x.StoreId == itemStoreId, ct).ConfigureAwait(false) ?? new GroceryItem();
+    }
 
-        var ncms = groceryItems
-            .Where(g => g.NcmCode != null)
-            .Select(x => x.NcmCode)
-            .Distinct()
-            .Except(_context.Ncms.Select(s => s.Code));
+    public async Task InsertPriceLogAsync(PriceLog priceLog, CancellationToken ct)
+    {
+        await _context.PriceLogs.AddIfNotExistsAsync(priceLog,
+            p => p.GroceryItemId == priceLog.Id && p.LogDate.Date == priceLog.LogDate.Date,
+            ct).ConfigureAwait(false);
+    }
 
-        var cests = groceryItems
-            .Where(g => g.CestCode != null)
-            .Select(g => g.CestCode)
-            .Distinct()
-            .Except(_context.Cests.Select(s => s.Code));
-
-        if (store != null)
-            await _context.Stores.AddAsync(store, ct);
-
-        if (ncms.Any())
-            await _context.Ncms.AddRangeAsync(ncms.Select(s => new Ncm { Code = s }), ct);
-
-        if (cests.Any())
-            await _context.Cests.AddRangeAsync(cests.Select(s => new Cest { Code = s }), ct);
-
-        foreach (var groceryItem in groceryItems)
-        {
-            var dbItem = await _context.GroceryItems
-                .FirstOrDefaultAsync(x => x.Barcode == groceryItem.Barcode && x.StoreId == groceryItem.StoreId, ct);
-
-            if (dbItem == null)
-            {
-                await _context.GroceryItems.AddAsync(groceryItem, ct);
-                await _context.PriceLogs.AddAsync(new PriceLog
-                {
-                    GroceryItemId = groceryItem.Id,
-                    Price = groceryItem.Price,  
-                    LogDate = groceryItem.PurchaseDate,
-                }, ct);
-            }
-            
-            if (groceryItem.Price != dbItem?.Price && dbItem != null)
-            {
-                dbItem.Price = groceryItem.Price;
-                dbItem.LastUpdate = DateTime.Now;
-                _context.GroceryItems.Update(dbItem);
-                var priceLog = new PriceLog
-                {
-                    GroceryItemId = dbItem.Id,
-                    Price = dbItem.Price,
-                    LogDate = dbItem.PurchaseDate,
-                };
-                await _context.PriceLogs.AddIfNotExistsAsync(priceLog, 
-                    p => p.GroceryItemId == priceLog.GroceryItemId 
-                         && p.LogDate.Date.Equals(priceLog.LogDate.Date)
-                    , ct);
-            }
-        }
-
-        // await _context.Database.CommitTransactionAsync(ct);
-        await _context.SaveChangesAsync(ct);
-        return groceryItems;
+    public async Task<PriceLog> GetLastPriceLogAsync(long groceryItemId, CancellationToken ct)
+    {
+        return await _context.PriceLogs
+            .AsNoTracking()
+            .OrderByDescending(x => x.LogDate)
+            .FirstOrDefaultAsync(x => x.GroceryItemId == groceryItemId, ct) ?? new PriceLog();
     }
 
     public new async Task<GroceryItem> InsertAsync(GroceryItem entity, CancellationToken ct)
@@ -132,12 +89,12 @@ public class GroceryItemRepository : BaseRepository<GroceryItem>, IGroceryItemRe
                 LogDate = dbItem.PurchaseDate,
             }, ct);
         }
-        
+
         await _context.SaveChangesAsync(ct);
         await _context.Database.CommitTransactionAsync(ct);
         return entity;
     }
-
+    
     public void Dispose()
     {
     }

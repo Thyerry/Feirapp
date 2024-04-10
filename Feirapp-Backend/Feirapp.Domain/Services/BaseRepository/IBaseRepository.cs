@@ -1,4 +1,6 @@
-﻿namespace Feirapp.Domain.Services.BaseRepository;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+
+namespace Feirapp.Domain.Services.BaseRepository;
 
 public interface IBaseRepository<T>
 {
@@ -11,4 +13,6 @@ public interface IBaseRepository<T>
     Task<List<T>> GetAllAsync(CancellationToken ct);
 
     Task<T> GetByIdAsync(long id, CancellationToken ct);
+    
+    Task AddIfNotExistsAsync(T entity, Func<T, bool> predicate, CancellationToken ct = default);
 }

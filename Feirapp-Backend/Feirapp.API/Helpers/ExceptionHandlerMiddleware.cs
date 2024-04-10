@@ -1,6 +1,7 @@
 using FluentValidation;
 using System.Net;
 using System.Text.Json;
+using Humanizer;
 
 namespace Feirapp.API.Helpers;
 
@@ -34,7 +35,11 @@ public class ExceptionHandlerMiddleware
 
                 default:
                     response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    result = JsonSerializer.Serialize(new { message = "We're having some technical issues right now. Try again later." });
+                    result = JsonSerializer.Serialize(new
+                    {
+                        message = exception.Message,
+                        innerException = exception.InnerException?.Message,
+                    });
                     break;
             }
 
