@@ -22,7 +22,6 @@
       <Folder Include="Services\GroceryItems\Dtos\Queries\" />
       <Folder Include="Services\GroceryItems\Validators\" />
       <Folder Include="Services\BaseRepository\" />
-      <Folder Include="Services\Stores\Interfaces\" />
     </ItemGroup>
 
 </Project>

@@ -88,7 +88,7 @@ public static class GroceryItemMapper
         return entities.Select(x => x.MapToInsertResponse()).ToList();
     }
 
-    public static GetStoreResponse MapToStoreDto(this Store store)
+    public static GetStoreResponse MapToStoreDto(this Store? store)
     {
         return new GetStoreResponse
         (

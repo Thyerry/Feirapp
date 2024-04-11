@@ -64,7 +64,7 @@ public class GroceryItem
     public string CestCode { get; set; }
     public Cest Cest { get; set; }
     public long StoreId { get; set; }
-    public Store Store { get; set; }
+    public Store? Store { get; set; }
 
     /// <summary>
     /// Gets or sets the price history of the grocery item.

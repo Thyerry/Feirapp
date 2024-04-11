@@ -5,6 +5,7 @@ using Feirapp.Domain.Services.DataScrapper.Implementations;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Implementations;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
+using Feirapp.Domain.Services.Stores.Interfaces;
 using Feirapp.Entities.Entities;
 using Feirapp.Infrastructure.Configuration;
 using Feirapp.Infrastructure.Repository;
@@ -68,7 +69,7 @@ void ConfigurationsAndServices(IServiceCollection services, IConfiguration confi
     #region Repositories
 
     services.AddScoped<IGroceryItemRepository, GroceryItemRepository>();
-    services.AddScoped<IBaseRepository<Store>, BaseRepository<Store>>();
+    services.AddScoped<IStoreRepository, StoreRepository>();
     services.AddScoped<IBaseRepository<Ncm>, BaseRepository<Ncm>>();
     services.AddScoped<IBaseRepository<Cest>, BaseRepository<Cest>>();
 

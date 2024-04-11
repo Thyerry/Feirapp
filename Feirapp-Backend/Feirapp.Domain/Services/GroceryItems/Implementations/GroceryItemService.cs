@@ -3,6 +3,7 @@ using Feirapp.Domain.Services.GroceryItems.Dtos.Commands;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Mappers;
+using Feirapp.Domain.Services.Stores.Interfaces;
 using Feirapp.Entities.Entities;
 
 namespace Feirapp.Domain.Services.GroceryItems.Implementations;
@@ -10,12 +11,15 @@ namespace Feirapp.Domain.Services.GroceryItems.Implementations;
 public class GroceryItemService : IGroceryItemService
 {
     private readonly IGroceryItemRepository _groceryItemRepository;
-    private readonly IBaseRepository<Store> _storeRepository;
+    private readonly IStoreRepository _storeRepository;
     private readonly IBaseRepository<Ncm> _ncmRepository;
     private readonly IBaseRepository<Cest> _cestRepository;
 
-    public GroceryItemService(IGroceryItemRepository groceryItemRepository, IBaseRepository<Store> storeRepository,
-        IBaseRepository<Ncm> ncmRepository, IBaseRepository<Cest> cestRepository)
+    public GroceryItemService(
+        IGroceryItemRepository groceryItemRepository,
+        IStoreRepository storeRepository,
+        IBaseRepository<Ncm> ncmRepository,
+        IBaseRepository<Cest> cestRepository)
     {
         _groceryItemRepository = groceryItemRepository;
         _storeRepository = storeRepository;
@@ -33,61 +37,51 @@ public class GroceryItemService : IGroceryItemService
         CancellationToken ct = default)
     {
         var groceryItems = insertCommands.MapToEntity();
-
-        var store = groceryItems.FirstOrDefault()?.Store;
-        var existingNcms = await _ncmRepository.GetAllAsync(ct);
-        // var existingCests = await _cestRepository.GetAllAsync(ct);
-
-        var ncms = groceryItems
-            .Where(g => string.IsNullOrWhiteSpace(g.NcmCode))
-            .Select(x => x.NcmCode)
-            .Distinct()
-            .Except(existingNcms.Select(s => s.Code))
-            .ToList();
-
-        var cests = groceryItems
-            .Where(g => string.IsNullOrWhiteSpace(g.CestCode))
-            .Select(x => x.CestCode)
-            .Distinct()
-            // .Except(existingCests.Select(s => s.Code))
-            .ToList();
-
-        if (store == null)
-            await _storeRepository.AddIfNotExistsAsync(store, x => x.Name == store.Name, ct);
-
-        if (ncms.Count != 0)
-            ncms.Select(async s => await _ncmRepository.InsertAsync(new Ncm { Code = s }, ct));
-
-        if (cests.Count != 0)
-            cests.Select(async s => await _cestRepository.InsertAsync(new Cest { Code = s }, ct));
-
+        var storeToInsert = groceryItems.FirstOrDefault(g => g.Store != null)?.Store;
+        await _storeRepository.AddIfNotExistsAsync(storeToInsert, x => x.Cnpj == storeToInsert.Cnpj, ct);
+        var storeId = (await _storeRepository.GetByCnpjAsync(storeToInsert.Cnpj, ct)) is { } store ? store.Id : 0;
         foreach (var item in groceryItems)
         {
-            var dbResult = await _groceryItemRepository.GetByBarcodeAndStoreIdAsync(item.Barcode, item.StoreId, ct);
+            var dbResult = await _groceryItemRepository.GetByBarcodeAndStoreIdAsync(item.Barcode, storeId, ct);
 
             if (dbResult == null)
             {
-                var priceLog = new PriceLog
-                {
-                    GroceryItemId = item.Id,
-                    Price = item.Price,
-                    LogDate = item.PurchaseDate
-                };
-                await _groceryItemRepository.InsertAsync(item, ct);
-                await _groceryItemRepository.InsertPriceLogAsync(priceLog, ct);
-            }
-            else if (item.Price != dbResult.Price)
-            {
-                var priceLog = new PriceLog
-                {
-                    GroceryItemId = item.Id,
-                    Price = item.Price,
-                    LogDate = item.PurchaseDate
-                };
+                var newNcm = new Ncm { Code = item.NcmCode, };
+                await _ncmRepository.AddIfNotExistsAsync(
+                    newNcm,
+                    ncm => ncm.Code == item.NcmCode,
+                    ct);
+                
+                var newCest = new Cest { Code = item.CestCode, };
+                await _cestRepository.AddIfNotExistsAsync(
+                    newCest,
+                    cest => cest.Code == item.CestCode,
+                    ct);
 
-                await _groceryItemRepository.UpdateAsync(dbResult, ct);
+                await _groceryItemRepository.InsertAsync(item, ct);
+                
+                var priceLog = new PriceLog
+                {
+                    GroceryItemId = item.Id,
+                    Price = item.Price,
+                    LogDate = item.PurchaseDate
+                };
+                
                 await _groceryItemRepository.InsertPriceLogAsync(priceLog, ct);
             }
+            // else if (item.Price != dbResult.Price)
+            // {
+            //     // TODO: Implementar lógica para atualizar o preço do item
+            //     var priceLog = new PriceLog
+            //     {
+            //         GroceryItemId = item.Id,
+            //         Price = item.Price,
+            //         LogDate = item.PurchaseDate
+            //     };
+            //     var lastPriceLog = await _groceryItemRepository.GetLastPriceLogAsync(dbResult.Id, ct);
+            //     await _groceryItemRepository.UpdateAsync(dbResult, ct);
+            //     await _groceryItemRepository.InsertPriceLogAsync(priceLog, ct);
+            // }
         }
     }
 
