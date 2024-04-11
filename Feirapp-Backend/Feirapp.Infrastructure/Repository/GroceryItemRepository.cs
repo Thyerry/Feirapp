@@ -41,12 +41,12 @@ public class GroceryItemRepository : BaseRepository<GroceryItem>, IGroceryItemRe
             ct).ConfigureAwait(false);
     }
 
-    public async Task<PriceLog> GetLastPriceLogAsync(long groceryItemId, CancellationToken ct)
+    public async Task<PriceLog?> GetLastPriceLogAsync(long groceryItemId, CancellationToken ct)
     {
         return await _context.PriceLogs
             .AsNoTracking()
             .OrderByDescending(x => x.LogDate)
-            .FirstOrDefaultAsync(x => x.GroceryItemId == groceryItemId, ct) ?? new PriceLog();
+            .FirstOrDefaultAsync(x => x.GroceryItemId == groceryItemId, ct);
     }
 
     public void Dispose()

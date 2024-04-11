@@ -12,6 +12,6 @@ public class Store
     public string? StreetNumber { get; set; }
     public string? Neighborhood { get; set; }
     public string? CityName { get; set; }
-    public States? State { get; set; }
+    public StatesEnum? State { get; set; }
     public ICollection<GroceryItem> GroceryItems { get; set; }
 }

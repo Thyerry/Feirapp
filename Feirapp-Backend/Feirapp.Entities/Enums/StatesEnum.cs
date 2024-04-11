@@ -1,6 +1,6 @@
 ﻿namespace Feirapp.Entities.Enums;
 
-public enum States
+public enum StatesEnum
 {
     EMPTY = 0,
     AC,

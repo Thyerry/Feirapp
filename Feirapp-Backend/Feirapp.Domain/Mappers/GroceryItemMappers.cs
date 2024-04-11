@@ -1,11 +1,12 @@
-﻿using Feirapp.Domain.Services.GroceryItems.Dtos.Commands;
+﻿using Feirapp.Domain.Services.DataScrapper.Dtos;
+using Feirapp.Domain.Services.GroceryItems.Dtos.Commands;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
 using Feirapp.Entities.Entities;
 using Feirapp.Entities.Enums;
 
-namespace Feirapp.Domain.Services.GroceryItems.Mappers;
+namespace Feirapp.Domain.Mappers;
 
-public static class GroceryItemMapper
+public static class GroceryItemMappers
 {
     public static List<GetGroceryItemResponse> MapToGetAllResponse(this List<GroceryItem> entities)
     {
@@ -30,33 +31,22 @@ public static class GroceryItemMapper
         );
     }
 
-    public static List<GroceryItem> MapToEntity(this List<InsertGroceryItemCommand> command)
+    public static List<GroceryItem> MapToEntity(this List<GroceryItemDto> command)
     {
         return command.Select(x => x.MapToEntity()).ToList();
     }
 
-    public static GroceryItem MapToEntity(this InsertGroceryItemCommand dto)
+    public static GroceryItem MapToEntity(this GroceryItemDto dto)
     {
         return new GroceryItem
         {
             Name = dto.Name,
             Price = dto.Price,
-            Barcode = dto.Barcode,
+            Barcode = dto.Barcode!,
             Description = dto.Description,
             ImageUrl = dto.ImageUrl,
             NcmCode = dto.NcmCode!,
-            CestCode = dto.CestCode!,
-            Store = new Store
-            {
-                Name = dto.StoreName,
-                Cnpj = dto.StoreCnpj,
-                Cep = dto.StoreCep,
-                Street = dto.StoreStreet,
-                StreetNumber = dto.StoreStreetNumber,
-                Neighborhood = dto.StoreNeighborhood,
-                CityName = dto.StoreCityName,
-                State = dto.StoreState
-            }
+            CestCode = dto.CestCode!
         };
     }
 
@@ -70,8 +60,8 @@ public static class GroceryItemMapper
             entity.Barcode,
             entity.Description!,
             entity.ImageUrl!,
-            entity.NcmCode!,
-            entity.CestCode!,
+            entity.NcmCode,
+            entity.CestCode,
             entity.Store.Name,
             entity.Store.Cnpj,
             entity.Store.Cep,
@@ -79,7 +69,7 @@ public static class GroceryItemMapper
             entity.Store.StreetNumber,
             entity.Store.Neighborhood,
             entity.Store.CityName,
-            (States)entity.Store.State!
+            (StatesEnum)entity.Store.State!
         );
     }
 
@@ -110,5 +100,39 @@ public static class GroceryItemMapper
             log.Price,
             log.LogDate
         );
+    }
+
+    public static List<GroceryItem> MapToEntity(this List<InvoiceGroceryItem> groceryItems)
+    {
+        return groceryItems.Select(x => x.MapToEntity()).ToList();
+    }
+
+    public static GroceryItem MapToEntity(this InvoiceGroceryItem groceryItem)
+    {
+        return new GroceryItem
+        {
+            Name = groceryItem.Name,
+            Price = groceryItem.Price,
+            Barcode = groceryItem.Barcode,
+            NcmCode = groceryItem.NcmCode,
+            MeasureUnit = groceryItem.MeasureUnit.MapToMeasureUnit(),
+            PurchaseDate = groceryItem.PurchaseDate,
+            CestCode = groceryItem.CestCode,
+        };
+    }
+
+    public static Store MapToEntity(this InvoiceStore store)
+    {
+        return new Store
+        {
+            Name = store.Name,
+            Cnpj = store.Cnpj,
+            Cep = store.Cep,
+            Street = store.Street,
+            StreetNumber = store.StreetNumber,
+            Neighborhood = store.Neighborhood,
+            CityName = store.CityName,
+            State = store.State.MapToStatesEnum()
+        };
     }
 }

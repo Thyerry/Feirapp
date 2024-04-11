@@ -1,6 +1,6 @@
 ﻿using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
-using Feirapp.Domain.Services.DataScrapper.Mappers;
+using Feirapp.Domain.Services.GroceryItems.Dtos.Commands;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Options;
@@ -49,15 +49,15 @@ public class InvoiceReaderService : IInvoiceReaderService
             State: storeNameXml.SelectSingleNode("//enderemit//uf").InnerText,
             Country: storeNameXml.SelectSingleNode("//enderemit//xpais").InnerText
         );
-
+        
         var groceryItems = GetGroceryItemList(groceryItemXmlList, purchaseDateXml);
-        await _groceryItemService.InsertBatchAsync(groceryItems.MapToInsertCommand(store), ct);
+        var insertCommand = new InsertGroceryItemCommand(groceryItems, store);
+        await _groceryItemService.InsertBatchAsync(insertCommand, ct);
         
         return new InvoiceImportResponse(store, groceryItems);
     }
 
-    private static List<InvoiceGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList,
-        HtmlNode purchaseDateXml)
+    private static List<InvoiceGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList, HtmlNode purchaseDateXml)
     {
         var result = new List<InvoiceGroceryItem>();
         foreach (var groceryItemXml in groceryItemXmlList)
@@ -73,8 +73,8 @@ public class InvoiceReaderService : IInvoiceReaderService
                 MeasureUnit: groceryItemXml.SelectSingleNode($"{xpath}/ucom").InnerText,
                 Barcode: groceryItemXml.SelectSingleNode($"{xpath}/cean").InnerText,
                 PurchaseDate: DateTime.Parse(purchaseDateXml.InnerText),
-                Ncm: (!string.IsNullOrWhiteSpace(ncm) ? ToNcmFormat(ncm) : null) ?? string.Empty,
-                Cest: (!string.IsNullOrWhiteSpace(cest) ? ToCestFormat(cest) : null) ?? string.Empty
+                NcmCode: (!string.IsNullOrWhiteSpace(ncm) ? ToNcmFormat(ncm) : null) ?? string.Empty,
+                CestCode: (!string.IsNullOrWhiteSpace(cest) ? ToCestFormat(cest) : null) ?? string.Empty
             )
             {
                 Quantity = ToDecimal(groceryItemXml.SelectSingleNode($"{xpath}/qcom").InnerText)

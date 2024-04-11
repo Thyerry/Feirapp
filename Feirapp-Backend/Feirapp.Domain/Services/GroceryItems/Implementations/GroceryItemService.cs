@@ -1,8 +1,8 @@
+using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Services.BaseRepository;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Commands;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
-using Feirapp.Domain.Services.GroceryItems.Mappers;
 using Feirapp.Domain.Services.Stores.Interfaces;
 using Feirapp.Entities.Entities;
 
@@ -33,16 +33,16 @@ public class GroceryItemService : IGroceryItemService
         return groceryItems.MapToGetAllResponse();
     }
 
-    public async Task InsertBatchAsync(List<InsertGroceryItemCommand> insertCommands,
-        CancellationToken ct = default)
+    public async Task InsertBatchAsync(InsertGroceryItemCommand insertCommand, CancellationToken ct = default)
     {
-        var groceryItems = insertCommands.MapToEntity();
-        var storeToInsert = groceryItems.FirstOrDefault(g => g.Store != null)?.Store;
+        var groceryItems = insertCommand.Items.MapToEntity();
+        var storeToInsert = insertCommand.Store.MapToEntity();
         await _storeRepository.AddIfNotExistsAsync(storeToInsert, x => x.Cnpj == storeToInsert.Cnpj, ct);
-        var storeId = (await _storeRepository.GetByCnpjAsync(storeToInsert.Cnpj, ct)) is { } store ? store.Id : 0;
+        var storeId = await _storeRepository.GetByCnpjAsync(storeToInsert.Cnpj, ct) is { } store ? store.Id : 0;
         foreach (var item in groceryItems)
         {
             var dbResult = await _groceryItemRepository.GetByBarcodeAndStoreIdAsync(item.Barcode, storeId, ct);
+            item.LastUpdate = DateTime.Now;
 
             if (dbResult == null)
             {
@@ -51,37 +51,37 @@ public class GroceryItemService : IGroceryItemService
                     newNcm,
                     ncm => ncm.Code == item.NcmCode,
                     ct);
-                
+
                 var newCest = new Cest { Code = item.CestCode, };
                 await _cestRepository.AddIfNotExistsAsync(
                     newCest,
                     cest => cest.Code == item.CestCode,
                     ct);
 
+                item.StoreId = storeId;
                 await _groceryItemRepository.InsertAsync(item, ct);
-                
+
                 var priceLog = new PriceLog
                 {
                     GroceryItemId = item.Id,
                     Price = item.Price,
                     LogDate = item.PurchaseDate
                 };
-                
+
                 await _groceryItemRepository.InsertPriceLogAsync(priceLog, ct);
             }
-            // else if (item.Price != dbResult.Price)
-            // {
-            //     // TODO: Implementar lógica para atualizar o preço do item
-            //     var priceLog = new PriceLog
-            //     {
-            //         GroceryItemId = item.Id,
-            //         Price = item.Price,
-            //         LogDate = item.PurchaseDate
-            //     };
-            //     var lastPriceLog = await _groceryItemRepository.GetLastPriceLogAsync(dbResult.Id, ct);
-            //     await _groceryItemRepository.UpdateAsync(dbResult, ct);
-            //     await _groceryItemRepository.InsertPriceLogAsync(priceLog, ct);
-            // }
+            else if (item.Price != dbResult.Price)
+            {
+                item.LastUpdate = DateTime.Now;
+                await _groceryItemRepository.UpdateAsync(dbResult, ct);
+                var priceLog = new PriceLog
+                {
+                    GroceryItemId = item.Id,
+                    Price = item.Price,
+                    LogDate = item.PurchaseDate
+                };
+                await _groceryItemRepository.InsertPriceLogAsync(priceLog, ct);
+            }
         }
     }
 

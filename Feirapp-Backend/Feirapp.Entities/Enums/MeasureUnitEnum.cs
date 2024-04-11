@@ -5,5 +5,7 @@ public enum MeasureUnitEnum
     EMPTY = 0,
     KILO,
     UNIT,
-    BOX
+    BOX,
+    LITER,
+    METER
 }

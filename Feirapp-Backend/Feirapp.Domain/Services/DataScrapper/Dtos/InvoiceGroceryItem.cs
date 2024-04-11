@@ -7,8 +7,8 @@ public record InvoiceGroceryItem
     string MeasureUnit,
     string Barcode,
     DateTime PurchaseDate,
-    string Ncm,
-    string Cest
+    string NcmCode,
+    string CestCode
 )
 {
     public decimal Quantity { get; set; }

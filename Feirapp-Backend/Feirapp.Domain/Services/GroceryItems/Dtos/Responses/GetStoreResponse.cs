@@ -10,7 +10,7 @@ public record GetStoreResponse(
     string? StreetNumber = null,
     string? Neighborhood = null,
     string? CityName = null,
-    States? State = States.PE)
+    StatesEnum? State = StatesEnum.PE)
 {
     public GetStoreResponse() : this("Empty Store")
     {

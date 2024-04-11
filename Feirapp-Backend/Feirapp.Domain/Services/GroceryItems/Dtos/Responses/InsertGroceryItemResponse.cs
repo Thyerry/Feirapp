@@ -19,7 +19,7 @@ public record InsertGroceryItemResponse
     string? StoreStreetNumber = null,
     string? StoreNeighborhood = null,
     string? StoreCityName = null,
-    States StoreState = States.PE,
+    StatesEnum StoreStateEnum = StatesEnum.PE,
     string? Category = null
 )
 {
