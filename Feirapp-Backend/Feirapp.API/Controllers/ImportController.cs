@@ -11,14 +11,17 @@ namespace Feirapp.API.Controllers;
 public class ImportController : ControllerBase
 {
     private readonly IInvoiceReaderService _invoiceReaderService;
+    private readonly INcmCestDataScrapper _ncmCestDataScrapper;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ImportController"/> class.
     /// </summary>
     /// <param name="invoiceReaderService">The service to read invoice data.</param>
-    public ImportController(IInvoiceReaderService invoiceReaderService)
+    /// <param name="ncmCestDataScrapper"></param>
+    public ImportController(IInvoiceReaderService invoiceReaderService, INcmCestDataScrapper ncmCestDataScrapper)
     {
         _invoiceReaderService = invoiceReaderService;
+        _ncmCestDataScrapper = ncmCestDataScrapper;
     }
 
     /// <summary>
@@ -35,5 +38,12 @@ public class ImportController : ControllerBase
             return NotFound();
 
         return Ok(result);
+    }
+    
+    [HttpPut("update-ncm")]
+    public async Task<IActionResult> ImportFromNcmCest(CancellationToken ct)
+    {
+        await _ncmCestDataScrapper.UpdateNcmAndCestsDetails(ct);
+        return Ok();
     }
 }

@@ -39,6 +39,7 @@ public class GroceryItemService : IGroceryItemService
         var storeToInsert = insertCommand.Store.MapToEntity();
         await _storeRepository.AddIfNotExistsAsync(storeToInsert, x => x.Cnpj == storeToInsert.Cnpj, ct);
         var storeId = await _storeRepository.GetByCnpjAsync(storeToInsert.Cnpj, ct) is { } store ? store.Id : 0;
+
         foreach (var item in groceryItems)
         {
             var dbResult = await _groceryItemRepository.GetByBarcodeAndStoreIdAsync(item.Barcode, storeId, ct);
@@ -46,15 +47,13 @@ public class GroceryItemService : IGroceryItemService
 
             if (dbResult == null)
             {
-                var newNcm = new Ncm { Code = item.NcmCode, };
                 await _ncmRepository.AddIfNotExistsAsync(
-                    newNcm,
+                    new Ncm { Code = item.NcmCode, LastUpdate = DateTime.Now },
                     ncm => ncm.Code == item.NcmCode,
                     ct);
 
-                var newCest = new Cest { Code = item.CestCode, };
                 await _cestRepository.AddIfNotExistsAsync(
-                    newCest,
+                    new Cest { Code = item.CestCode, },
                     cest => cest.Code == item.CestCode,
                     ct);
 

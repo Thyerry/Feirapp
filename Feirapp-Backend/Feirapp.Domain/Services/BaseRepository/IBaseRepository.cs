@@ -15,4 +15,5 @@ public interface IBaseRepository<T>
     Task<T> GetByIdAsync(long id, CancellationToken ct);
     
     Task AddIfNotExistsAsync(T entity, Func<T, bool> predicate, CancellationToken ct = default);
+    List<T> GetByQuery(Func<T, bool> predicate, CancellationToken ct);
 }

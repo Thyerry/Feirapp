@@ -63,6 +63,7 @@ void ConfigurationsAndServices(IServiceCollection services, IConfiguration confi
 
     services.AddScoped<IGroceryItemService, GroceryItemService>();
     services.AddScoped<IInvoiceReaderService, InvoiceReaderService>();
+    services.AddScoped<INcmCestDataScrapper, NcmCestDataScrapper>();
     
     #endregion Services
 

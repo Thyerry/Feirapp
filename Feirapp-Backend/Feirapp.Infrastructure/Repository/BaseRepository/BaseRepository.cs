@@ -50,6 +50,11 @@ public class BaseRepository<T> : IBaseRepository<T>, IDisposable where T : class
         await _context.SaveChangesAsync(ct);
     }
 
+    public List<T> GetByQuery(Func<T, bool> predicate, CancellationToken ct)
+    {
+        return _context.Set<T>().Where(predicate).ToList();
+    }
+
     public void Dispose()
     {
     }

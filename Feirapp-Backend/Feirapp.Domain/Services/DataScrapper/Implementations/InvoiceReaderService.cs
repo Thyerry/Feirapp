@@ -22,7 +22,7 @@ public class InvoiceReaderService : IInvoiceReaderService
         _groceryItemService = groceryItemService;
         _sefazPe = options.Value;
     }
-    
+
     /// <summary>
     /// Scrapes invoice data asynchronously.
     /// </summary>
@@ -37,6 +37,7 @@ public class InvoiceReaderService : IInvoiceReaderService
         var groceryItemXmlList = doc.DocumentNode.SelectNodes("//prod");
         var storeNameXml = doc.DocumentNode.SelectSingleNode("//emit");
         var purchaseDateXml = doc.DocumentNode.SelectSingleNode("//ide//dhemi");
+        
         var store = new InvoiceStore
         (
             Name: storeNameXml.SelectSingleNode("//xnome").InnerText,
@@ -46,18 +47,18 @@ public class InvoiceReaderService : IInvoiceReaderService
             StreetNumber: storeNameXml.SelectSingleNode("//enderemit//nro").InnerText,
             Neighborhood: storeNameXml.SelectSingleNode("//enderemit//xbairro").InnerText,
             CityName: storeNameXml.SelectSingleNode("//enderemit//xmun").InnerText,
-            State: storeNameXml.SelectSingleNode("//enderemit//uf").InnerText,
-            Country: storeNameXml.SelectSingleNode("//enderemit//xpais").InnerText
+            State: storeNameXml.SelectSingleNode("//enderemit//uf").InnerText
         );
-        
+
         var groceryItems = GetGroceryItemList(groceryItemXmlList, purchaseDateXml);
         var insertCommand = new InsertGroceryItemCommand(groceryItems, store);
         await _groceryItemService.InsertBatchAsync(insertCommand, ct);
-        
+
         return new InvoiceImportResponse(store, groceryItems);
     }
 
-    private static List<InvoiceGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList, HtmlNode purchaseDateXml)
+    private static List<InvoiceGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList,
+        HtmlNode purchaseDateXml)
     {
         var result = new List<InvoiceGroceryItem>();
         foreach (var groceryItemXml in groceryItemXmlList)
@@ -73,8 +74,8 @@ public class InvoiceReaderService : IInvoiceReaderService
                 MeasureUnit: groceryItemXml.SelectSingleNode($"{xpath}/ucom").InnerText,
                 Barcode: groceryItemXml.SelectSingleNode($"{xpath}/cean").InnerText,
                 PurchaseDate: DateTime.Parse(purchaseDateXml.InnerText),
-                NcmCode: (!string.IsNullOrWhiteSpace(ncm) ? ToNcmFormat(ncm) : null) ?? string.Empty,
-                CestCode: (!string.IsNullOrWhiteSpace(cest) ? ToCestFormat(cest) : null) ?? string.Empty
+                NcmCode: ncm ?? string.Empty,
+                CestCode: cest ?? string.Empty
             )
             {
                 Quantity = ToDecimal(groceryItemXml.SelectSingleNode($"{xpath}/qcom").InnerText)
@@ -98,32 +99,4 @@ public class InvoiceReaderService : IInvoiceReaderService
     /// A decimal number that is equivalent to the number in the string, or 0 (zero) if the conversion fails.
     /// </returns>
     private static decimal ToDecimal(string text) => Convert.ToDecimal(string.Join(",", text.Split(".")));
-
-    /// <summary>
-    /// Converts the given text to a specific CEST (Código Especificador da Substituição Tributária) format.
-    /// </summary>
-    /// <param name="text">The text to be formatted.</param>
-    /// <returns>
-    /// A string representing the formatted CEST code, or null if the text length is not valid.
-    /// The CEST code is formatted as "00.000.00".
-    /// </returns>
-    private static string? ToCestFormat(string text) => Convert.ToInt64(text).ToString(@"00\.000\.00");
-
-    /// <summary>
-    /// Converts the given text to a specific NCM (Nomenclatura Comum do Mercosul) format.
-    /// </summary>
-    /// <param name="text">The text to be formatted.</param>
-    /// <returns>
-    /// A string representing the formatted NCM code, or null if the text length is not valid.
-    /// </returns>
-    private static string? ToNcmFormat(string text) =>
-        text.Length switch
-        {
-            4 => Convert.ToInt64(text).ToString(@"0000"),
-            5 => Convert.ToInt64(text).ToString(@"0000\.0"),
-            6 => Convert.ToInt64(text).ToString(@"0000\.00"),
-            7 => Convert.ToInt64(text).ToString(@"0000\.00\.0"),
-            8 => Convert.ToInt64(text).ToString(@"0000\.00\.00"),
-            _ => null
-        };
 }

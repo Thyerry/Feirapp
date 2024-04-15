@@ -1,4 +1,5 @@
 ﻿using Feirapp.Entities.Entities;
+using Feirapp.Entities.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Feirapp.Infrastructure.Configuration;
@@ -33,12 +34,12 @@ public class BaseContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired();
             entity.Property(e => e.PurchaseDate).IsRequired();
-            entity.Property(e => e.MeasureUnit).IsRequired();
             entity.HasOne(e => e.Store).WithMany(e => e.GroceryItems).HasForeignKey(e => e.StoreId);
             entity.HasMany(e => e.PriceHistory).WithOne(e => e.GroceryItem);
             entity.HasOne(e => e.Ncm).WithMany().HasForeignKey(e => e.NcmCode);
             entity.HasOne(e => e.Cest).WithMany().HasForeignKey(e => e.CestCode);
-            entity.HasIndex(e => e.Barcode).IsUnique();
+            entity.HasIndex(e => e.Barcode);
+            entity.Property(e => e.MeasureUnit).IsRequired().HasConversion<string>();
         });
 
         modelBuilder.Entity<PriceLog>(entity =>

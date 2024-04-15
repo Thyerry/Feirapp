@@ -9,6 +9,5 @@ public record InvoiceStore
     string StreetNumber,
     string Neighborhood,
     string CityName,
-    string State,
-    string Country
+    string State
 );
