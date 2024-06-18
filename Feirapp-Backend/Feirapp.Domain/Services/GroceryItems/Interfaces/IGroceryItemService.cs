@@ -6,16 +6,5 @@ namespace Feirapp.Domain.Services.GroceryItems.Interfaces;
 public interface IGroceryItemService
 {
     Task<List<GetGroceryItemResponse>> GetAllAsync(CancellationToken ct = default);
-
-    //Task<List<GroceryItemDto>> GetRandomGroceryItemsAsync(int quantity, CancellationToken cancellationToken = default);
-
-    //Task<GroceryItemDto> GetById(long groceryId, CancellationToken cancellationToken = default);
-
-    //Task<GroceryItemDto> InsertAsync(GroceryItemDto groceryItemDto, CancellationToken cancellationToken = default);
-
     Task InsertBatchAsync(InsertGroceryItemCommand insertCommand, CancellationToken ct = default);
-
-    //Task UpdateAsync(GroceryItemDto groceryItemDto, CancellationToken cancellationToken = default);
-
-    //Task DeleteAsync(long groceryId, CancellationToken cancellationToken = default);
 }

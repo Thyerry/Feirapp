@@ -1,5 +1,6 @@
 ﻿using Feirapp.Domain.Services.BaseRepository;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
+using Feirapp.Domain.Services.Ncms.Interfaces;
 using Feirapp.Entities.Entities;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -9,10 +10,10 @@ namespace Feirapp.Domain.Services.DataScrapper.Implementations;
 public class NcmCestDataScrapper : INcmCestDataScrapper
 {
     private const string BaseUrl = "https://codigocest.com.br/consulta-codigo-cest-pelo-ncm";
-    private readonly IBaseRepository<Ncm> _ncmRepository;
+    private readonly INcmRepository _ncmRepository;
     private readonly IBaseRepository<Cest> _cestRepository;
 
-    public NcmCestDataScrapper(IBaseRepository<Ncm> ncmRepository, IBaseRepository<Cest> cestRepository)
+    public NcmCestDataScrapper(INcmRepository ncmRepository, IBaseRepository<Cest> cestRepository)
     {
         _ncmRepository = ncmRepository;
         _cestRepository = cestRepository;

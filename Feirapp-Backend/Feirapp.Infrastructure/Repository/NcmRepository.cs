@@ -17,7 +17,7 @@ public class NcmRepository : BaseRepository<Ncm>, INcmRepository
     
     public new async Task UpdateAsync(Ncm entity, CancellationToken ct)
     {
-        var ncm = await GetByCodeAsync(entity.Code, ct);
+        var ncm = await GetByCodeAsync(entity.Code!, ct);
         ncm.Description = entity.Description;
         ncm.LastUpdate = DateTime.Now.Date;
         await base.UpdateAsync(ncm, ct);
@@ -26,7 +26,6 @@ public class NcmRepository : BaseRepository<Ncm>, INcmRepository
     public async Task<Ncm?> GetByCodeAsync(string code, CancellationToken ct)
     {
         return await _context.Ncms
-            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Code == code, ct);
     }
 }

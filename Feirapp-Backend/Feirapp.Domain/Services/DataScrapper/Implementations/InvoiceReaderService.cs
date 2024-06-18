@@ -57,8 +57,7 @@ public class InvoiceReaderService : IInvoiceReaderService
         return new InvoiceImportResponse(store, groceryItems);
     }
 
-    private static List<InvoiceGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList,
-        HtmlNode purchaseDateXml)
+    private static List<InvoiceGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList, HtmlNode purchaseDateXml)
     {
         var result = new List<InvoiceGroceryItem>();
         foreach (var groceryItemXml in groceryItemXmlList)

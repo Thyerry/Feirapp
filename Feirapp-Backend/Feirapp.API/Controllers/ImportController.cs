@@ -7,7 +7,7 @@ namespace Feirapp.API.Controllers;
 /// Controller for handling operations related to Import Grocery Items.
 /// </summary>
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class ImportController : ControllerBase
 {
     private readonly IInvoiceReaderService _invoiceReaderService;
