@@ -1,4 +1,4 @@
-using Feirapp.Domain.Services.GroceryItems.Dtos.Commands;
+using Feirapp.Domain.Services.DataScrapper.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -7,40 +7,59 @@ namespace Feirapp.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class GroceryItemController : ControllerBase
+public class GroceryItemController(IGroceryItemService service, IInvoiceReaderService invoiceService, ILogger<GroceryItemController> logger) : ControllerBase
 {
-    private readonly IGroceryItemService _groceryItemService;
-    private readonly ILogger<GroceryItemController> _logger;
-
-    public GroceryItemController(IGroceryItemService service, ILogger<GroceryItemController> logger)
-    {
-        _groceryItemService = service ?? throw new ArgumentNullException(nameof(service));
-        _logger = logger;
-    }
+    private readonly IGroceryItemService _groceryItemService = service ?? throw new ArgumentNullException(nameof(service));
+    private readonly IInvoiceReaderService _invoiceService = invoiceService ?? throw new ArgumentNullException(nameof(invoiceService));
+    private readonly ILogger<GroceryItemController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     [HttpGet]
-    [ProducesResponseType(typeof(List<GetGroceryItemResponse>), 200)]
+    [ProducesResponseType(typeof(GetGroceryItemResponse), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetAll(CancellationToken ct = default)
     {
         var groceryItems = await _groceryItemService.GetAllAsync(ct);
-        if (!groceryItems.Any())
+        if (groceryItems.Items.Count == 0)
+            return NotFound("No Grocery Items Found");
+ 
+        return Ok(groceryItems);
+    }
+    
+    [HttpGet("getFromStore/{storeId}")]
+    [ProducesResponseType(typeof(GetGroceryItemResponse), 200)]
+    [ProducesResponseType(typeof(NotFoundResult), 404)]
+    public async Task<IActionResult> GetFromStore(long storeId, CancellationToken ct = default)
+    {
+        var groceryItems = await _groceryItemService.GetFromStoreAsync(storeId, ct);
+        if (groceryItems.Items.Count == 0)
+            return NotFound("No Grocery Items Found");
+
+        return Ok(groceryItems);
+    }
+    
+    [HttpGet("getFromInvoice/{invoiceId}")]
+    [ProducesResponseType(typeof(GetGroceryItemResponse), 200)]
+    [ProducesResponseType(typeof(NotFoundResult), 404)]
+    public async Task<IActionResult> GetFromInvoice(string invoiceId, CancellationToken ct = default)
+    {
+        var groceryItems = await _invoiceService.InvoiceDataScrapperAsync(invoiceId, false,ct);
+        if (groceryItems.Items.Count == 0)
             return NotFound("No Grocery Items Found");
 
         return Ok(groceryItems);
     }
 
-    //[HttpGet("Random/{quantity:int}")]
-    //[ProducesResponseType(typeof(List<GroceryItemDto>), 200)]
-    //[ProducesResponseType(typeof(BadRequest), 400)]
-    //[ProducesResponseType(typeof(NotFoundResult), 404)]
-    //public async Task<IActionResult> GetRandomGroceryItems(int quantity, CancellationToken ct = default)
-    //{
-    //    if (quantity <= 0)
-    //        return BadRequest();
-    //    var randomGroceryItems = await _service.GetRandomGroceryItemsAsync(quantity, ct);
-    //    return Ok(randomGroceryItems);
-    //}
+    // [HttpGet("Random/{quantity:int}")]
+    // [ProducesResponseType(typeof(List<GroceryItemDto>), 200)]
+    // [ProducesResponseType(typeof(BadRequest), 400)]
+    // [ProducesResponseType(typeof(NotFoundResult), 404)]
+    // public async Task<IActionResult> GetRandomGroceryItems(int quantity, CancellationToken ct = default)
+    // {
+    //     if (quantity <= 0)
+    //         return BadRequest();
+    //     var randomGroceryItems = await _service.GetRandomGroceryItemsAsync(quantity, ct);
+    //     return Ok(randomGroceryItems);
+    // }
 
     //[HttpPost]
     //[ProducesResponseType(typeof(GroceryItemDto), 201)]

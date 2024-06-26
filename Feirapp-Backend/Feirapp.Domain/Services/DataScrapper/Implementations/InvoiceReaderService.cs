@@ -27,9 +27,10 @@ public class InvoiceReaderService : IInvoiceReaderService
     /// Scrapes invoice data asynchronously.
     /// </summary>
     /// <param name="invoiceCode">The invoice code.</param>
+    /// <param name="isInsert"></param>
     /// <param name="ct">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the list of invoice grocery items.</returns>
-    public async Task<InvoiceImportResponse> InvoiceDataScrapperAsync(string invoiceCode, CancellationToken ct)
+    public async Task<InvoiceImportResponse> InvoiceDataScrapperAsync(string invoiceCode, bool isInsert, CancellationToken ct)
     {
         var web = new HtmlWeb();
         var doc = await web.LoadFromWebAsync(_sefazPe.SefazUrl.Replace("{INVOICE_CODE}", invoiceCode), ct);
@@ -51,8 +52,8 @@ public class InvoiceReaderService : IInvoiceReaderService
         );
 
         var groceryItems = GetGroceryItemList(groceryItemXmlList, purchaseDateXml);
-        var insertCommand = new InsertGroceryItemCommand(groceryItems, store);
-        await _groceryItemService.InsertBatchAsync(insertCommand, ct);
+        
+        if(isInsert) await _groceryItemService.InsertBatchAsync(groceryItems, store, ct);
 
         return new InvoiceImportResponse(store, groceryItems);
     }

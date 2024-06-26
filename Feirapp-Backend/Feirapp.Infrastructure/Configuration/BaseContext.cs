@@ -1,5 +1,4 @@
 ﻿using Feirapp.Entities.Entities;
-using Feirapp.Entities.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Feirapp.Infrastructure.Configuration;

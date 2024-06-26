@@ -1,5 +1,6 @@
 using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Services.BaseRepository;
+using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Commands;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
@@ -28,18 +29,18 @@ public class GroceryItemService : IGroceryItemService
         _cestRepository = cestRepository;
     }
 
-    public async Task<List<GetGroceryItemResponse>> GetAllAsync(CancellationToken ct)
+    public async Task<GetGroceryItemResponse> GetAllAsync(CancellationToken ct)
     {
         var groceryItems = await _groceryItemRepository.GetAllAsync(ct);
-        return groceryItems.MapToGetAllResponse();
+        return new GetGroceryItemResponse(groceryItems.GetStore(), groceryItems.MapToGetAllResponse());
     }
 
-    public async Task InsertBatchAsync(InsertGroceryItemCommand insertCommand, CancellationToken ct = default)
+    public async Task InsertBatchAsync(List<InvoiceGroceryItem> items, InvoiceStore invoiceStore, CancellationToken ct)
     {
         try
         {
-            var groceryItems = insertCommand.Items.MapToEntity();
-            var storeToInsert = insertCommand.Store.MapToEntity();
+            var groceryItems = items.MapToEntity();
+            var storeToInsert = invoiceStore.MapToEntity();
             await _storeRepository.AddIfNotExistsAsync(storeToInsert, x => x.Cnpj == storeToInsert.Cnpj, ct);
             var storeId = await _storeRepository.GetByCnpjAsync(storeToInsert.Cnpj, ct) is { } store ? store.Id : 0;
 
@@ -91,5 +92,11 @@ public class GroceryItemService : IGroceryItemService
             Console.WriteLine(e);
             throw;
         }
+    }
+
+    public async Task<GetGroceryItemResponse> GetFromStoreAsync(long storeId, CancellationToken ct)
+    {
+        var groceryItems = await _groceryItemRepository.GetByStoreIdAsync(storeId, ct);
+        return new GetGroceryItemResponse(groceryItems.GetStore(), groceryItems.MapToGetAllResponse());
     }
 }

@@ -33,11 +33,11 @@ public class ImportController : ControllerBase
     [HttpGet("invoice")]
     public async Task<IActionResult> ImportFromInvoice([FromQuery]string invoiceCode, CancellationToken ct)
     {
-        var result = await _invoiceReaderService.InvoiceDataScrapperAsync(invoiceCode, ct);
+        var result = await _invoiceReaderService.InvoiceDataScrapperAsync(invoiceCode, true, ct);
         if (!result.Items.Any())
             return NotFound();
 
-        return Ok(result);
+        return Ok();
     }
     
     [HttpPut("update-ncm")]

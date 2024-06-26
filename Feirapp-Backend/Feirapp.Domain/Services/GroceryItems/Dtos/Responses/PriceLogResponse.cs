@@ -1,3 +1,3 @@
 ﻿namespace Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
 
-public record GetPriceLogResponse(decimal Price, DateTime LogDate);
+public record PriceLogResponse(decimal Price, DateTime LogDate);

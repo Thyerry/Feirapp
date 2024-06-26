@@ -8,20 +8,19 @@ namespace Feirapp.Domain.Mappers;
 
 public static class GroceryItemMappers
 {
-    public static List<GetGroceryItemResponse> MapToGetAllResponse(this List<GroceryItem> entities)
+    public static List<GroceryItemResponse> MapToGetAllResponse(this List<GroceryItem> entities)
     {
         return entities.Select(x => x.MapToGetAllResponse()).ToList();
     }
 
-    public static GetGroceryItemResponse MapToGetAllResponse(this GroceryItem entity)
+    public static GroceryItemResponse MapToGetAllResponse(this GroceryItem entity)
     {
-        return new GetGroceryItemResponse
+        return new GroceryItemResponse
         (
             entity.Id,
             entity.Name,
             entity.Description!,
             entity.Price,
-            entity.Store.MapToStoreDto(),
             entity.ImageUrl!,
             entity.Barcode!,
             entity.LastUpdate,
@@ -30,24 +29,26 @@ public static class GroceryItemMappers
             entity.PriceHistory.Select(x => x.MapToPriceLogDto()).ToList()
         );
     }
-
-    public static List<GroceryItem> MapToEntity(this List<GroceryItemDto> command)
+    
+    public static StoreResponse MapToStoreResponse(this Store store)
     {
-        return command.Select(x => x.MapToEntity()).ToList();
+        return new StoreResponse
+        (
+            Name: store.Name,
+            Cnpj: store.Cnpj,
+            Cep: store.Cep,
+            Street: store.Street,
+            StreetNumber: store.StreetNumber,
+            Neighborhood: store.Neighborhood,
+            CityName: store.CityName,
+            State: store.State
+        );
     }
-
-    public static GroceryItem MapToEntity(this GroceryItemDto dto)
+    
+    public static StoreResponse GetStore(this List<GroceryItem> groceryItems)
     {
-        return new GroceryItem
-        {
-            Name = dto.Name,
-            Price = dto.Price,
-            Barcode = dto.Barcode!,
-            Description = dto.Description,
-            ImageUrl = dto.ImageUrl,
-            NcmCode = dto.NcmCode!,
-            CestCode = dto.CestCode!
-        };
+        var store = groceryItems.FirstOrDefault()?.Store;
+        return store != null ? store.MapToStoreResponse() : new StoreResponse(string.Empty);
     }
 
     public static InsertGroceryItemResponse MapToInsertResponse(this GroceryItem entity)
@@ -78,24 +79,9 @@ public static class GroceryItemMappers
         return entities.Select(x => x.MapToInsertResponse()).ToList();
     }
 
-    public static GetStoreResponse MapToStoreDto(this Store? store)
+    public static PriceLogResponse MapToPriceLogDto(this PriceLog log)
     {
-        return new GetStoreResponse
-        (
-            Name: store.Name,
-            Cnpj: store.Cnpj,
-            Cep: store.Cep,
-            Street: store.Street,
-            StreetNumber: store.StreetNumber,
-            Neighborhood: store.Neighborhood,
-            CityName: store.CityName,
-            State: store.State
-        );
-    }
-
-    public static GetPriceLogResponse MapToPriceLogDto(this PriceLog log)
-    {
-        return new GetPriceLogResponse
+        return new PriceLogResponse
         (
             log.Price,
             log.LogDate

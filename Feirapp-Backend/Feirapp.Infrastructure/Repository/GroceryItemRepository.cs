@@ -22,15 +22,28 @@ public class GroceryItemRepository : BaseRepository<GroceryItem>, IGroceryItemRe
         var result = await _context.GroceryItems
             .OrderBy(x => Guid.NewGuid())
             .Take(quantity)
-            .AsNoTracking()
             .ToListAsync(ct);
         return result;
     }
 
+    public new async Task<List<GroceryItem>> GetAllAsync(CancellationToken ct)
+    {
+        var result = await _context.GroceryItems
+            .Join(_context.Stores,
+                gi => gi.StoreId,
+                s => s.Id,
+                (groceryItem, store) => new 
+                {
+                    GroceryItem = groceryItem,
+                    Store = store
+                }).ToListAsync(ct);
+        
+        return result.Select(x => x.GroceryItem).ToList();
+    }
+    
     public async Task<GroceryItem?> GetByBarcodeAndStoreIdAsync(string itemBarcode, long itemStoreId, CancellationToken ct)
     {
         return await _context.GroceryItems
-            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Barcode == itemBarcode && x.StoreId == itemStoreId, ct).ConfigureAwait(false);
     }
 
@@ -44,9 +57,15 @@ public class GroceryItemRepository : BaseRepository<GroceryItem>, IGroceryItemRe
     public async Task<PriceLog?> GetLastPriceLogAsync(long groceryItemId, CancellationToken ct)
     {
         return await _context.PriceLogs
-            .AsNoTracking()
             .OrderByDescending(x => x.LogDate)
             .FirstOrDefaultAsync(x => x.GroceryItemId == groceryItemId, ct);
+    }
+
+    public async Task<List<GroceryItem>> GetByStoreIdAsync(long storeId, CancellationToken ct)
+    {
+        return await _context.GroceryItems
+            .Where(x => x.StoreId == storeId)
+            .ToListAsync(ct);
     }
 
     public void Dispose()

@@ -11,7 +11,6 @@ public class BaseRepository<T> : IBaseRepository<T>, IDisposable where T : class
 
     public BaseRepository(BaseContext context)
     {
-        var options = new DbContextOptions<BaseContext>();
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
 

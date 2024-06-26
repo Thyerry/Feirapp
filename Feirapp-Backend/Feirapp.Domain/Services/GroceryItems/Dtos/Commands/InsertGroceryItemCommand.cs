@@ -5,6 +5,5 @@ namespace Feirapp.Domain.Services.GroceryItems.Dtos.Commands;
 
 public record InsertGroceryItemCommand(
     List<InvoiceGroceryItem> Items,
-    InvoiceStore Store,
-    string? Category = null
+    InvoiceStore Store
 );
