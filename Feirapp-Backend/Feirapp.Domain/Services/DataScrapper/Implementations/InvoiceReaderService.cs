@@ -1,6 +1,5 @@
 ﻿using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
-using Feirapp.Domain.Services.GroceryItems.Dtos.Commands;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Options;

@@ -1,7 +1,8 @@
 using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Services.BaseRepository;
 using Feirapp.Domain.Services.DataScrapper.Dtos;
-using Feirapp.Domain.Services.GroceryItems.Dtos.Commands;
+using Feirapp.Domain.Services.GroceryItems.Dtos;
+using Feirapp.Domain.Services.GroceryItems.Dtos.Command;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Domain.Services.Ncms.Interfaces;
@@ -29,14 +30,15 @@ public class GroceryItemService : IGroceryItemService
         _cestRepository = cestRepository;
     }
 
-    public async Task<GetGroceryItemResponse> GetAllAsync(CancellationToken ct)
+    public async Task<List<GetAllGroceryItemsResponse>> GetAllAsync(CancellationToken ct)
     {
         var groceryItems = await _groceryItemRepository.GetAllAsync(ct);
-        return new GetGroceryItemResponse(groceryItems.GetStore(), groceryItems.MapToGetAllResponse());
+        return groceryItems.MapToGetAllResponse();
     }
 
     public async Task InsertBatchAsync(List<InvoiceGroceryItem> items, InvoiceStore invoiceStore, CancellationToken ct)
     {
+        await using var trans = await _groceryItemRepository.BeginTransactionAsync(ct);
         try
         {
             var groceryItems = items.MapToEntity();
@@ -86,17 +88,90 @@ public class GroceryItemService : IGroceryItemService
                     await _groceryItemRepository.InsertPriceLogAsync(priceLog, ct);
                 }
             }
+
+            await trans.CommitAsync(ct);
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            Console.WriteLine(e);
+            await trans.RollbackAsync(ct);
             throw;
         }
     }
 
-    public async Task<GetGroceryItemResponse> GetFromStoreAsync(long storeId, CancellationToken ct)
+    public async Task<GetGroceryItemResponse> GetByStoreAsync(long storeId, CancellationToken ct)
     {
-        var groceryItems = await _groceryItemRepository.GetByStoreIdAsync(storeId, ct);
-        return new GetGroceryItemResponse(groceryItems.GetStore(), groceryItems.MapToGetAllResponse());
+        var groceryItems = await _groceryItemRepository.GetByStoreAsync(storeId, ct);
+        return new GetGroceryItemResponse(groceryItems.GetStore(), groceryItems.MapToDto());
+    }
+
+    public async Task<List<GetAllGroceryItemsResponse>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct)
+    {
+        var groceryItems = await _groceryItemRepository.GetRandomGroceryItemsAsync(quantity, ct);
+        return groceryItems.MapToGetAllResponse();
+    }
+
+    public async Task<GroceryItemDto> InsertAsync(GroceryItemDto groceryItem, CancellationToken ct)
+    {
+        var result = await _groceryItemRepository.InsertAsync(groceryItem.MapToEntity(), ct);
+        return result.MapToDto();
+    }
+
+    public async Task<GroceryItemDto> GetByIdAsync(long id, CancellationToken ct)
+    {
+        var result = await _groceryItemRepository.GetByIdAsync(id, ct);
+        return result.MapToDto();
+    }
+
+    public async Task UpdateAsync(UpdateGroceryItemCommand command, CancellationToken ct)
+    {
+        command.Validate();
+        var groceryItem =
+            await _groceryItemRepository.GetByBarcodeAndStoreIdAsync(command.Barcode, command.StoreId, ct);
+
+        if (groceryItem is null)
+            throw new InvalidOperationException("Grocery Item Not Found");
+
+        var hasChanged = UpdateGroceryItemFields(command, groceryItem);
+
+        if (!hasChanged)
+            throw new InvalidOperationException("No changes were made to the Grocery Item.");
+
+        await _groceryItemRepository.UpdateAsync(groceryItem, ct);
+    }
+
+    private static bool UpdateGroceryItemFields(UpdateGroceryItemCommand command, GroceryItem groceryItem)
+    {
+        var hasChanged = false;
+        if (!string.IsNullOrWhiteSpace(command.Brand) && groceryItem.Brand != command.Brand)
+        {
+            groceryItem.Brand = command.Brand;
+            hasChanged = true;
+        }
+
+        if (!string.IsNullOrWhiteSpace(command.Description) && groceryItem.Description != command.Description)
+        {
+            groceryItem.Description = command.Description;
+            hasChanged = true;
+        }
+
+        if (!string.IsNullOrWhiteSpace(command.ImageUrl) && groceryItem.ImageUrl != command.ImageUrl)
+        {
+            groceryItem.ImageUrl = command.ImageUrl;
+            hasChanged = true;
+        }
+
+        if (groceryItem.Price != command.Price)
+        {
+            groceryItem.Price = command.Price;
+            hasChanged = true;
+        }
+
+        if (groceryItem.PurchaseDate.Date <= command.PurchaseDate.Date)
+        {
+            groceryItem.PurchaseDate = command.PurchaseDate;
+            hasChanged = true;
+        }
+
+        return hasChanged;
     }
 }

@@ -19,6 +19,6 @@ public class StoreRepository : BaseRepository<Store>, IStoreRepository, IDisposa
     public Task<Store?> GetByCnpjAsync(string? storeCnpj, CancellationToken ct)
     {
         return _context.Stores
-            .FirstOrDefaultAsync(x => x.Cnpj == storeCnpj, ct) ;
+            .FirstOrDefaultAsync(x => x.Cnpj == storeCnpj, ct);
     }
 }

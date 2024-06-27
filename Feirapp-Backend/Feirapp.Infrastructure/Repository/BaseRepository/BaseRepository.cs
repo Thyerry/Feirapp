@@ -2,6 +2,7 @@
 using Feirapp.Infrastructure.Configuration;
 using Feirapp.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Feirapp.Infrastructure.Repository.BaseRepository;
 
@@ -12,6 +13,11 @@ public class BaseRepository<T> : IBaseRepository<T>, IDisposable where T : class
     public BaseRepository(BaseContext context)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
+
+    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken ct)
+    {
+        return await _context.Database.BeginTransactionAsync(ct);
     }
 
     public async Task<T> InsertAsync(T entity, CancellationToken ct)

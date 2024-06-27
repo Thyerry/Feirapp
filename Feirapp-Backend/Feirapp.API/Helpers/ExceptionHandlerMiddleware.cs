@@ -30,7 +30,26 @@ public class ExceptionHandlerMiddleware
             {
                 case ValidationException e:
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    result = JsonSerializer.Serialize(e.Errors);
+                    var errorObj = new
+                    {
+                        Message = "There was some validation errors",
+                        Errors = e.Errors.Select(x => new
+                        {
+                            x.PropertyName,
+                            x.ErrorMessage,
+                            x.AttemptedValue,
+                        })
+                    };
+                    
+                    result = JsonSerializer.Serialize(errorObj);
+                    break;
+                
+                case InvalidOperationException e:
+                    response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    result = JsonSerializer.Serialize(new
+                    {
+                        message = e.Message,
+                    });
                     break;
 
                 default:

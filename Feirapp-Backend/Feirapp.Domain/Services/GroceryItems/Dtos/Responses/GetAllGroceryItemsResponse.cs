@@ -1,8 +1,8 @@
-﻿using Feirapp.Entities.Enums;
+using Feirapp.Entities.Enums;
 
 namespace Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
 
-public record GroceryItemResponse(
+public record GetAllGroceryItemsResponse(
     long Id,
     string Name,
     string Description,
@@ -11,6 +11,7 @@ public record GroceryItemResponse(
     string Barcode,
     DateTime LastUpdate,
     DateTime PurchaseDate,
+    StoreDto Store,
     MeasureUnitEnum MeasureUnit,
-    List<PriceLogResponse> PriceHistory
+    List<PriceLogDto> PriceHistory
 );

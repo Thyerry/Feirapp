@@ -1,8 +1,8 @@
 ﻿using Feirapp.Entities.Enums;
 
-namespace Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
+namespace Feirapp.Domain.Services.GroceryItems.Dtos;
 
-public record StoreResponse(
+public record StoreDto(
     string Name,
     string? Cnpj = null,
     string? Cep = null,
