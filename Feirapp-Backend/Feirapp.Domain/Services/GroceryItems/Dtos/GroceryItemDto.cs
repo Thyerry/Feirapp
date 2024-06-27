@@ -1,21 +1,16 @@
+﻿using Feirapp.Entities.Enums;
+
 namespace Feirapp.Domain.Services.GroceryItems.Dtos;
 
-public class GroceryItemDto
-{
-    public string Id { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public decimal Price { get; set; }
-    public DateTime PurchaseDate { get; set; } = DateTime.UtcNow;
-    public string Barcode { get; set; } = string.Empty;
-    public string Brand { get; set; } = string.Empty;
-    public string StoreName { get; set; } = string.Empty;
-    public string ImageUrl { get; set; } = string.Empty;
-    public string? Ncm { get; set; }
-    public string? Cest { get; set; }
-    public List<PriceLogDto>? PriceHistory { get; set; }
-
-    public override string ToString()
-    {
-        return $"{Name}";
-    }
-}
+public record GroceryItemDto(
+    long Id,
+    string Name,
+    string Description,
+    decimal Price,
+    string ImageUrl,
+    string Barcode,
+    DateTime LastUpdate,
+    DateTime PurchaseDate,
+    MeasureUnitEnum MeasureUnit,
+    List<PriceLogDto> PriceHistory
+);

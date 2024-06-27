@@ -1,76 +1,68 @@
-using Feirapp.DocumentModels.Documents;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
-using Feirapp.Infrastructure.DataContext;
-using MongoDB.Driver;
+using Feirapp.Entities.Entities;
+using Feirapp.Infrastructure.Configuration;
+using Feirapp.Infrastructure.Repository.BaseRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace Feirapp.Infrastructure.Repository;
 
-public class GroceryItemRepository : IGroceryItemRepository, IDisposable
+public class GroceryItemRepository(BaseContext context)
+    : BaseRepository<GroceryItem>(context), IGroceryItemRepository, IDisposable
 {
-    private readonly IMongoCollection<GroceryItem> _collection;
+    private readonly BaseContext _context = context;
 
-    public GroceryItemRepository(IMongoFeirappContext context)
+    public async Task<List<GroceryItem>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct)
     {
-        _collection = context.GetCollection<GroceryItem>(nameof(GroceryItem));
-
-        FieldDefinition<GroceryItem> nameField = "name";
-        FieldDefinition<GroceryItem> priceField = "price";
-        FieldDefinition<GroceryItem> storeField = "store";
-
-        var indexedKeyDefinition =
-            Builders<GroceryItem>.IndexKeys.Text(nameField).Text(storeField).Ascending(priceField);
-        _collection.Indexes.CreateOne(new CreateIndexModel<GroceryItem>(indexedKeyDefinition));
+        var result = await _context.GroceryItems
+            .OrderBy(x => Guid.NewGuid())
+            .Take(quantity)
+            .Include(g => g.Store)
+            .Include(g => g.PriceHistory)
+            .ToListAsync(ct);
+        return result;
     }
 
-    public async Task<List<GroceryItem>> GetAllAsync(CancellationToken cancellationToken)
+    public new async Task<List<GroceryItem>> GetAllAsync(CancellationToken ct)
     {
-        var result = await _collection.FindAsync(q => true, cancellationToken: cancellationToken);
-        return result.ToList();
+        var result = await _context.GroceryItems
+            .Include(g => g.PriceHistory)
+            .Include(g => g.Store)
+            .ToListAsync(ct);
+        
+        return result;
+    }
+    
+    public async Task<GroceryItem?> GetByBarcodeAndStoreIdAsync(string itemBarcode, long itemStoreId, CancellationToken ct)
+    {
+        return await _context.GroceryItems
+            .FirstOrDefaultAsync(x => x.Barcode == itemBarcode && x.StoreId == itemStoreId, ct);
     }
 
-    public async Task<List<GroceryItem>> GetRandomGroceryItems(int quantity, CancellationToken cancellationToken)
+    public async Task InsertPriceLogAsync(PriceLog priceLog, CancellationToken ct)
     {
-        var result = await _collection.AggregateAsync(PipelineDefinition<GroceryItem, GroceryItem>.Create($@"
-        {{
-            $sample: {{ size: {quantity} }}
-        }}
-        "), cancellationToken: cancellationToken);
-        return result.ToList();
+        var result = await _context.PriceLogs
+            .FirstOrDefaultAsync(x => x.GroceryItemId == priceLog.Id && x.LogDate.Date == priceLog.LogDate.Date, ct);
+        if (result == null)
+        {
+            await _context.PriceLogs.AddAsync(priceLog, ct);
+            await _context.SaveChangesAsync(ct);
+        }
     }
 
-    public async Task<GroceryItem> InsertAsync(GroceryItem groceryItem, CancellationToken cancellationToken)
+    public async Task<PriceLog?> GetLastPriceLogAsync(long groceryItemId, CancellationToken ct)
     {
-        await _collection.InsertOneAsync(groceryItem, cancellationToken: cancellationToken);
-        return groceryItem;
+        return await _context.PriceLogs
+            .OrderByDescending(x => x.LogDate)
+            .FirstOrDefaultAsync(x => x.GroceryItemId == groceryItemId, ct);
     }
 
-    public async Task<GroceryItem> GetByIdAsync(string groceryId, CancellationToken cancellationToken)
+    public async Task<List<GroceryItem>> GetByStoreAsync(long storeId, CancellationToken ct)
     {
-        var result =
-            (await _collection.FindAsync(p => p.Id == groceryId, cancellationToken: cancellationToken)).ToList();
-        return result.FirstOrDefault()!;
-    }
-
-    public async Task UpdateAsync(GroceryItem groceryItem, CancellationToken cancellationToken)
-    {
-        await _collection.ReplaceOneAsync(
-            Builders<GroceryItem>.Filter.Eq(g => g.Id, groceryItem.Id),
-            groceryItem,
-            cancellationToken: cancellationToken
-        );
-    }
-
-    public async Task DeleteAsync(string groceryId, CancellationToken cancellationToken)
-    {
-        await _collection.DeleteOneAsync(groceryItem => groceryItem.Id == groceryId,
-            cancellationToken: cancellationToken);
-    }
-
-    public async Task<List<GroceryItem>> InsertBatchAsync(List<GroceryItem> groceryItems,
-        CancellationToken cancellationToken)
-    {
-        await _collection.InsertManyAsync(groceryItems, cancellationToken: cancellationToken);
-        return groceryItems;
+        return await _context.GroceryItems
+            .Where(x => x.StoreId == storeId)
+            .Include(x => x.PriceHistory)
+            .Include(x => x.Store)
+            .ToListAsync(ct);
     }
 
     public void Dispose()

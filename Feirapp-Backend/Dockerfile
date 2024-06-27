@@ -1,14 +1,14 @@
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["Feirapp.API/Feirapp.API.csproj", "Feirapp.API/"]
 COPY ["Feirapp.Domain/Feirapp.Domain.csproj", "Feirapp.Domain/"]
 COPY ["Feirapp.Infrastructure/Feirapp.Infrastructure.csproj", "Feirapp.Infrastructure/"]
-COPY ["Feirapp.Entities/Feirapp.DocumentModels.csproj", "Feirapp.DocumentModels/"]
+COPY ["Feirapp.Entities/Feirapp.Entities.csproj", "Feirapp.Entities/"]
 RUN dotnet restore "Feirapp.API/Feirapp.API.csproj"
 COPY . .
 WORKDIR "/src/Feirapp.API"

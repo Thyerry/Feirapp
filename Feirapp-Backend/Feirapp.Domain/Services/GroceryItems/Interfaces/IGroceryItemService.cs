@@ -1,21 +1,17 @@
+using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.GroceryItems.Dtos;
+using Feirapp.Domain.Services.GroceryItems.Dtos.Command;
+using Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
 
 namespace Feirapp.Domain.Services.GroceryItems.Interfaces;
 
 public interface IGroceryItemService
 {
-    Task<List<GroceryItemDto>> GetAllAsync(CancellationToken cancellationToken = default);
-
-    Task<List<GroceryItemDto>> GetRandomGroceryItemsAsync(int quantity, CancellationToken cancellationToken = default);
-
-    Task<GroceryItemDto> GetById(string groceryId, CancellationToken cancellationToken = default);
-
-    Task<GroceryItemDto> InsertAsync(GroceryItemDto groceryItemDto, CancellationToken cancellationToken = default);
-
-    Task<List<GroceryItemDto>> InsertBatchAsync(List<GroceryItemDto> groceryItemDtos,
-        CancellationToken cancellationToken = default);
-
-    Task UpdateAsync(GroceryItemDto groceryItemDto, CancellationToken cancellationToken = default);
-
-    Task DeleteAsync(string groceryId, CancellationToken cancellationToken = default);
+    Task<List<GetAllGroceryItemsResponse>> GetAllAsync(CancellationToken ct);
+    Task InsertBatchAsync(List<InvoiceGroceryItem> items, InvoiceStore invoiceStore, CancellationToken ct);
+    Task<GetGroceryItemResponse> GetByStoreAsync(long storeId, CancellationToken ct);
+    Task<List<GetAllGroceryItemsResponse>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct);
+    Task<GroceryItemDto> InsertAsync(GroceryItemDto groceryItem, CancellationToken ct);
+    Task<GroceryItemDto> GetByIdAsync(long id, CancellationToken ct);
+    Task UpdateAsync(UpdateGroceryItemCommand command, CancellationToken ct);
 }

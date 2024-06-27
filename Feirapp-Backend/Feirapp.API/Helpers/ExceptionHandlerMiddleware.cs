@@ -1,6 +1,7 @@
 using FluentValidation;
 using System.Net;
 using System.Text.Json;
+using Humanizer;
 
 namespace Feirapp.API.Helpers;
 
@@ -21,7 +22,7 @@ public class ExceptionHandlerMiddleware
         }
         catch (Exception exception)
         {
-            var response = context.Response;
+            var response = context.Response; 
             response.ContentType = "application/json";
 
             string result;
@@ -29,12 +30,35 @@ public class ExceptionHandlerMiddleware
             {
                 case ValidationException e:
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    result = JsonSerializer.Serialize(e.Errors);
+                    var errorObj = new
+                    {
+                        Message = "There was some validation errors",
+                        Errors = e.Errors.Select(x => new
+                        {
+                            x.PropertyName,
+                            x.ErrorMessage,
+                            x.AttemptedValue,
+                        })
+                    };
+                    
+                    result = JsonSerializer.Serialize(errorObj);
+                    break;
+                
+                case InvalidOperationException e:
+                    response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    result = JsonSerializer.Serialize(new
+                    {
+                        message = e.Message,
+                    });
                     break;
 
                 default:
                     response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    result = JsonSerializer.Serialize(new { message = exception.Message });
+                    result = JsonSerializer.Serialize(new
+                    {
+                        message = exception.Message,
+                        innerException = exception.InnerException?.Message,
+                    });
                     break;
             }
 

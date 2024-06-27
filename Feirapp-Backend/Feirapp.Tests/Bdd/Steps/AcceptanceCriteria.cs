@@ -1,7 +1,7 @@
-﻿using Feirapp.DocumentModels.Documents;
-using FluentAssertions;
+﻿using FluentAssertions;
 using System.Collections.Generic;
 using System.Net.Http;
+using Feirapp.Entities.Entities;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 

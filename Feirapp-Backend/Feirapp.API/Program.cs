@@ -1,14 +1,30 @@
 using Feirapp.API.Helpers;
+using Feirapp.Domain.Services.BaseRepository;
+using Feirapp.Domain.Services.DataScrapper.Dtos;
+using Feirapp.Domain.Services.DataScrapper.Implementations;
+using Feirapp.Domain.Services.DataScrapper.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Implementations;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
-using Feirapp.Infrastructure.DataContext;
+using Feirapp.Domain.Services.Ncms.Interfaces;
+using Feirapp.Domain.Services.Stores.Interfaces;
+using Feirapp.Entities.Entities;
+using Feirapp.Infrastructure.Configuration;
 using Feirapp.Infrastructure.Repository;
+using Feirapp.Infrastructure.Repository.BaseRepository;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-ConfigurationAndServices(builder.Services, builder.Configuration);
+#region DB Context Configuration
+
+builder.Services.AddDbContext<BaseContext>(options =>
+    options.UseMySql(builder.Configuration.GetConnectionString("MySqlConnection"), new MySqlServerVersion(new Version(8, 3, 0))));
+
+#endregion DB Context Configuration
+
+ConfigurationsAndServices(builder.Services, builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -36,20 +52,28 @@ app.MapControllers();
 
 app.Run();
 
-void ConfigurationAndServices(IServiceCollection services, IConfiguration configuration)
+void ConfigurationsAndServices(IServiceCollection services, IConfiguration configuration)
 {
-    services.Configure<MongoSettings>(configuration.GetSection(nameof(MongoSettings)));
-    services.AddTransient<IMongoFeirappContext, MongoFeirappContext>();
+    #region Configurations
+
+    services.Configure<SefazPE>(configuration.GetSection("DataScrappingResources:SefazPE"));
+
+    #endregion Configurations
 
     #region Services
 
-    services.AddTransient<IGroceryItemService, GroceryItemService>();
-
+    services.AddScoped<IGroceryItemService, GroceryItemService>();
+    services.AddScoped<IInvoiceReaderService, InvoiceReaderService>();
+    services.AddScoped<INcmCestDataScrapper, NcmCestDataScrapper>();
+    
     #endregion Services
 
     #region Repositories
 
-    services.AddTransient<IGroceryItemRepository, GroceryItemRepository>();
+    services.AddScoped<IGroceryItemRepository, GroceryItemRepository>();
+    services.AddScoped<IStoreRepository, StoreRepository>();
+    services.AddScoped<INcmRepository, NcmRepository>();
+    services.AddScoped<IBaseRepository<Cest>, BaseRepository<Cest>>();
 
     #endregion Repositories
 }

@@ -1,8 +1,11 @@
-﻿namespace Feirapp.DocumentModels.Enums;
+﻿namespace Feirapp.Entities.Enums;
 
 public enum MeasureUnitEnum
 {
-    KILO = 0,
+    EMPTY = 0,
+    KILO,
     UNIT,
-    BOX
+    BOX,
+    LITER,
+    METER
 }
