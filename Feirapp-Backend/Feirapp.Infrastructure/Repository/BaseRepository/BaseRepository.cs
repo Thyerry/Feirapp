@@ -27,6 +27,11 @@ public class BaseRepository<T> : IBaseRepository<T>, IDisposable where T : class
         return result.Entity;
     }
 
+    public async Task InsertListAsync(List<T> entities, CancellationToken ct)
+    {
+        await _context.Set<T>().BulkInsertAsync(entities, ct);
+    }
+
     public async Task UpdateAsync(T entity, CancellationToken ct)
     {
         _context.Set<T>().Update(entity);
@@ -49,10 +54,11 @@ public class BaseRepository<T> : IBaseRepository<T>, IDisposable where T : class
         return await _context.Set<T>().FindAsync(id, ct) ?? throw new InvalidOperationException();
     }
 
-    public async Task AddIfNotExistsAsync(T entity, Func<T, bool>? predicate, CancellationToken ct = default)
+    public async Task<T> AddIfNotExistsAsync(Func<T, bool> predicate, T entity, CancellationToken ct = default)
     {
-        await _context.Set<T>().AddIfNotExistsAsync(entity, predicate, ct);
+        var result = await _context.Set<T>().AddIfNotExistsAsync(entity, predicate, ct);
         await _context.SaveChangesAsync(ct);
+        return result;
     }
 
     public List<T> GetByQuery(Func<T, bool> predicate, CancellationToken ct)

@@ -4,6 +4,7 @@ using FluentValidation.Results;
 namespace Feirapp.Domain.Services.GroceryItems.Dtos.Command;
 
 public record UpdateGroceryItemCommand(
+    long Id,
     string Barcode,
     long StoreId,
     string? Brand,
@@ -15,6 +16,8 @@ public record UpdateGroceryItemCommand(
     public void Validate()
     {
         var errors = new List<ValidationFailure>();
+        if (Id <= 0)
+            errors.Add(new ValidationFailure(nameof(Id), "Id must be greater than 0.", Id));
         if (string.IsNullOrWhiteSpace(Barcode))
             errors.Add(new ValidationFailure(nameof(Barcode), "Barcode cannot be null or empty.", Barcode));
         if (Barcode.Length <= 13)

@@ -16,7 +16,7 @@ public static class EnumMappers
             _ => MeasureUnitEnum.UNIT
         };
     }
-    
+
     public static string MapToString(this MeasureUnitEnum measureUnit)
     {
         return measureUnit switch
@@ -29,7 +29,7 @@ public static class EnumMappers
             _ => "UN"
         };
     }
-    
+
     public static StatesEnum MapToStatesEnum(this string state)
     {
         return state switch

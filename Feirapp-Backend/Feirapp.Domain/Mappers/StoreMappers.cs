@@ -20,7 +20,7 @@ public static class StoreMappers
             State: store.State
         );
     }
-    
+
     public static Store MapToEntity(this StoreDto storeDto)
     {
         return new Store
@@ -35,7 +35,7 @@ public static class StoreMappers
             State = storeDto.State
         };
     }
-    
+
     public static Store MapToEntity(this InvoiceStore store)
     {
         return new Store
@@ -50,5 +50,4 @@ public static class StoreMappers
             State = store.State.MapToStatesEnum()
         };
     }
-
 }

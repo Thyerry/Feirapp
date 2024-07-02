@@ -3,6 +3,7 @@ using Feirapp.Domain.Services.DataScrapper.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Options;
+using OpenQA.Selenium.DevTools.V85.Fetch;
 
 namespace Feirapp.Domain.Services.DataScrapper.Implementations;
 
@@ -29,7 +30,8 @@ public class InvoiceReaderService : IInvoiceReaderService
     /// <param name="isInsert"></param>
     /// <param name="ct">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the list of invoice grocery items.</returns>
-    public async Task<InvoiceImportResponse> InvoiceDataScrapperAsync(string invoiceCode, bool isInsert, CancellationToken ct)
+    public async Task<InvoiceImportResponse> InvoiceDataScrapperAsync(string invoiceCode, bool isInsert,
+        CancellationToken ct)
     {
         var web = new HtmlWeb();
         var doc = await web.LoadFromWebAsync(_sefazPe.SefazUrl.Replace("{INVOICE_CODE}", invoiceCode), ct);
@@ -37,7 +39,7 @@ public class InvoiceReaderService : IInvoiceReaderService
         var groceryItemXmlList = doc.DocumentNode.SelectNodes("//prod");
         var storeNameXml = doc.DocumentNode.SelectSingleNode("//emit");
         var purchaseDateXml = doc.DocumentNode.SelectSingleNode("//ide//dhemi");
-        
+
         var store = new InvoiceStore
         (
             Name: storeNameXml.SelectSingleNode("//xnome").InnerText,
@@ -51,13 +53,14 @@ public class InvoiceReaderService : IInvoiceReaderService
         );
 
         var groceryItems = GetGroceryItemList(groceryItemXmlList, purchaseDateXml);
-        
-        if(isInsert) await _groceryItemService.InsertBatchAsync(groceryItems, store, ct);
+
+        if (isInsert) Console.WriteLine("no");//await _groceryItemService.InsertBatchAsync(groceryItems, store, ct);
 
         return new InvoiceImportResponse(store, groceryItems);
     }
 
-    private static List<InvoiceGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList, HtmlNode purchaseDateXml)
+    private static List<InvoiceGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList,
+        HtmlNode purchaseDateXml)
     {
         var result = new List<InvoiceGroceryItem>();
         foreach (var groceryItemXml in groceryItemXmlList)

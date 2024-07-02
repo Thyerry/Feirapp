@@ -2,8 +2,7 @@
 
 namespace Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
 
-public record InsertGroceryItemResponse
-(
+public record InsertGroceryItemResponse(
     long Id,
     string Name,
     decimal Price,

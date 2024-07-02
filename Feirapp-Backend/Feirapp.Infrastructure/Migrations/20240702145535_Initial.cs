@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Feirapp.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class DatabaseCreation : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,7 +22,8 @@ namespace Feirapp.Infrastructure.Migrations
                     Code = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Description = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    LastUpdate = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -65,11 +66,11 @@ namespace Feirapp.Infrastructure.Migrations
                 {
                     Code = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Segment = table.Column<string>(type: "longtext", nullable: false)
+                    Segment = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Description = table.Column<string>(type: "longtext", nullable: false)
+                    Description = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    NcmCode = table.Column<string>(type: "varchar(255)", nullable: false)
+                    NcmCode = table.Column<string>(type: "varchar(255)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -79,8 +80,7 @@ namespace Feirapp.Infrastructure.Migrations
                         name: "FK_Cests_Ncms_NcmCode",
                         column: x => x.NcmCode,
                         principalTable: "Ncms",
-                        principalColumn: "Code",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Code");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -102,13 +102,13 @@ namespace Feirapp.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Price = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
                     LastUpdate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    PurchaseDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    MeasureUnit = table.Column<int>(type: "int", nullable: false),
-                    NcmCode = table.Column<string>(type: "varchar(255)", nullable: false)
+                    LastPurchaseDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    MeasureUnit = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CestCode = table.Column<string>(type: "varchar(255)", nullable: false)
+                    NcmCode = table.Column<string>(type: "varchar(255)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    StoreId = table.Column<long>(type: "bigint", nullable: false)
+                    CestCode = table.Column<string>(type: "varchar(255)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -117,20 +117,12 @@ namespace Feirapp.Infrastructure.Migrations
                         name: "FK_GroceryItems_Cests_CestCode",
                         column: x => x.CestCode,
                         principalTable: "Cests",
-                        principalColumn: "Code",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Code");
                     table.ForeignKey(
                         name: "FK_GroceryItems_Ncms_NcmCode",
                         column: x => x.NcmCode,
                         principalTable: "Ncms",
-                        principalColumn: "Code",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_GroceryItems_Stores_StoreId",
-                        column: x => x.StoreId,
-                        principalTable: "Stores",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Code");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -140,9 +132,12 @@ namespace Feirapp.Infrastructure.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    GroceryItemId = table.Column<long>(type: "bigint", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
-                    LogDate = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    LogDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    GroceryItemId = table.Column<long>(type: "bigint", nullable: false),
+                    Barcode = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    StoreId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -151,6 +146,12 @@ namespace Feirapp.Infrastructure.Migrations
                         name: "FK_PriceLogs_GroceryItems_GroceryItemId",
                         column: x => x.GroceryItemId,
                         principalTable: "GroceryItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PriceLogs_Stores_StoreId",
+                        column: x => x.StoreId,
+                        principalTable: "Stores",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -164,8 +165,7 @@ namespace Feirapp.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_GroceryItems_Barcode",
                 table: "GroceryItems",
-                column: "Barcode",
-                unique: true);
+                column: "Barcode");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GroceryItems_CestCode",
@@ -178,15 +178,15 @@ namespace Feirapp.Infrastructure.Migrations
                 column: "NcmCode");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GroceryItems_StoreId",
-                table: "GroceryItems",
-                column: "StoreId");
+                name: "IX_PriceLogs_GroceryItemId_Barcode_LogDate_StoreId",
+                table: "PriceLogs",
+                columns: new[] { "GroceryItemId", "Barcode", "LogDate", "StoreId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_PriceLogs_GroceryItemId_LogDate",
+                name: "IX_PriceLogs_StoreId",
                 table: "PriceLogs",
-                columns: new[] { "GroceryItemId", "LogDate" },
-                unique: true);
+                column: "StoreId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Stores_Cnpj",
@@ -205,10 +205,10 @@ namespace Feirapp.Infrastructure.Migrations
                 name: "GroceryItems");
 
             migrationBuilder.DropTable(
-                name: "Cests");
+                name: "Stores");
 
             migrationBuilder.DropTable(
-                name: "Stores");
+                name: "Cests");
 
             migrationBuilder.DropTable(
                 name: "Ncms");

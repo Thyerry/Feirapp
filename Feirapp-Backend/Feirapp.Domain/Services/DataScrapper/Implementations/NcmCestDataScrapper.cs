@@ -1,4 +1,5 @@
 ﻿using Feirapp.Domain.Services.BaseRepository;
+using Feirapp.Domain.Services.Cests.Interfaces;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
 using Feirapp.Domain.Services.Ncms.Interfaces;
 using Feirapp.Entities.Entities;
@@ -11,9 +12,9 @@ public class NcmCestDataScrapper : INcmCestDataScrapper
 {
     private const string BaseUrl = "https://codigocest.com.br/consulta-codigo-cest-pelo-ncm";
     private readonly INcmRepository _ncmRepository;
-    private readonly IBaseRepository<Cest> _cestRepository;
+    private readonly ICestRepository _cestRepository;
 
-    public NcmCestDataScrapper(INcmRepository ncmRepository, IBaseRepository<Cest> cestRepository)
+    public NcmCestDataScrapper(INcmRepository ncmRepository, ICestRepository cestRepository)
     {
         _ncmRepository = ncmRepository;
         _cestRepository = cestRepository;
@@ -39,7 +40,7 @@ public class NcmCestDataScrapper : INcmCestDataScrapper
 
         var searchButton = form.FindElement(By.XPath("/html/body/div[1]/div[2]/form/div/div[2]/button"));
         searchButton.Click();
-        
+
         driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(3);
         var ncmDivs = driver.FindElement(By.XPath("/html/body/div[1]/div[3]/div/div[2]/div[1]"));
 
@@ -49,7 +50,7 @@ public class NcmCestDataScrapper : INcmCestDataScrapper
             Description = ncmDivs.Text,
             LastUpdate = DateTime.Now
         };
-        
+
         try
         {
             var cestTableRows = driver
@@ -63,10 +64,10 @@ public class NcmCestDataScrapper : INcmCestDataScrapper
                 Description = tr.FindElements(By.TagName("td"))[3].Text,
                 NcmCode = ncmCode
             });
-            
+
             await _ncmRepository.UpdateAsync(ncmUpdate, ct);
             foreach (var cest in cests)
-                await _cestRepository.AddIfNotExistsAsync(cest, c => c.Code == cest.Code, ct);
+                await _cestRepository.AddIfNotExistsAsync(c => c.Code == cest.Code, cest, ct);
         }
         catch (Exception)
         {

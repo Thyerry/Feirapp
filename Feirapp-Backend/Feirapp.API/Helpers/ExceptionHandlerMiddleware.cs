@@ -22,7 +22,7 @@ public class ExceptionHandlerMiddleware
         }
         catch (Exception exception)
         {
-            var response = context.Response; 
+            var response = context.Response;
             response.ContentType = "application/json";
 
             string result;
@@ -40,12 +40,12 @@ public class ExceptionHandlerMiddleware
                             x.AttemptedValue,
                         })
                     };
-                    
+
                     result = JsonSerializer.Serialize(errorObj);
                     break;
-                
+
                 case InvalidOperationException e:
-                    response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
                     result = JsonSerializer.Serialize(new
                     {
                         message = e.Message,

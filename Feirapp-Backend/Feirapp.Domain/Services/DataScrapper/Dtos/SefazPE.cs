@@ -1,4 +1,5 @@
 ﻿namespace Feirapp.Domain.Services.DataScrapper.Dtos;
+
 /// <summary>
 /// Represents the SefazPE Configurations
 /// </summary>

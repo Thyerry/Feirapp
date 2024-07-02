@@ -10,8 +10,6 @@ public record GetAllGroceryItemsResponse(
     string ImageUrl,
     string Barcode,
     DateTime LastUpdate,
-    DateTime PurchaseDate,
-    StoreDto Store,
-    MeasureUnitEnum MeasureUnit,
-    List<PriceLogDto> PriceHistory
+    DateTime LastPurchaseDate,
+    MeasureUnitEnum MeasureUnit
 );

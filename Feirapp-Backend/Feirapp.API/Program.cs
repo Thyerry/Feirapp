@@ -1,5 +1,6 @@
 using Feirapp.API.Helpers;
 using Feirapp.Domain.Services.BaseRepository;
+using Feirapp.Domain.Services.Cests.Interfaces;
 using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.DataScrapper.Implementations;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
@@ -20,7 +21,8 @@ builder.Services.AddControllers();
 #region DB Context Configuration
 
 builder.Services.AddDbContext<BaseContext>(options =>
-    options.UseMySql(builder.Configuration.GetConnectionString("MySqlConnection"), new MySqlServerVersion(new Version(8, 3, 0))));
+    options.UseMySql(builder.Configuration.GetConnectionString("MySqlConnection"),
+        new MySqlServerVersion(new Version(8, 3, 0))));
 
 #endregion DB Context Configuration
 
@@ -51,6 +53,7 @@ app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.MapControllers();
 
 app.Run();
+return;
 
 void ConfigurationsAndServices(IServiceCollection services, IConfiguration configuration)
 {
@@ -65,7 +68,7 @@ void ConfigurationsAndServices(IServiceCollection services, IConfiguration confi
     services.AddScoped<IGroceryItemService, GroceryItemService>();
     services.AddScoped<IInvoiceReaderService, InvoiceReaderService>();
     services.AddScoped<INcmCestDataScrapper, NcmCestDataScrapper>();
-    
+
     #endregion Services
 
     #region Repositories
@@ -73,7 +76,7 @@ void ConfigurationsAndServices(IServiceCollection services, IConfiguration confi
     services.AddScoped<IGroceryItemRepository, GroceryItemRepository>();
     services.AddScoped<IStoreRepository, StoreRepository>();
     services.AddScoped<INcmRepository, NcmRepository>();
-    services.AddScoped<IBaseRepository<Cest>, BaseRepository<Cest>>();
+    services.AddScoped<ICestRepository, CestRepository>();
 
     #endregion Repositories
 }

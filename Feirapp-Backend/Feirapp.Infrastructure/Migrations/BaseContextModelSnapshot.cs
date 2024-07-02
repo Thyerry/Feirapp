@@ -67,6 +67,9 @@ namespace Feirapp.Infrastructure.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("longtext");
 
+                    b.Property<DateTime>("LastPurchaseDate")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<DateTime>("LastUpdate")
                         .HasColumnType("datetime(6)");
 
@@ -84,12 +87,6 @@ namespace Feirapp.Infrastructure.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(65,30)");
 
-                    b.Property<DateTime>("PurchaseDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<long>("StoreId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Barcode");
@@ -97,8 +94,6 @@ namespace Feirapp.Infrastructure.Migrations
                     b.HasIndex("CestCode");
 
                     b.HasIndex("NcmCode");
-
-                    b.HasIndex("StoreId");
 
                     b.ToTable("GroceryItems");
                 });
@@ -127,6 +122,10 @@ namespace Feirapp.Infrastructure.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<string>("Barcode")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
                     b.Property<long>("GroceryItemId")
                         .HasColumnType("bigint");
 
@@ -136,9 +135,14 @@ namespace Feirapp.Infrastructure.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(65,30)");
 
+                    b.Property<long>("StoreId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("GroceryItemId", "LogDate")
+                    b.HasIndex("StoreId");
+
+                    b.HasIndex("GroceryItemId", "Barcode", "LogDate", "StoreId")
                         .IsUnique();
 
                     b.ToTable("PriceLogs");
@@ -204,17 +208,9 @@ namespace Feirapp.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("NcmCode");
 
-                    b.HasOne("Feirapp.Entities.Entities.Store", "Store")
-                        .WithMany("GroceryItems")
-                        .HasForeignKey("StoreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Cest");
 
                     b.Navigation("Ncm");
-
-                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("Feirapp.Entities.Entities.PriceLog", b =>
@@ -225,7 +221,15 @@ namespace Feirapp.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Feirapp.Entities.Entities.Store", "Store")
+                        .WithMany("PriceLogs")
+                        .HasForeignKey("StoreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("GroceryItem");
+
+                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("Feirapp.Entities.Entities.Cest", b =>
@@ -245,7 +249,7 @@ namespace Feirapp.Infrastructure.Migrations
 
             modelBuilder.Entity("Feirapp.Entities.Entities.Store", b =>
                 {
-                    b.Navigation("GroceryItems");
+                    b.Navigation("PriceLogs");
                 });
 #pragma warning restore 612, 618
         }

@@ -6,19 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Feirapp.Infrastructure.Repository;
 
-public class StoreRepository : BaseRepository<Store>, IStoreRepository, IDisposable
+public class StoreRepository(BaseContext context) : BaseRepository<Store>(context), IStoreRepository, IDisposable
 {
-    private readonly BaseContext _context;
-
-    public StoreRepository(BaseContext context) : base(context)
-    {
-        var options = new DbContextOptions<BaseContext>();
-        _context = context ?? throw new ArgumentNullException(nameof(context));
-    }
+    private readonly BaseContext _context = context ?? throw new ArgumentNullException(nameof(context));
 
     public Task<Store?> GetByCnpjAsync(string? storeCnpj, CancellationToken ct)
     {
-        return _context.Stores
-            .FirstOrDefaultAsync(x => x.Cnpj == storeCnpj, ct);
+        return _context.Stores.FirstOrDefaultAsync(x => x.Cnpj == storeCnpj, ct);
     }
 }

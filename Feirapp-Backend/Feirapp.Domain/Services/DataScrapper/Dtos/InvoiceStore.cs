@@ -1,7 +1,6 @@
 ﻿namespace Feirapp.Domain.Services.DataScrapper.Dtos;
 
-public record InvoiceStore
-(
+public record InvoiceStore(
     string Name,
     string Cnpj,
     string Cep,

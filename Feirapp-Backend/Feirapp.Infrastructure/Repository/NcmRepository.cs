@@ -7,14 +7,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Feirapp.Infrastructure.Repository;
 
-public class NcmRepository : BaseRepository<Ncm>, INcmRepository 
+public class NcmRepository(BaseContext context) : BaseRepository<Ncm>(context), INcmRepository
 {
-    private readonly BaseContext _context;
-    public NcmRepository(BaseContext context) : base(context)
-    {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
-    }
-    
+    private readonly BaseContext _context = context ?? throw new ArgumentNullException(nameof(context));
+
     public new async Task UpdateAsync(Ncm entity, CancellationToken ct)
     {
         var ncm = await GetByCodeAsync(entity.Code!, ct);
@@ -27,5 +23,15 @@ public class NcmRepository : BaseRepository<Ncm>, INcmRepository
     {
         return await _context.Ncms
             .FirstOrDefaultAsync(x => x.Code == code, ct);
+    }
+
+    public Task InsertListOfCodesAsync(List<string> entities, CancellationToken ct)
+    {
+        var ncms = entities.Select(x => new Ncm {Code = x}).ToList();
+        return _context.Ncms.BulkInsertAsync(ncms, options =>
+        {
+            options.InsertIfNotExists = true;
+            options.ColumnPrimaryKeyExpression = c => c.Code;
+        },ct);
     }
 }

@@ -50,9 +50,9 @@ public class GroceryItem
     public DateTime LastUpdate { get; set; }
 
     /// <summary>
-    /// Gets or sets the date the grocery item was purchased.
+    /// Gets or sets the last date when the grocery item was purchased.
     /// </summary>
-    public DateTime PurchaseDate { get; set; }
+    public DateTime LastPurchaseDate { get; set; }
 
     /// <summary>
     /// Gets or sets the measure unit of the grocery item.
@@ -63,19 +63,11 @@ public class GroceryItem
     public Ncm Ncm { get; set; }
     public string? CestCode { get; set; }
     public Cest Cest { get; set; }
-    public long StoreId { get; set; }
-    public Store? Store { get; set; }
 
     /// <summary>
     /// Gets or sets the price history of the grocery item.
     /// </summary>
-    public ICollection<PriceLog> PriceHistory { get; set; }
+    public ICollection<PriceLog>? PriceHistory { get; set; }
 
-    /// <summary>
-    /// Returns a string that represents the current grocery item.
-    /// </summary>
-    /// <returns>
-    /// A string that represents the current grocery item.
-    /// </returns>
     public override string ToString() => $"{Name}";
 }
