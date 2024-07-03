@@ -54,7 +54,7 @@ public class InvoiceReaderService : IInvoiceReaderService
 
         var groceryItems = GetGroceryItemList(groceryItemXmlList, purchaseDateXml);
 
-        if (isInsert) Console.WriteLine("no");//await _groceryItemService.InsertBatchAsync(groceryItems, store, ct);
+        if (isInsert) await _groceryItemService.InsertBatchAsync(groceryItems, store, ct);
 
         return new InvoiceImportResponse(store, groceryItems);
     }

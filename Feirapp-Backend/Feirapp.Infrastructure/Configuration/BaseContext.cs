@@ -32,8 +32,6 @@ public class BaseContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired();
-            entity.Property(e => e.Price).HasPrecision(2);
-            entity.Property(e => e.LastPurchaseDate).IsRequired();
             entity.HasMany(e => e.PriceHistory).WithOne(e => e.GroceryItem);
             entity.HasOne(e => e.Ncm).WithMany().HasForeignKey(e => e.NcmCode);
             entity.HasOne(e => e.Cest).WithMany().HasForeignKey(e => e.CestCode);
@@ -44,7 +42,7 @@ public class BaseContext : DbContext
         modelBuilder.Entity<PriceLog>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Price).IsRequired().HasPrecision(2);
+            entity.Property(e => e.Price).IsRequired();
             entity.Property(e => e.LogDate).IsRequired();
             entity.HasIndex(e => new { e.GroceryItemId, e.Barcode, e.LogDate, e.StoreId }).IsUnique();
         });

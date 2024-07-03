@@ -5,5 +5,5 @@ namespace Feirapp.Domain.Services.Cests.Interfaces;
 
 public interface ICestRepository : IBaseRepository<Cest>
 {
-    Task InsertListOfCodesAsync(List<string?> cestCodes, CancellationToken ct);
+    Task InsertListOfCodesAsync(List<string>? cestCodes, CancellationToken ct);
 }

@@ -1,6 +1,7 @@
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Command;
+using Feirapp.Domain.Services.GroceryItems.Dtos.Queries;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -24,11 +25,11 @@ public class GroceryItemController(
         logger ?? throw new ArgumentNullException(nameof(logger));
 
     [HttpGet]
-    [ProducesResponseType(typeof(List<GetAllGroceryItemsResponse>), 200)]
+    [ProducesResponseType(typeof(List<ListGroceryItemsResponse>), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
-    public async Task<IActionResult> GetAll(CancellationToken ct = default)
+    public async Task<IActionResult> ListGroceryItems(ListGroceryItemsQuery query, CancellationToken ct = default)
     {
-        var groceryItems = await _groceryItemService.GetAllAsync(ct);
+        var groceryItems = await _groceryItemService.ListGroceryItemsAsync(query, ct);
         if (groceryItems.Count == 0)
             return NotFound("No Grocery Items Found");
 
@@ -47,17 +48,17 @@ public class GroceryItemController(
     //     return Ok(groceryItems);
     // }
     //
-    // [HttpGet("getFromInvoice")]
-    // [ProducesResponseType(typeof(GetGroceryItemResponse), 200)]
-    // [ProducesResponseType(typeof(NotFoundResult), 404)]
-    // public async Task<IActionResult> GetFromInvoice([FromQuery]string invoiceId, CancellationToken ct = default)
-    // {
-    //     var groceryItems = await _invoiceService.InvoiceDataScrapperAsync(invoiceId, false, ct);
-    //     if (groceryItems.Items.Count == 0)
-    //         return NotFound("No Grocery Items Found");
-    //
-    //     return Ok(groceryItems);
-    // }
+    [HttpGet("getFromInvoice")]
+    [ProducesResponseType(typeof(GetGroceryItemResponse), 200)]
+    [ProducesResponseType(typeof(NotFoundResult), 404)]
+    public async Task<IActionResult> GetFromInvoice([FromQuery]string invoiceId, CancellationToken ct = default)
+    {
+        var groceryItems = await _invoiceService.InvoiceDataScrapperAsync(invoiceId, false, ct);
+        if (groceryItems.Items.Count == 0)
+            return NotFound("No Grocery Items Found");
+    
+        return Ok(groceryItems);
+    }
     //
     // [HttpGet("Random/{quantity:int}")]
     // [ProducesResponseType(typeof(List<GetGroceryItemResponse>), 200)]

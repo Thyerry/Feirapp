@@ -17,7 +17,7 @@ public class GroceryItem
     /// <summary>
     /// Gets or sets the name of the grocery item.
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the brand of the grocery item.
@@ -38,21 +38,6 @@ public class GroceryItem
     /// Gets or sets the barcode of the grocery item.
     /// </summary>
     public string Barcode { get; set; } = "SEM GTIN";
-
-    /// <summary>
-    /// Gets or sets the price of the grocery item.
-    /// </summary>
-    public decimal Price { get; set; }
-
-    /// <summary>
-    /// Gets or sets the date of the last update to the grocery item's information.
-    /// </summary>
-    public DateTime LastUpdate { get; set; }
-
-    /// <summary>
-    /// Gets or sets the last date when the grocery item was purchased.
-    /// </summary>
-    public DateTime LastPurchaseDate { get; set; }
 
     /// <summary>
     /// Gets or sets the measure unit of the grocery item.

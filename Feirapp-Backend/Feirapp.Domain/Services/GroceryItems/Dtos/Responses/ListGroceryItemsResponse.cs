@@ -2,14 +2,15 @@ using Feirapp.Entities.Enums;
 
 namespace Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
 
-public record GetAllGroceryItemsResponse(
+public record ListGroceryItemsResponse(
     long Id,
     string Name,
     string Description,
-    decimal Price,
+    decimal LastPrice,
     string ImageUrl,
     string Barcode,
     DateTime LastUpdate,
-    DateTime LastPurchaseDate,
-    MeasureUnitEnum MeasureUnit
+    MeasureUnitEnum MeasureUnit,
+    long StoreId,
+    string StoreName
 );

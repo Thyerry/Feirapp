@@ -100,9 +100,6 @@ namespace Feirapp.Infrastructure.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Barcode = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Price = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
-                    LastUpdate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    LastPurchaseDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     MeasureUnit = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     NcmCode = table.Column<string>(type: "varchar(255)", nullable: true)

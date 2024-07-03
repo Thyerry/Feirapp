@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Feirapp.Infrastructure.Migrations
 {
     [DbContext(typeof(BaseContext))]
-    [Migration("20240702145535_Initial")]
+    [Migration("20240703032106_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -70,12 +70,6 @@ namespace Feirapp.Infrastructure.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime>("LastPurchaseDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("LastUpdate")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<string>("MeasureUnit")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -86,9 +80,6 @@ namespace Feirapp.Infrastructure.Migrations
 
                     b.Property<string>("NcmCode")
                         .HasColumnType("varchar(255)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)");
 
                     b.HasKey("Id");
 

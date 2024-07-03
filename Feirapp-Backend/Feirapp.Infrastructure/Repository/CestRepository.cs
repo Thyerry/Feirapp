@@ -9,7 +9,7 @@ public class CestRepository(BaseContext context) : BaseRepository<Cest>(context)
 {
     private readonly BaseContext _context = context ?? throw new ArgumentNullException(nameof(context));
 
-    public Task InsertListOfCodesAsync(List<string?> cestCodes, CancellationToken ct)
+    public Task InsertListOfCodesAsync(List<string>? cestCodes, CancellationToken ct)
     {
         var cests = cestCodes.Select(x => new Cest { Code = x }).ToList();
         return _context.Cests.BulkInsertAsync(cests, options =>

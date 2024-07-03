@@ -67,12 +67,6 @@ namespace Feirapp.Infrastructure.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime>("LastPurchaseDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("LastUpdate")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<string>("MeasureUnit")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -83,9 +77,6 @@ namespace Feirapp.Infrastructure.Migrations
 
                     b.Property<string>("NcmCode")
                         .HasColumnType("varchar(255)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)");
 
                     b.HasKey("Id");
 

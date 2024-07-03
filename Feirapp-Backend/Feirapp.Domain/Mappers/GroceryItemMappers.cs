@@ -8,22 +8,41 @@ namespace Feirapp.Domain.Mappers;
 
 public static class GroceryItemMappers
 {
-    public static List<GetAllGroceryItemsResponse> MapToGetAllResponse(this List<GroceryItem> entities)
+    public static ListGroceryItemsResponse ToResponse(this GroceryItemList model)
     {
-        return entities.Select(entity => entity.MapToGetAllResponse()).ToList();
-    }
-    public static GetAllGroceryItemsResponse MapToGetAllResponse(this GroceryItem entity)
-    {
-        return new GetAllGroceryItemsResponse(
-            entity.Id,
-            entity.Name,
-            entity.Description,
-            entity.Price,
-            entity.ImageUrl,
-            entity.Barcode,
-            entity.LastUpdate,
-            entity.LastPurchaseDate,
-            entity.MeasureUnit
+        return new ListGroceryItemsResponse(
+            model.Id,
+            model.Name,
+            model.Description,
+            model.LastPrice,
+            model.ImageUrl,
+            model.Barcode,
+            model.LastUpdate,
+            model.MeasureUnit,
+            model.StoreId,
+            model.StoreName
         );
+    }
+
+    public static List<ListGroceryItemsResponse> ToResponse(this List<GroceryItemList> models)
+    {
+        return models.Select(ToResponse).ToList();
+    }
+
+    public static GroceryItem ToEntity(this InvoiceGroceryItem model)
+    {
+        return new GroceryItem
+        {
+            Name = model.Name,
+            Barcode = model.Barcode,
+            MeasureUnit = model.MeasureUnit.MapToMeasureUnit(),
+            NcmCode = model.NcmCode,
+            CestCode = model.CestCode,
+        };
+    }
+    
+    public static List<GroceryItem> ToEntity(this List<InvoiceGroceryItem> models)
+    {
+        return models.Select(m => m.ToEntity()).ToList();
     }
 }
