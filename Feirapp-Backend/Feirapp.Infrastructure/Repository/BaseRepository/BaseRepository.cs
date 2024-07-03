@@ -40,7 +40,7 @@ public class BaseRepository<T> : IBaseRepository<T>, IDisposable where T : class
 
     public async Task DeleteAsync(long id, CancellationToken ct)
     {
-        _context.Set<T>().Remove(await GetByIdAsync(id, ct));
+        _context.Set<T>().Remove(await GetByIdAsync(id, ct) ?? throw new InvalidOperationException("No entity found to delete"));
         await _context.SaveChangesAsync(ct);
     }
 
@@ -49,7 +49,7 @@ public class BaseRepository<T> : IBaseRepository<T>, IDisposable where T : class
         return await _context.Set<T>().ToListAsync(cancellationToken: ct);
     }
 
-    public async Task<T> GetByIdAsync(long id, CancellationToken ct)
+    public virtual async Task<T?> GetByIdAsync(long id, CancellationToken ct)
     {
         return await _context.Set<T>().FindAsync(id, ct) ?? throw new InvalidOperationException();
     }

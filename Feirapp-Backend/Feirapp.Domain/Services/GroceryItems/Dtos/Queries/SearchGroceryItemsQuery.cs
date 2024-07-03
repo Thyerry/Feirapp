@@ -2,5 +2,5 @@
 
 namespace Feirapp.Domain.Services.GroceryItems.Dtos.Queries;
 
-public record ListGroceryItemsQuery(string? Name, long StoreId, int Page, int PageSize);
+public record SearchGroceryItemsQuery(string? Name, long StoreId, int Page, int PageSize);
 

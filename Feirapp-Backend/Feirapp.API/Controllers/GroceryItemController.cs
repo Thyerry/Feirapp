@@ -1,3 +1,4 @@
+using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Command;
@@ -25,31 +26,45 @@ public class GroceryItemController(
         logger ?? throw new ArgumentNullException(nameof(logger));
 
     [HttpGet]
-    [ProducesResponseType(typeof(List<ListGroceryItemsResponse>), 200)]
+    [ProducesResponseType(typeof(List<SearchGroceryItemsResponse>), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
-    public async Task<IActionResult> ListGroceryItems(ListGroceryItemsQuery query, CancellationToken ct = default)
+    public async Task<IActionResult> SearchGroceryItems(SearchGroceryItemsQuery query, CancellationToken ct = default)
     {
-        var groceryItems = await _groceryItemService.ListGroceryItemsAsync(query, ct);
+        var groceryItems = await _groceryItemService.SearchGroceryItemsAsync(query, ct);
         if (groceryItems.Count == 0)
             return NotFound("No Grocery Items Found");
 
         return Ok(groceryItems);
     }
+    
+    [HttpGet("{id}")]
+    [ProducesResponseType(typeof(GroceryItemDto), 200)]
+    [ProducesResponseType(typeof(NotFoundResult), 404)]
+    public async Task<IActionResult> GetById(long id, CancellationToken ct = default)
+    {
+        var result = await _groceryItemService.GetByIdAsync(id, ct);
+    
+        if (result == null)
+            return NotFound("Grocery Item Not Found");
+    
+        return Ok(result);
+    }
 
-    // [HttpGet("getFromStore/{storeId}")]
-    // [ProducesResponseType(typeof(GetGroceryItemResponse), 200)]
-    // [ProducesResponseType(typeof(NotFoundResult), 404)]
-    // public async Task<IActionResult> GetFromStore(long storeId, CancellationToken ct = default)
-    // {
-    //     var groceryItems = await _groceryItemService.GetByStoreAsync(storeId, ct);
-    //     if (groceryItems.Items.Count == 0)
-    //         return NotFound("No Grocery Items Found");
-    //
-    //     return Ok(groceryItems);
-    // }
-    //
+    [HttpGet("getFromStore/{storeId}")]
+    [ProducesResponseType(typeof(GetGroceryItemFromStoreIdResponse), 200)]
+    [ProducesResponseType(typeof(NotFoundResult), 404)]
+    public async Task<IActionResult> GetFromStore(long storeId, CancellationToken ct = default)
+    {
+        var groceryItems = await _groceryItemService.GetByStoreAsync(storeId, ct);
+        if (groceryItems.Items.Count == 0)
+            return NotFound("No Store Found");
+    
+        return Ok(groceryItems);
+    }
+    
+    
     [HttpGet("getFromInvoice")]
-    [ProducesResponseType(typeof(GetGroceryItemResponse), 200)]
+    [ProducesResponseType(typeof(InvoiceImportResponse), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetFromInvoice([FromQuery]string invoiceId, CancellationToken ct = default)
     {
@@ -59,7 +74,7 @@ public class GroceryItemController(
     
         return Ok(groceryItems);
     }
-    //
+    
     // [HttpGet("Random/{quantity:int}")]
     // [ProducesResponseType(typeof(List<GetGroceryItemResponse>), 200)]
     // [ProducesResponseType(typeof(BadRequestResult), 400)]
@@ -87,20 +102,7 @@ public class GroceryItemController(
     //     await _groceryItemService.InsertListAsync(command, ct);
     //     return Created();
     // }
-    //
-    // [HttpGet("{id}")]
-    // [ProducesResponseType(typeof(GroceryItemDto), 200)]
-    // [ProducesResponseType(typeof(NotFoundResult), 404)]
-    // public async Task<IActionResult> GetById(long id, CancellationToken ct = default)
-    // {
-    //     var result = await _groceryItemService.GetByIdAsync(id, ct);
-    //
-    //     if (result == null)
-    //         return NotFound("Grocery Item Not Found");
-    //
-    //     return Ok(result);
-    // }
-    //
+    
     // [HttpPut]
     // [ProducesResponseType(typeof(AcceptedResult), 204)]
     // [ProducesResponseType(typeof(BadRequestResult), 400)]

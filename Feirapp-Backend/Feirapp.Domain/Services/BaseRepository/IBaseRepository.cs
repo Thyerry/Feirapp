@@ -11,7 +11,7 @@ public interface IBaseRepository<T>
     Task DeleteAsync(long id, CancellationToken ct);
     Task UpdateAsync(T entity, CancellationToken ct);
     Task<List<T>> GetAllAsync(CancellationToken ct);
-    Task<T> GetByIdAsync(long id, CancellationToken ct);
+    Task<T?> GetByIdAsync(long id, CancellationToken ct);
     Task<T> AddIfNotExistsAsync(Func<T, bool> predicate, T entity, CancellationToken ct = default);
     List<T> GetByQuery(Func<T, bool> predicate, CancellationToken ct);
 }

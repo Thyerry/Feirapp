@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Feirapp.Infrastructure.Migrations
 {
     [DbContext(typeof(BaseContext))]
-    [Migration("20240703032106_Initial")]
+    [Migration("20240703145431_Initial")]
     partial class Initial
     {
         /// <inheritdoc />

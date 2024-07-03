@@ -8,7 +8,8 @@ namespace Feirapp.Domain.Services.GroceryItems.Interfaces;
 
 public interface IGroceryItemService
 {
-    Task<List<ListGroceryItemsResponse>> ListGroceryItemsAsync(ListGroceryItemsQuery query, CancellationToken ct);
-    Task<GetGroceryItemResponse> GetByIdAsync(long id, CancellationToken ct);
+    Task<List<SearchGroceryItemsResponse>> SearchGroceryItemsAsync(SearchGroceryItemsQuery query, CancellationToken ct);
+    Task<GetGroceryItemByIdResponse?> GetByIdAsync(long id, CancellationToken ct);
     Task InsertBatchAsync(List<InvoiceGroceryItem> invoiceItems, InvoiceStore store, CancellationToken ct);
+    Task<GetGroceryItemFromStoreIdResponse> GetByStoreAsync(long storeId, CancellationToken ct);
 }

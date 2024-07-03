@@ -8,9 +8,9 @@ namespace Feirapp.Domain.Mappers;
 
 public static class GroceryItemMappers
 {
-    public static ListGroceryItemsResponse ToResponse(this GroceryItemList model)
+    public static SearchGroceryItemsResponse ToResponse(this GroceryItemList model)
     {
-        return new ListGroceryItemsResponse(
+        return new SearchGroceryItemsResponse(
             model.Id,
             model.Name,
             model.Description,
@@ -24,7 +24,7 @@ public static class GroceryItemMappers
         );
     }
 
-    public static List<ListGroceryItemsResponse> ToResponse(this List<GroceryItemList> models)
+    public static List<SearchGroceryItemsResponse> ToResponse(this List<GroceryItemList> models)
     {
         return models.Select(ToResponse).ToList();
     }
@@ -44,5 +44,42 @@ public static class GroceryItemMappers
     public static List<GroceryItem> ToEntity(this List<InvoiceGroceryItem> models)
     {
         return models.Select(m => m.ToEntity()).ToList();
+    }
+
+    public static GetGroceryItemByIdResponse ToGetByIdResponse(this GroceryItem entity)
+    {
+        return new GetGroceryItemByIdResponse
+        (
+            entity.Id,
+            entity.Name,
+            entity.Description,
+            entity.ImageUrl,
+            entity.Brand,
+            entity.Barcode,
+            entity.NcmCode!,
+            entity.CestCode!,
+            entity.MeasureUnit,
+            entity.PriceHistory?.Select(p => p.ToDto()).ToList()!
+        );
+    }
+    
+    public static GroceryItemDto ToDto(this GroceryItem entity)
+    {
+        return new GroceryItemDto
+        (
+            entity.Id,
+            entity.Name,
+            entity.Description!,
+            entity.ImageUrl!,
+            entity.Barcode,
+            entity.MeasureUnit,
+            entity.PriceHistory?.Select(p => p.ToDto()).ToList()!
+        );
+    }
+    
+    
+    public static List<GroceryItemDto> ToDto(this List<GroceryItem> entities)
+    {
+        return entities.Select(ToDto).ToList();
     }
 }

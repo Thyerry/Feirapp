@@ -10,7 +10,7 @@ public class BaseContext : DbContext
     }
 
     public DbSet<GroceryItem> GroceryItems { get; set; }
-    public DbSet<PriceLog> PriceLogs { get; set; }
+    public DbSet<PriceLog?> PriceLogs { get; set; }
     public DbSet<Store> Stores { get; set; }
     public DbSet<Ncm> Ncms { get; set; }
     public DbSet<Cest> Cests { get; set; }

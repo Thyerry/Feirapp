@@ -1,9 +1,8 @@
-using System.Data.SqlTypes;
-using System.Runtime.Intrinsics.X86;
 using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Queries;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Entities.Entities;
+using Feirapp.Entities.Entities.Dtos;
 using Feirapp.Infrastructure.Configuration;
 using Feirapp.Infrastructure.Repository.BaseRepository;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +14,7 @@ public class GroceryItemRepository(BaseContext context)
 {
     private readonly BaseContext _context = context;
 
-    public async Task<List<GroceryItemList>> ListGroceryItemsAsync(ListGroceryItemsQuery queryParams,
+    public async Task<List<GroceryItemList>> SearchGroceryItemsAsync(SearchGroceryItemsQuery queryParams,
         CancellationToken ct)
     {
         var query = 
@@ -46,6 +45,18 @@ public class GroceryItemRepository(BaseContext context)
             .ToListAsync(ct);
     }
 
+    public override async Task<GroceryItem?> GetByIdAsync(long id, CancellationToken ct)
+    {
+        var query = from g in _context.GroceryItems
+            join p in _context.PriceLogs on g.Id equals p.GroceryItemId
+            join s in _context.Stores on p.StoreId equals s.Id
+            where g.Id == id
+            select new {g, p, s};
+        
+        var result = await query.FirstOrDefaultAsync(ct);
+        return result?.g;
+    }
+
     public async Task<GroceryItem?> CheckIfGroceryItemExistsAsync(GroceryItem groceryItem, long storeId, CancellationToken ct)
     {
         var query =
@@ -62,17 +73,34 @@ public class GroceryItemRepository(BaseContext context)
         return await query.FirstOrDefaultAsync(ct);
     }
 
-    public async Task InsertPriceLog(PriceLog priceLog, CancellationToken ct)
+    public async Task InsertPriceLog(PriceLog? priceLog, CancellationToken ct)
     {
         await _context.PriceLogs.AddAsync(priceLog, ct);
+        await _context.SaveChangesAsync(ct);
     }
 
-    public async Task<PriceLog> GetLastPriceLogAsync(long groceryItemId, CancellationToken ct)
+    public async Task<PriceLog?> GetLastPriceLogAsync(long groceryItemId, CancellationToken ct)
     {
         return await _context.PriceLogs
             .Where(p => p.GroceryItemId == groceryItemId)
             .OrderByDescending(p => p.LogDate)
             .FirstOrDefaultAsync(ct);
+    }
+
+    public async Task<StoreWithItems> GetByStoreAsync(long storeId, CancellationToken ct)
+    {
+        var query = from g in _context.GroceryItems
+            join p in _context.PriceLogs on g.Id equals p.GroceryItemId
+            join s in _context.Stores on p.StoreId equals s.Id
+            where p.StoreId == storeId
+            select new {g, p, s};
+
+        var result = await query.ToListAsync(ct);
+        return new StoreWithItems()
+        {
+            Store = result.First().s,
+            Items = result.Select(r => r.g).ToList()
+        };
     }
 
     public void Dispose()

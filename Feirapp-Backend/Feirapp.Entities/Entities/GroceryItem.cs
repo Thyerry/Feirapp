@@ -55,4 +55,5 @@ public class GroceryItem
     public ICollection<PriceLog>? PriceHistory { get; set; }
 
     public override string ToString() => $"{Name}";
+    
 }

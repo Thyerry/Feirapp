@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Services.Cests.Interfaces;
 using Feirapp.Domain.Services.DataScrapper.Dtos;
+using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Queries;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
@@ -17,16 +19,22 @@ public sealed class GroceryItemService(
     ICestRepository cestRepository)
     : IGroceryItemService
 {
-    public async Task<List<ListGroceryItemsResponse>> ListGroceryItemsAsync(ListGroceryItemsQuery query, CancellationToken ct)
+    public async Task<List<SearchGroceryItemsResponse>> SearchGroceryItemsAsync(SearchGroceryItemsQuery query, CancellationToken ct)
     {
-        var entities = await groceryItemRepository.ListGroceryItemsAsync(query, ct);
+        var entities = await groceryItemRepository.SearchGroceryItemsAsync(query, ct);
         return entities.ToResponse();
     }
 
-    public async Task<GetGroceryItemResponse> GetByIdAsync(long id, CancellationToken ct)
+    public async Task<GetGroceryItemByIdResponse?> GetByIdAsync(long id, CancellationToken ct)
     {
         var entity = await groceryItemRepository.GetByIdAsync(id, ct);
-        return null;
+        return entity?.ToGetByIdResponse();
+    }
+
+    public async Task<GetGroceryItemFromStoreIdResponse> GetByStoreAsync(long storeId, CancellationToken ct)
+    {
+        var result = await groceryItemRepository.GetByStoreAsync(storeId, ct);
+        return new GetGroceryItemFromStoreIdResponse(result.Store.MapToDto(), result.Items.ToDto());
     }
 
     public async Task InsertBatchAsync(List<InvoiceGroceryItem> invoiceItems, InvoiceStore invoiceStore,
@@ -47,39 +55,7 @@ public sealed class GroceryItemService(
             foreach (var item in invoiceItems)
             {
                 var insertGroceryItem = item.ToEntity();
-                var dbResult = await groceryItemRepository.CheckIfGroceryItemExistsAsync(insertGroceryItem, store.Id, ct);
-
-                if (dbResult == null)
-                {
-                    await groceryItemRepository.InsertAsync(insertGroceryItem, ct);
-                    var priceLog = new PriceLog()
-                    {
-                        GroceryItemId = insertGroceryItem.Id,
-                        Barcode = item.Barcode,
-                        StoreId = store.Id,
-                        Price = item.Price,
-                        LogDate = item.PurchaseDate,
-                    };
-
-                    await groceryItemRepository.InsertPriceLog(priceLog, ct);
-                }
-                else
-                {
-                    var lastPriceLog = await groceryItemRepository.GetLastPriceLogAsync(dbResult.Id, ct);
-                    if (lastPriceLog.Price != item.Price)
-                    {
-                        var priceLog = new PriceLog()
-                        {
-                            GroceryItemId = dbResult.Id,
-                            Barcode = item.Barcode,
-                            StoreId = store.Id,
-                            Price = item.Price,
-                            LogDate = item.PurchaseDate,
-                        };
-
-                        await groceryItemRepository.InsertPriceLog(priceLog, ct);
-                    }
-                }
+                await IncludeGroceryItemBusinessLogic(insertGroceryItem, store.Id, item.Price, item.PurchaseDate, ct);
             }
 
             await trans.CommitAsync(ct);
@@ -89,6 +65,44 @@ public sealed class GroceryItemService(
             await trans.RollbackAsync(ct);
             throw;
         }
+    }
 
+    private async Task IncludeGroceryItemBusinessLogic(GroceryItem item, long storeId, decimal price, DateTime purchaseDate, CancellationToken ct)
+    {
+        var dbResult =
+            await groceryItemRepository.CheckIfGroceryItemExistsAsync(item, storeId, ct);
+
+        if (dbResult == null)
+        {
+            await groceryItemRepository.InsertAsync(item, ct);
+            var priceLog = new PriceLog()
+            {
+                GroceryItemId = item.Id,
+                Barcode = item.Barcode,
+                StoreId = storeId,
+                Price = price,
+                
+                LogDate = purchaseDate,
+            };
+
+            await groceryItemRepository.InsertPriceLog(priceLog, ct);
+        }
+        else
+        {
+            var lastPriceLog = await groceryItemRepository.GetLastPriceLogAsync(dbResult.Id, ct);
+            if (price != lastPriceLog.Price && purchaseDate.Date > lastPriceLog.LogDate.Date)
+            {
+                var priceLog = new PriceLog()
+                {
+                    GroceryItemId = dbResult.Id,
+                    Barcode = item.Barcode,
+                    StoreId = storeId,
+                    Price = price,
+                    LogDate = purchaseDate,
+                };
+
+                await groceryItemRepository.InsertPriceLog(priceLog, ct);
+            }
+        }
     }
 }
