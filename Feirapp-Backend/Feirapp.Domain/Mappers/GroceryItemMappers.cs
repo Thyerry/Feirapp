@@ -8,7 +8,7 @@ namespace Feirapp.Domain.Mappers;
 
 public static class GroceryItemMappers
 {
-    public static SearchGroceryItemsResponse ToResponse(this GroceryItemList model)
+    public static SearchGroceryItemsResponse ToResponse(this SearchGroceryItemsDto model)
     {
         return new SearchGroceryItemsResponse(
             model.Id,
@@ -24,7 +24,7 @@ public static class GroceryItemMappers
         );
     }
 
-    public static List<SearchGroceryItemsResponse> ToResponse(this List<GroceryItemList> models)
+    public static List<SearchGroceryItemsResponse> ToResponse(this List<SearchGroceryItemsDto> models)
     {
         return models.Select(ToResponse).ToList();
     }

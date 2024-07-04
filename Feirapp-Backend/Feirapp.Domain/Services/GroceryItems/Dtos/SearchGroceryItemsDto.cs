@@ -2,7 +2,7 @@
 
 namespace Feirapp.Domain.Services.GroceryItems.Dtos;
 
-public record GroceryItemList(
+public record SearchGroceryItemsDto(
     long Id,
     string Name,
     string? Description,

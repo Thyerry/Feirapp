@@ -32,7 +32,7 @@ public class StoreController(IStoreService storeService) : ControllerBase
         return Ok(stores);
     }
     
-    [HttpGet]
+    [HttpGet("getById")]
     [ProducesResponseType(typeof(StoreDto), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetAllStores([FromQuery] long storeId, CancellationToken ct = default)

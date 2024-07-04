@@ -6,6 +6,7 @@ using Feirapp.Entities.Entities.Dtos;
 using Feirapp.Infrastructure.Configuration;
 using Feirapp.Infrastructure.Repository.BaseRepository;
 using Microsoft.EntityFrameworkCore;
+using OpenQA.Selenium;
 
 namespace Feirapp.Infrastructure.Repository;
 
@@ -14,14 +15,14 @@ public class GroceryItemRepository(BaseContext context)
 {
     private readonly BaseContext _context = context;
 
-    public async Task<List<GroceryItemList>> SearchGroceryItemsAsync(SearchGroceryItemsQuery queryParams,
+    public async Task<List<SearchGroceryItemsDto>> SearchGroceryItemsAsync(SearchGroceryItemsQuery queryParams,
         CancellationToken ct)
     {
         var query =
             from groceryItem in _context.GroceryItems
             join priceLog in _context.PriceLogs on groceryItem.Id equals priceLog.GroceryItemId
             join store in _context.Stores on priceLog.StoreId equals store.Id
-            select new GroceryItemList(
+            select new SearchGroceryItemsDto(
                 groceryItem.Id,
                 groceryItem.Name,
                 groceryItem.Description,
@@ -104,45 +105,32 @@ public class GroceryItemRepository(BaseContext context)
         };
     }
 
-    public async Task<List<GroceryItemList>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct)
+    public async Task<List<SearchGroceryItemsDto>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct)
     {
-        var test = 
-            from groceryItem in _context.GroceryItems
-            join priceLog in _context.PriceLogs on groceryItem.Id equals priceLog.GroceryItemId
-            join store in _context.Stores on priceLog.StoreId equals store.Id
-            group new { groceryItem, priceLog, store } by groceryItem.Id into grouped
-            select new
-            {
-                groceryItem = grouped.First(x => x.groceryItem.Id == grouped.Key).groceryItem,
-                stores = grouped.Select(x => x.store).ToList(),
-                priceLogs = grouped.Select(x => x.priceLog).ToList()
-            };
-
-        var result = await test.ToListAsync(ct);
-        
-        var query =
-            from groceryItem in _context.GroceryItems
-            join priceLog in _context.PriceLogs on groceryItem.Id equals priceLog.GroceryItemId
-            join store in _context.Stores on priceLog.StoreId equals store.Id
-            select new GroceryItemList(
-                groceryItem.Id,
-                groceryItem.Name,
-                groceryItem.Description,
-                priceLog.Price,
-                groceryItem.ImageUrl,
-                groceryItem.Barcode,
-                priceLog.LogDate,
-                groceryItem.MeasureUnit,
-                store.Id,
-                store.Name);
-
-        return await query
+        var query = await _context.GroceryItems
+            .FromSqlRaw("SELECT * FROM GroceryItems ORDER BY RAND() LIMIT {0}", quantity)
             .AsNoTracking()
-            .OrderBy(g => Guid.NewGuid())
-            .Take(quantity)
+            .Include(g => g.PriceHistory)!
+            .ThenInclude(p => p.Store)
             .ToListAsync(ct);
-    }
 
+        
+        return query.Select(g => new SearchGroceryItemsDto(
+                g.Id,
+                g.Name,
+                g.Description,
+                g.PriceHistory!.OrderBy(p => p.LogDate).Last().Price,
+                g.ImageUrl,
+                g.Barcode,
+                g.PriceHistory!.OrderBy(p => p.LogDate).Last().LogDate,
+                g.MeasureUnit,
+                g.PriceHistory!.OrderBy(p => p.LogDate).Last().StoreId,
+                g.PriceHistory!.OrderBy(p => p.LogDate).Last().Store.Name))
+            .OrderBy(g => Guid.NewGuid())
+            .ToList();
+    }
+    
+    
     public void Dispose()
     {
     }
