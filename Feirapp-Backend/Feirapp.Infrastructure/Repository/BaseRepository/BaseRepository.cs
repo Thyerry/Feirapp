@@ -30,6 +30,7 @@ public class BaseRepository<T> : IBaseRepository<T>, IDisposable where T : class
     public async Task InsertListAsync(List<T> entities, CancellationToken ct)
     {
         await _context.Set<T>().BulkInsertAsync(entities, ct);
+        await _context.SaveChangesAsync(ct);
     }
 
     public async Task UpdateAsync(T entity, CancellationToken ct)
@@ -51,7 +52,7 @@ public class BaseRepository<T> : IBaseRepository<T>, IDisposable where T : class
 
     public virtual async Task<T?> GetByIdAsync(long id, CancellationToken ct)
     {
-        return await _context.Set<T>().FindAsync(id, ct) ?? throw new InvalidOperationException();
+        return await _context.Set<T>().FindAsync(id, ct);
     }
 
     public async Task<T> AddIfNotExistsAsync(Func<T, bool> predicate, T entity, CancellationToken ct = default)

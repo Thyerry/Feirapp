@@ -1,5 +1,4 @@
 using Feirapp.Domain.Services.DataScrapper.Dtos;
-using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Command;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Queries;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
@@ -12,4 +11,6 @@ public interface IGroceryItemService
     Task<GetGroceryItemByIdResponse?> GetByIdAsync(long id, CancellationToken ct);
     Task InsertBatchAsync(List<InvoiceGroceryItem> invoiceItems, InvoiceStore store, CancellationToken ct);
     Task<GetGroceryItemFromStoreIdResponse> GetByStoreAsync(long storeId, CancellationToken ct);
+    Task<List<SearchGroceryItemsResponse>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct);
+    Task InsertAsync(InsertGroceryItemCommand command, CancellationToken ct);
 }

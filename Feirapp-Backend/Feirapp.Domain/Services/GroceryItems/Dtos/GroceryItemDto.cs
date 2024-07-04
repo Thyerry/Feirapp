@@ -1,6 +1,4 @@
-﻿using Feirapp.Entities.Entities;
-using Feirapp.Entities.Enums;
-using FluentValidation.Results;
+﻿using Feirapp.Entities.Enums;
 
 namespace Feirapp.Domain.Services.GroceryItems.Dtos;
 
@@ -12,4 +10,7 @@ public record GroceryItemDto(
     string Barcode,
     MeasureUnitEnum MeasureUnit,
     List<PriceLogDto>? PriceHistory
-);
+)
+{
+    public decimal Price { get; set; }
+};

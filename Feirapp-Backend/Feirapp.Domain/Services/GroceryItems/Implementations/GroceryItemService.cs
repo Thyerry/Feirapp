@@ -1,14 +1,14 @@
-using System.Diagnostics;
 using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Services.Cests.Interfaces;
 using Feirapp.Domain.Services.DataScrapper.Dtos;
-using Feirapp.Domain.Services.GroceryItems.Dtos;
+using Feirapp.Domain.Services.GroceryItems.Dtos.Command;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Queries;
 using Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Domain.Services.Ncms.Interfaces;
 using Feirapp.Domain.Services.Stores.Interfaces;
 using Feirapp.Entities.Entities;
+using OpenQA.Selenium;
 
 namespace Feirapp.Domain.Services.GroceryItems.Implementations;
 
@@ -19,7 +19,8 @@ public sealed class GroceryItemService(
     ICestRepository cestRepository)
     : IGroceryItemService
 {
-    public async Task<List<SearchGroceryItemsResponse>> SearchGroceryItemsAsync(SearchGroceryItemsQuery query, CancellationToken ct)
+    public async Task<List<SearchGroceryItemsResponse>> SearchGroceryItemsAsync(SearchGroceryItemsQuery query,
+        CancellationToken ct)
     {
         var entities = await groceryItemRepository.SearchGroceryItemsAsync(query, ct);
         return entities.ToResponse();
@@ -35,6 +36,37 @@ public sealed class GroceryItemService(
     {
         var result = await groceryItemRepository.GetByStoreAsync(storeId, ct);
         return new GetGroceryItemFromStoreIdResponse(result.Store.MapToDto(), result.Items.ToDto());
+    }
+
+    public async Task<List<SearchGroceryItemsResponse>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct)
+    {
+        var result = await groceryItemRepository.GetRandomGroceryItemsAsync(quantity, ct);
+        return result.ToResponse();
+    }
+
+    public async Task InsertAsync(InsertGroceryItemCommand command, CancellationToken ct)
+    {
+        await using var trans = await groceryItemRepository.BeginTransactionAsync(ct);
+        try
+        {
+            var groceryItem = new GroceryItem
+            {
+                Name = command.Name,
+                Description = command.Description,
+                ImageUrl = command.ImageUrl,
+                Barcode = command.Barcode,
+                MeasureUnit = command.MeasureUnit,
+            };
+
+            await IncludeGroceryItemBusinessLogic(groceryItem, command.Store!.Id, command.Price, DateTime.Now, ct);
+
+            await trans.CommitAsync(ct);
+        }
+        catch (Exception)
+        {
+            await trans.RollbackAsync(ct);
+            throw;
+        }
     }
 
     public async Task InsertBatchAsync(List<InvoiceGroceryItem> invoiceItems, InvoiceStore invoiceStore,
@@ -67,7 +99,8 @@ public sealed class GroceryItemService(
         }
     }
 
-    private async Task IncludeGroceryItemBusinessLogic(GroceryItem item, long storeId, decimal price, DateTime purchaseDate, CancellationToken ct)
+    private async Task IncludeGroceryItemBusinessLogic(GroceryItem item, long storeId, decimal price,
+        DateTime purchaseDate, CancellationToken ct)
     {
         var dbResult =
             await groceryItemRepository.CheckIfGroceryItemExistsAsync(item, storeId, ct);
@@ -81,7 +114,7 @@ public sealed class GroceryItemService(
                 Barcode = item.Barcode,
                 StoreId = storeId,
                 Price = price,
-                
+
                 LogDate = purchaseDate,
             };
 

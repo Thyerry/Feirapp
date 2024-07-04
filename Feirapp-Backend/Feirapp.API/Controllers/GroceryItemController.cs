@@ -75,26 +75,26 @@ public class GroceryItemController(
         return Ok(groceryItems);
     }
     
-    // [HttpGet("Random/{quantity:int}")]
-    // [ProducesResponseType(typeof(List<GetGroceryItemResponse>), 200)]
-    // [ProducesResponseType(typeof(BadRequestResult), 400)]
-    // [ProducesResponseType(typeof(NotFoundResult), 404)]
-    // public async Task<IActionResult> GetRandomGroceryItems(int quantity, CancellationToken ct = default)
-    // {
-    //     if (quantity <= 0)
-    //         return BadRequest();
-    //     var randomGroceryItems = await _groceryItemService.GetRandomGroceryItemsAsync(quantity, ct);
-    //     return Ok(randomGroceryItems);
-    // }
-    //
-    // [HttpPost]
-    // [ProducesResponseType(typeof(GroceryItemDto), 201)]
-    // public async Task<IActionResult> Insert(InsertGroceryItemCommand command, CancellationToken ct = default)
-    // {
-    //     await _groceryItemService.InsertAsync(command, ct);
-    //     return Created();
-    // }
-    //
+    [HttpGet("Random/{quantity:int}")]
+    [ProducesResponseType(typeof(List<SearchGroceryItemsResponse>), 200)]
+    [ProducesResponseType(typeof(BadRequestResult), 400)]
+    [ProducesResponseType(typeof(NotFoundResult), 404)]
+    public async Task<IActionResult> GetRandomGroceryItems(int quantity, CancellationToken ct = default)
+    {
+        if (quantity <= 0)
+            return BadRequest();
+        var randomGroceryItems = await _groceryItemService.GetRandomGroceryItemsAsync(quantity, ct);
+        return Ok(randomGroceryItems);
+    }
+    
+    [HttpPost]
+    [ProducesResponseType(typeof(GroceryItemDto), 201)]
+    public async Task<IActionResult> Insert(InsertGroceryItemCommand command, CancellationToken ct = default)
+    {
+        await _groceryItemService.InsertAsync(command, ct);
+        return Created();
+    }
+    
     // [HttpPost("InsertList")]
     // [ProducesResponseType(typeof(CreatedResult), 201)]
     // public async Task<IActionResult> InsertList(InsertListOfGroceryItems command, CancellationToken ct = default)

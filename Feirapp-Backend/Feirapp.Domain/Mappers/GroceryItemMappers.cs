@@ -45,6 +45,22 @@ public static class GroceryItemMappers
     {
         return models.Select(m => m.ToEntity()).ToList();
     }
+    
+    public static List<GroceryItem> ToEntity(this List<GroceryItemDto> models)
+    {
+        return models.Select(m => m.ToEntity()).ToList();
+    }
+    public static GroceryItem ToEntity(this GroceryItemDto model)
+    {
+        return new GroceryItem
+        {
+            Name = model.Name,
+            Description = model.Description,
+            ImageUrl = model.ImageUrl,
+            Barcode = model.Barcode,
+            MeasureUnit = model.MeasureUnit,
+        };
+    }
 
     public static GetGroceryItemByIdResponse ToGetByIdResponse(this GroceryItem entity)
     {
@@ -76,7 +92,6 @@ public static class GroceryItemMappers
             entity.PriceHistory?.Select(p => p.ToDto()).ToList()!
         );
     }
-    
     
     public static List<GroceryItemDto> ToDto(this List<GroceryItem> entities)
     {

@@ -13,4 +13,5 @@ public interface IGroceryItemRepository : IBaseRepository<GroceryItem>
     Task InsertPriceLog(PriceLog? priceLog, CancellationToken ct);
     Task<PriceLog?> GetLastPriceLogAsync(long groceryItemId, CancellationToken ct);
     Task<StoreWithItems> GetByStoreAsync(long storeId, CancellationToken ct);
+    Task<List<GroceryItemList>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct);
 }

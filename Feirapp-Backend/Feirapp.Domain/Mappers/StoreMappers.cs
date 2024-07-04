@@ -10,7 +10,9 @@ public static class StoreMappers
     {
         return new StoreDto
         (
+            Id: store.Id,
             Name: store.Name,
+            AltNames: store.AltNames,
             Cnpj: store.Cnpj,
             Cep: store.Cep,
             Street: store.Street,
@@ -19,6 +21,11 @@ public static class StoreMappers
             CityName: store.CityName,
             State: store.State
         );
+    }
+    
+    public static List<StoreDto> MapToDto(this List<Store> stores)
+    {
+        return stores.Select(store => store.MapToDto()).ToList();
     }
 
     public static Store MapToEntity(this StoreDto storeDto)
