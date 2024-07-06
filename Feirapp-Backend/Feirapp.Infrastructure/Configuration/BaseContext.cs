@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Feirapp.Infrastructure.Configuration;
 
-public class BaseContext : DbContext
+public partial class BaseContext : DbContext
 {
     public BaseContext(DbContextOptions options) : base(options)
     {
@@ -15,6 +15,13 @@ public class BaseContext : DbContext
     public DbSet<Ncm> Ncms { get; set; }
     public DbSet<Cest> Cests { get; set; }
 
+    
+    [DbFunction("RAND")]
+    public static double Random()
+    {
+        throw new NotImplementedException();
+    }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -58,5 +65,14 @@ public class BaseContext : DbContext
             entity.HasKey(e => e.Code);
             entity.HasMany(e => e.GroceryItems).WithOne(e => e.Cest).HasForeignKey(e => e.CestCode);
         });
+
+        modelBuilder
+            .HasDbFunction(typeof(BaseContext).GetMethod(nameof(Random), new Type[]{}))
+            .HasName("RAND");
     }
+}
+
+public partial class BaseContext 
+{
+
 }

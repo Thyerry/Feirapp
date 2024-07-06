@@ -6,7 +6,6 @@ using Feirapp.Entities.Entities.Dtos;
 using Feirapp.Infrastructure.Configuration;
 using Feirapp.Infrastructure.Repository.BaseRepository;
 using Microsoft.EntityFrameworkCore;
-using OpenQA.Selenium;
 
 namespace Feirapp.Infrastructure.Repository;
 
@@ -18,21 +17,32 @@ public class GroceryItemRepository(BaseContext context)
     public async Task<List<SearchGroceryItemsDto>> SearchGroceryItemsAsync(SearchGroceryItemsQuery queryParams,
         CancellationToken ct)
     {
+        var lastPriceQuery = 
+            from p in _context.PriceLogs
+            group p by p.GroceryItemId into g
+            select new
+            {
+                GroceryItemId = g.Key,
+                Date = g.Max(p => p.LogDate)
+            };
+        
         var query =
-            from groceryItem in _context.GroceryItems
-            join priceLog in _context.PriceLogs on groceryItem.Id equals priceLog.GroceryItemId
-            join store in _context.Stores on priceLog.StoreId equals store.Id
+            from p in _context.PriceLogs
+            join g in _context.GroceryItems on p.GroceryItemId equals g.Id
+            join s in _context.Stores on p.StoreId equals s.Id
+            join lp in lastPriceQuery on g.Id equals lp.GroceryItemId
+            orderby BaseContext.Random()
             select new SearchGroceryItemsDto(
-                groceryItem.Id,
-                groceryItem.Name,
-                groceryItem.Description,
-                priceLog.Price,
-                groceryItem.ImageUrl,
-                groceryItem.Barcode,
-                priceLog.LogDate,
-                groceryItem.MeasureUnit,
-                store.Id,
-                store.Name);
+                g.Id, 
+                g.Name,
+                g.Description,
+                p.Price,
+                g.ImageUrl,
+                g.Barcode,
+                lp.Date,
+                g.MeasureUnit,
+                s.Id,
+                s.Name);
 
         if (!string.IsNullOrEmpty(queryParams.Name))
             query = query.Where(g => g.Name.Contains(queryParams.Name));
@@ -107,27 +117,36 @@ public class GroceryItemRepository(BaseContext context)
 
     public async Task<List<SearchGroceryItemsDto>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct)
     {
-        var query = await _context.GroceryItems
-            .FromSqlRaw("SELECT * FROM GroceryItems ORDER BY RAND() LIMIT {0}", quantity)
-            .AsNoTracking()
-            .Include(g => g.PriceHistory)!
-            .ThenInclude(p => p.Store)
-            .ToListAsync(ct);
-
+        var lastPriceQuery = 
+            from p in _context.PriceLogs
+            group p by p.GroceryItemId into g
+            select new
+            {
+                GroceryItemId = g.Key,
+                Date = g.Max(p => p.LogDate)
+            };
         
-        return query.Select(g => new SearchGroceryItemsDto(
-                g.Id,
+        var query =
+            from p in _context.PriceLogs
+            join g in _context.GroceryItems on p.GroceryItemId equals g.Id
+            join s in _context.Stores on p.StoreId equals s.Id
+            join lp in lastPriceQuery on g.Id equals lp.GroceryItemId
+            orderby BaseContext.Random()
+            select new SearchGroceryItemsDto(
+                g.Id, 
                 g.Name,
                 g.Description,
-                g.PriceHistory!.OrderBy(p => p.LogDate).Last().Price,
+                p.Price,
                 g.ImageUrl,
                 g.Barcode,
-                g.PriceHistory!.OrderBy(p => p.LogDate).Last().LogDate,
+                lp.Date,
                 g.MeasureUnit,
-                g.PriceHistory!.OrderBy(p => p.LogDate).Last().StoreId,
-                g.PriceHistory!.OrderBy(p => p.LogDate).Last().Store.Name))
-            .OrderBy(g => Guid.NewGuid())
-            .ToList();
+                s.Id,
+                s.Name);
+
+        return await query
+            .Take(quantity)
+            .ToListAsync(ct);
     }
     
     

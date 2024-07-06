@@ -41,7 +41,7 @@ public sealed class GroceryItemService(
     public async Task<List<SearchGroceryItemsResponse>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct)
     {
         var result = await groceryItemRepository.GetRandomGroceryItemsAsync(quantity, ct);
-        return result.ToResponse();
+        return result.ToResponse().OrderBy(p => Guid.NewGuid()).ToList();
     }
 
     public async Task InsertAsync(InsertGroceryItemCommand command, CancellationToken ct)
