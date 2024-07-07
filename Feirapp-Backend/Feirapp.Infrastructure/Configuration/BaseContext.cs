@@ -67,7 +67,7 @@ public partial class BaseContext : DbContext
         });
 
         modelBuilder
-            .HasDbFunction(typeof(BaseContext).GetMethod(nameof(Random), new Type[]{}))
+            .HasDbFunction(typeof(BaseContext).GetMethod(nameof(Random), new Type[]{}) ?? throw new InvalidOperationException())
             .HasName("RAND");
     }
 }

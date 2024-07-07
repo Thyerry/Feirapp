@@ -80,7 +80,8 @@ public class GroceryItemRepository(BaseContext context)
 
     public async Task<List<SearchGroceryItemsDto>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct)
     {
-        var query = from g in _context.GroceryItems
+        var query = 
+            from g in _context.GroceryItems
             join p in _context.PriceLogs on g.Id equals p.GroceryItemId
             join s in _context.Stores on p.StoreId equals s.Id
             orderby BaseContext.Random()
