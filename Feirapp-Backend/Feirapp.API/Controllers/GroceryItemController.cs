@@ -28,7 +28,7 @@ public class GroceryItemController(
     [HttpGet]
     [ProducesResponseType(typeof(List<SearchGroceryItemsResponse>), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
-    public async Task<IActionResult> SearchGroceryItems(SearchGroceryItemsQuery query, CancellationToken ct = default)
+    public async Task<IActionResult> SearchGroceryItems([FromQuery]SearchGroceryItemsQuery query, CancellationToken ct = default)
     {
         var groceryItems = await _groceryItemService.SearchGroceryItemsAsync(query, ct);
         if (groceryItems.Count == 0)

@@ -51,6 +51,9 @@ namespace Feirapp.Infrastructure.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<string>("AltNames")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Barcode")
                         .IsRequired()
                         .HasColumnType("varchar(255)");

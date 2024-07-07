@@ -19,8 +19,7 @@ public sealed class GroceryItemService(
     ICestRepository cestRepository)
     : IGroceryItemService
 {
-    public async Task<List<SearchGroceryItemsResponse>> SearchGroceryItemsAsync(SearchGroceryItemsQuery query,
-        CancellationToken ct)
+    public async Task<List<SearchGroceryItemsResponse>> SearchGroceryItemsAsync(SearchGroceryItemsQuery query, CancellationToken ct)
     {
         var entities = await groceryItemRepository.SearchGroceryItemsAsync(query, ct);
         return entities.ToResponse();
@@ -69,8 +68,7 @@ public sealed class GroceryItemService(
         }
     }
 
-    public async Task InsertBatchAsync(List<InvoiceGroceryItem> invoiceItems, InvoiceStore invoiceStore,
-        CancellationToken ct)
+    public async Task InsertBatchAsync(List<InvoiceGroceryItem> invoiceItems, InvoiceStore invoiceStore, CancellationToken ct)
     {
         await using var trans = await groceryItemRepository.BeginTransactionAsync(ct);
         try
@@ -99,13 +97,16 @@ public sealed class GroceryItemService(
         }
     }
 
-    private async Task IncludeGroceryItemBusinessLogic(GroceryItem item, long storeId, decimal price,
-        DateTime purchaseDate, CancellationToken ct)
+    private async Task IncludeGroceryItemBusinessLogic(GroceryItem item, long storeId, decimal price, DateTime purchaseDate, CancellationToken ct)
     {
-        var dbResult =
+        if(item.Barcode == "SEM GTIN")
+        {
+            return;
+        }
+        var (itemFromDb, store) =
             await groceryItemRepository.CheckIfGroceryItemExistsAsync(item, storeId, ct);
 
-        if (dbResult == null)
+        if (itemFromDb == null)
         {
             await groceryItemRepository.InsertAsync(item, ct);
             var priceLog = new PriceLog()
@@ -122,12 +123,12 @@ public sealed class GroceryItemService(
         }
         else
         {
-            var lastPriceLog = await groceryItemRepository.GetLastPriceLogAsync(dbResult.Id, ct);
+            var lastPriceLog = await groceryItemRepository.GetLastPriceLogAsync(itemFromDb.Id, storeId, ct);
             if (price != lastPriceLog.Price && purchaseDate.Date > lastPriceLog.LogDate.Date)
             {
                 var priceLog = new PriceLog()
                 {
-                    GroceryItemId = dbResult.Id,
+                    GroceryItemId = itemFromDb.Id,
                     Barcode = item.Barcode,
                     StoreId = storeId,
                     Price = price,

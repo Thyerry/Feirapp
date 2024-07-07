@@ -9,80 +9,48 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Feirapp.Infrastructure.Repository;
 
+
+
 public class GroceryItemRepository(BaseContext context)
     : BaseRepository<GroceryItem>(context), IGroceryItemRepository, IDisposable
 {
     private readonly BaseContext _context = context;
 
-    public async Task<List<SearchGroceryItemsDto>> SearchGroceryItemsAsync(SearchGroceryItemsQuery queryParams,
-        CancellationToken ct)
+    public async Task<List<SearchGroceryItemsDto>> SearchGroceryItemsAsync(SearchGroceryItemsQuery queryParams, CancellationToken ct)
     {
-        var lastPriceQuery = 
-            from p in _context.PriceLogs
-            group p by p.GroceryItemId into g
-            select new
-            {
-                GroceryItemId = g.Key,
-                Date = g.Max(p => p.LogDate)
-            };
+        var query = 
+            from g in _context.GroceryItems join p in _context.PriceLogs on g.Id equals p.GroceryItemId into pg
+            from p in pg.OrderByDescending(p => p.LogDate).Take(1) join s in _context.Stores on p.StoreId equals s.Id
+            where 
+                (string.IsNullOrEmpty(queryParams.Name) || g.Name.Contains(queryParams.Name))
+                && (queryParams.StoreId <= 0 || s.Id == queryParams.StoreId)
+            select new SearchGroceryItemsDto(g.Id, g.Name, g.Description, p.Price, g.ImageUrl, g.Barcode, p.LogDate, g.MeasureUnit, s.Id, s.Name);
         
-        var query =
-            from p in _context.PriceLogs
-            join g in _context.GroceryItems on p.GroceryItemId equals g.Id
-            join s in _context.Stores on p.StoreId equals s.Id
-            join lp in lastPriceQuery on g.Id equals lp.GroceryItemId
-            orderby BaseContext.Random()
-            select new SearchGroceryItemsDto(
-                g.Id, 
-                g.Name,
-                g.Description,
-                p.Price,
-                g.ImageUrl,
-                g.Barcode,
-                lp.Date,
-                g.MeasureUnit,
-                s.Id,
-                s.Name);
-
-        if (!string.IsNullOrEmpty(queryParams.Name))
-            query = query.Where(g => g.Name.Contains(queryParams.Name));
-        if (queryParams.StoreId <= 0)
-            query = query.Where(g => g.StoreId == queryParams.StoreId);
+        var uee = query.ToQueryString();
 
         return await query
-            .AsNoTracking()
             .Skip(queryParams.PageSize * queryParams.Page)
             .Take(queryParams.PageSize)
+            .AsNoTracking()
             .ToListAsync(ct);
     }
-
     public override async Task<GroceryItem?> GetByIdAsync(long id, CancellationToken ct)
     {
-        var query = from g in _context.GroceryItems
-            join p in _context.PriceLogs on g.Id equals p.GroceryItemId
-            join s in _context.Stores on p.StoreId equals s.Id
-            where g.Id == id
-            select new { g, p, s };
+        var query = _context.GroceryItems
+            .Where(g => g.Id == id)
+            .Include(g => g.PriceHistory)!
+            .ThenInclude(p => p.Store);
 
         var result = await query.FirstOrDefaultAsync(ct);
-        return result?.g;
+        return result;
     }
 
-    public async Task<GroceryItem?> CheckIfGroceryItemExistsAsync(GroceryItem groceryItem, long storeId,
+    public async Task<(GroceryItem?, Store?)> CheckIfGroceryItemExistsAsync(GroceryItem groceryItem, long storeId,
         CancellationToken ct)
     {
-        var query =
-            from g in _context.GroceryItems
-            join p in _context.PriceLogs on g.Id equals p.GroceryItemId
-            join s in _context.Stores on p.StoreId equals s.Id
-            where s.Id == storeId
-            select g;
-
-        query = groceryItem.Barcode == "SEM GTIN"
-            ? query.Where(g => g.Name == groceryItem.Name)
-            : query.Where(g => g.Barcode == groceryItem.Barcode);
-
-        return await query.FirstOrDefaultAsync(ct);
+        var item = await _context.GroceryItems.FirstOrDefaultAsync(g => g.Barcode == groceryItem.Barcode, ct);
+        var store = await _context.Stores.FindAsync(storeId, ct);
+        return (item, store);
     }
 
     public async Task InsertPriceLog(PriceLog? priceLog, CancellationToken ct)
@@ -91,65 +59,37 @@ public class GroceryItemRepository(BaseContext context)
         await _context.SaveChangesAsync(ct);
     }
 
-    public async Task<PriceLog?> GetLastPriceLogAsync(long groceryItemId, CancellationToken ct)
+    public async Task<PriceLog?> GetLastPriceLogAsync(long groceryItemId, long storeId, CancellationToken ct)
     {
         return await _context.PriceLogs
-            .Where(p => p.GroceryItemId == groceryItemId)
+            .Where(p => p.GroceryItemId == groceryItemId && p.StoreId == storeId)
             .OrderByDescending(p => p.LogDate)
             .FirstOrDefaultAsync(ct);
     }
 
     public async Task<StoreWithItems> GetByStoreAsync(long storeId, CancellationToken ct)
     {
-        var query = from g in _context.GroceryItems
+        var items = await (from g in _context.GroceryItems
             join p in _context.PriceLogs on g.Id equals p.GroceryItemId
-            join s in _context.Stores on p.StoreId equals s.Id
             where p.StoreId == storeId
-            select new { g, p, s };
+            select g).ToListAsync(ct);
 
-        var result = await query.ToListAsync(ct);
-        return new StoreWithItems()
-        {
-            Store = result.First().s,
-            Items = result.Select(r => r.g).ToList()
-        };
+        var store = await _context.Stores.FindAsync(storeId, ct);
+        return new StoreWithItems { Store = store, Items = items };
     }
 
     public async Task<List<SearchGroceryItemsDto>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct)
     {
-        var lastPriceQuery = 
-            from p in _context.PriceLogs
-            group p by p.GroceryItemId into g
-            select new
-            {
-                GroceryItemId = g.Key,
-                Date = g.Max(p => p.LogDate)
-            };
-        
-        var query =
-            from p in _context.PriceLogs
-            join g in _context.GroceryItems on p.GroceryItemId equals g.Id
+        var query = from g in _context.GroceryItems
+            join p in _context.PriceLogs on g.Id equals p.GroceryItemId
             join s in _context.Stores on p.StoreId equals s.Id
-            join lp in lastPriceQuery on g.Id equals lp.GroceryItemId
             orderby BaseContext.Random()
-            select new SearchGroceryItemsDto(
-                g.Id, 
-                g.Name,
-                g.Description,
-                p.Price,
-                g.ImageUrl,
-                g.Barcode,
-                lp.Date,
-                g.MeasureUnit,
-                s.Id,
-                s.Name);
+            select new SearchGroceryItemsDto(g.Id, g.Name, g.Description, p.Price, g.ImageUrl, g.Barcode, p.LogDate, g.MeasureUnit, s.Id, s.Name);
 
-        return await query
-            .Take(quantity)
-            .ToListAsync(ct);
+        return await query.Take(quantity).ToListAsync(ct);
     }
-    
-    
+
+
     public void Dispose()
     {
     }
