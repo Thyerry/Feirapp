@@ -26,8 +26,6 @@ public class GroceryItemRepository(BaseContext context)
                 && (queryParams.StoreId <= 0 || s.Id == queryParams.StoreId)
             select new SearchGroceryItemsDto(g.Id, g.Name, g.Description, p.Price, g.ImageUrl, g.Barcode, p.LogDate, g.MeasureUnit, s.Id, s.Name);
         
-        var uee = query.ToQueryString();
-
         return await query
             .Skip(queryParams.PageSize * queryParams.Page)
             .Take(queryParams.PageSize)
@@ -41,16 +39,13 @@ public class GroceryItemRepository(BaseContext context)
             .Include(g => g.PriceHistory)!
             .ThenInclude(p => p.Store);
 
-        var result = await query.FirstOrDefaultAsync(ct);
-        return result;
+        return await query.FirstOrDefaultAsync(ct);
     }
 
-    public async Task<(GroceryItem?, Store?)> CheckIfGroceryItemExistsAsync(GroceryItem groceryItem, long storeId,
+    public async Task<GroceryItem?> CheckIfGroceryItemExistsAsync(GroceryItem groceryItem, long storeId,
         CancellationToken ct)
     {
-        var item = await _context.GroceryItems.FirstOrDefaultAsync(g => g.Barcode == groceryItem.Barcode, ct);
-        var store = await _context.Stores.FindAsync(storeId, ct);
-        return (item, store);
+        return new GroceryItem();
     }
 
     public async Task InsertPriceLog(PriceLog? priceLog, CancellationToken ct)
@@ -87,11 +82,11 @@ public class GroceryItemRepository(BaseContext context)
             orderby BaseContext.Random()
             select new SearchGroceryItemsDto(g.Id, g.Name, g.Description, p.Price, g.ImageUrl, g.Barcode, p.LogDate, g.MeasureUnit, s.Id, s.Name);
 
-        return await query.Take(quantity).ToListAsync(ct);
+        return await query
+            .Take(quantity)
+            .ToListAsync(ct);
     }
 
-
-    public void Dispose()
-    {
-    }
+    public new void Dispose()
+    { }
 }

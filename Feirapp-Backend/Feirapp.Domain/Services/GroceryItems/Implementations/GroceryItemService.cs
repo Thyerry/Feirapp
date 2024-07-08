@@ -8,6 +8,7 @@ using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Domain.Services.Ncms.Interfaces;
 using Feirapp.Domain.Services.Stores.Interfaces;
 using Feirapp.Entities.Entities;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 using OpenQA.Selenium;
 
 namespace Feirapp.Domain.Services.GroceryItems.Implementations;
@@ -57,7 +58,7 @@ public sealed class GroceryItemService(
                 MeasureUnit = command.MeasureUnit,
             };
 
-            await IncludeGroceryItemBusinessLogic(groceryItem, command.Store!.Id, command.Price, DateTime.Now, ct);
+            await InsertGroceryItem(groceryItem, command.Store!.Id, command.Price, DateTime.Now, ct);
 
             await trans.CommitAsync(ct);
         }
@@ -81,11 +82,13 @@ public sealed class GroceryItemService(
 
             await ncmRepository.InsertListOfCodesAsync(ncms, ct);
             await cestRepository.InsertListOfCodesAsync(cests, ct);
-
+            
             foreach (var item in invoiceItems)
             {
                 var insertGroceryItem = item.ToEntity();
-                await IncludeGroceryItemBusinessLogic(insertGroceryItem, store.Id, item.Price, item.PurchaseDate, ct);
+                if(insertGroceryItem.Barcode != "SEM GTIN" && insertGroceryItem.Barcode.Length > 13)
+                    insertGroceryItem.Barcode = insertGroceryItem.Barcode.Substring(1, 13);
+                await InsertGroceryItem(insertGroceryItem, store.Id, item.Price, item.PurchaseDate, ct);
             }
 
             await trans.CommitAsync(ct);
@@ -97,14 +100,10 @@ public sealed class GroceryItemService(
         }
     }
 
-    private async Task IncludeGroceryItemBusinessLogic(GroceryItem item, long storeId, decimal price, DateTime purchaseDate, CancellationToken ct)
+    private async Task InsertGroceryItem(GroceryItem item, long storeId, decimal price, DateTime purchaseDate,
+        CancellationToken ct)
     {
-        if(item.Barcode == "SEM GTIN")
-        {
-            return;
-        }
-        var (itemFromDb, store) =
-            await groceryItemRepository.CheckIfGroceryItemExistsAsync(item, storeId, ct);
+        var itemFromDb = await groceryItemRepository.CheckIfGroceryItemExistsAsync(item, storeId, ct);
 
         if (itemFromDb == null)
         {
@@ -115,7 +114,6 @@ public sealed class GroceryItemService(
                 Barcode = item.Barcode,
                 StoreId = storeId,
                 Price = price,
-
                 LogDate = purchaseDate,
             };
 

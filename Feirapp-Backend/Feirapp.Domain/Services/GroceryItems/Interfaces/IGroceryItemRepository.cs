@@ -9,7 +9,7 @@ namespace Feirapp.Domain.Services.GroceryItems.Interfaces;
 public interface IGroceryItemRepository : IBaseRepository<GroceryItem>
 {
     Task<List<SearchGroceryItemsDto>> SearchGroceryItemsAsync(SearchGroceryItemsQuery query, CancellationToken ct);
-    Task<(GroceryItem?, Store?)> CheckIfGroceryItemExistsAsync(GroceryItem groceryItem, long storeId,
+    Task<GroceryItem?> CheckIfGroceryItemExistsAsync(GroceryItem groceryItem, long storeId,
         CancellationToken ct);
     Task InsertPriceLog(PriceLog? priceLog, CancellationToken ct);
     Task<PriceLog?> GetLastPriceLogAsync(long groceryItemId, long storeId, CancellationToken ct);
