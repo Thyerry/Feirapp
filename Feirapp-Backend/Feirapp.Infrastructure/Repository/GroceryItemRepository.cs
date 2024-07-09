@@ -45,7 +45,14 @@ public class GroceryItemRepository(BaseContext context)
     public async Task<GroceryItem?> CheckIfGroceryItemExistsAsync(GroceryItem groceryItem, long storeId,
         CancellationToken ct)
     {
-        return new GroceryItem();
+        var query = _context.GroceryItems
+            .Join(_context.PriceLogs, g => g.Id, p => p.GroceryItemId, (g, p) => new { g, p })
+            .Where(x => groceryItem.Barcode == "SEM GTIN" 
+                ? x.g.Name == groceryItem.Name && x.p.StoreId == storeId
+                : x.g.Barcode == groceryItem.Barcode)
+            .Select(x => x.g);
+
+        return await query.FirstOrDefaultAsync(ct);
     }
 
     public async Task InsertPriceLog(PriceLog? priceLog, CancellationToken ct)

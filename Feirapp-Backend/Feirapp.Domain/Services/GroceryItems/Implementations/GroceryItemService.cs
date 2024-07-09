@@ -100,11 +100,9 @@ public sealed class GroceryItemService(
         }
     }
 
-    private async Task InsertGroceryItem(GroceryItem item, long storeId, decimal price, DateTime purchaseDate,
-        CancellationToken ct)
+    private async Task InsertGroceryItem(GroceryItem item, long storeId, decimal price, DateTime purchaseDate, CancellationToken ct)
     {
         var itemFromDb = await groceryItemRepository.CheckIfGroceryItemExistsAsync(item, storeId, ct);
-
         if (itemFromDb == null)
         {
             await groceryItemRepository.InsertAsync(item, ct);
@@ -122,7 +120,12 @@ public sealed class GroceryItemService(
         else
         {
             var lastPriceLog = await groceryItemRepository.GetLastPriceLogAsync(itemFromDb.Id, storeId, ct);
-            if (price != lastPriceLog.Price && purchaseDate.Date > lastPriceLog.LogDate.Date)
+            if (itemFromDb.AltNames != null && itemFromDb.Name != item.Name && itemFromDb.AltNames.Contains(item.Name) == false)
+            {
+                itemFromDb.AltNames.Add(item.Name);
+                await groceryItemRepository.UpdateAsync(itemFromDb, ct);
+            }
+            if (lastPriceLog == null || (price != lastPriceLog.Price && purchaseDate.Date > lastPriceLog.LogDate.Date))
             {
                 var priceLog = new PriceLog()
                 {
