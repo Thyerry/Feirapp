@@ -11,9 +11,9 @@ public static class EnumMappers
             "UN" => MeasureUnitEnum.UNIT,
             "KG" => MeasureUnitEnum.KILO,
             "CX" => MeasureUnitEnum.BOX,
-            "L" => MeasureUnitEnum.LITER,
-            "M" => MeasureUnitEnum.METER,
-            _ => MeasureUnitEnum.UNIT
+            "L"  => MeasureUnitEnum.LITER,
+            "M"  => MeasureUnitEnum.METER,
+            _    => MeasureUnitEnum.UNIT
         };
     }
 
@@ -23,7 +23,7 @@ public static class EnumMappers
         {
             MeasureUnitEnum.UNIT => "UN",
             MeasureUnitEnum.KILO => "KG",
-            MeasureUnitEnum.BOX => "CX",
+            MeasureUnitEnum.BOX  => "CX",
             MeasureUnitEnum.LITER => "L",
             MeasureUnitEnum.METER => "M",
             _ => "UN"

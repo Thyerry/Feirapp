@@ -1,7 +1,10 @@
-﻿using Feirapp.Domain.Services.DataScrapper.Dtos;
+﻿using Feirapp.Domain.Mappers;
+using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Command;
+using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
+using Feirapp.Entities.Enums;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Options;
 using OpenQA.Selenium.DevTools.V85.Fetch;
@@ -41,21 +44,23 @@ public class InvoiceReaderService : IInvoiceReaderService
         var storeNameXml = doc.DocumentNode.SelectSingleNode("//emit");
         var purchaseDateXml = doc.DocumentNode.SelectSingleNode("//ide//dhemi");
 
-        var store = new InvoiceStore
+        var store = new StoreDto
         (
+            Id: null,
             Name: storeNameXml.SelectSingleNode("//xnome").InnerText,
+            AltNames: [],
             Cnpj: storeNameXml.SelectSingleNode("//cnpj").InnerText,
             Cep: storeNameXml.SelectSingleNode("//enderemit//cep").InnerText,
             Street: storeNameXml.SelectSingleNode("//enderemit//xlgr").InnerText,
             StreetNumber: storeNameXml.SelectSingleNode("//enderemit//nro").InnerText,
             Neighborhood: storeNameXml.SelectSingleNode("//enderemit//xbairro").InnerText,
             CityName: storeNameXml.SelectSingleNode("//enderemit//xmun").InnerText,
-            State: storeNameXml.SelectSingleNode("//enderemit//uf").InnerText
+            State: (StatesEnum)storeNameXml.SelectSingleNode("//enderemit//uf").InnerText.MapToStatesEnum()
         );
 
         var groceryItems = GetGroceryItemList(groceryItemXmlList, purchaseDateXml);
 
-        if (isInsert) await _groceryItemService.InsertBatchAsync(groceryItems, store, ct);
+        if (isInsert) await _groceryItemService.InsertListAsync(new InsertListOfGroceryItemsCommand(groceryItems, store), ct);
 
         return new InvoiceImportResponse(store, groceryItems);
     }

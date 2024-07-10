@@ -20,17 +20,18 @@ public class SandboxController : Controller
     public async Task<IActionResult> CreateGroceryItem([FromQuery] CreateGroceryItemPayload payload,
         CancellationToken ct)
     {
+        var date = new Faker().Date.Past(1);
         var groceryItems = new Faker<InsertGroceryItem>()
             .CustomInstantiator(f => new InsertGroceryItem(
                 f.Commerce.ProductName(),
-                f.Random.Decimal(1, 100),
-                f.PickRandom<MeasureUnitEnum>().ToString(),
+                Math.Round(f.Random.Decimal(1, 100), 2),
+                f.PickRandomWithout(MeasureUnitEnum.EMPTY).ToString(),
                 f.Commerce.Ean13(),
-                f.Date.Past(1),
+                date,
                 f.Commerce.Ean8(),
-                f.Commerce.Ean13())
+                f.Commerce.Ean8())
             {
-                Quantity = f.Random.Decimal(1, 100)
+                Quantity = Math.Round(f.Random.Decimal(1, 100), 3)
             })
             .UseSeed(payload.ProductSeed)
             .Generate(payload.Quantity);

@@ -12,14 +12,15 @@ public static class StoreMappers
         (
             Id : store.Id,
             Name: store.Name,
-            AltNames: store.AltNames,
+            AltNames: store.AltNames!,
             Cnpj: store.Cnpj,
             Cep: store.Cep,
             Street: store.Street,
             StreetNumber: store.StreetNumber,
             Neighborhood: store.Neighborhood,
             CityName: store.CityName,
-            State: store.State);
+            State: store.State
+        );
     }
     
     public static List<StoreDto> MapToDto(this List<Store> stores)
