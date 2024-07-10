@@ -1,6 +1,6 @@
-﻿namespace Feirapp.Domain.Services.DataScrapper.Dtos;
+﻿namespace Feirapp.Domain.Services.GroceryItems.Command;
 
-public record InvoiceGroceryItem(
+public record InsertGroceryItem(
     string Name,
     decimal Price,
     string MeasureUnit,

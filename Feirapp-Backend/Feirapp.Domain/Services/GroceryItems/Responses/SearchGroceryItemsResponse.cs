@@ -1,6 +1,6 @@
 using Feirapp.Entities.Enums;
 
-namespace Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
+namespace Feirapp.Domain.Services.GroceryItems.Responses;
 
 public record SearchGroceryItemsResponse(
     long Id,

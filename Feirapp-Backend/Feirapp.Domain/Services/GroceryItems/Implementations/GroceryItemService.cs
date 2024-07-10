@@ -1,10 +1,10 @@
 using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Services.Cests.Interfaces;
 using Feirapp.Domain.Services.DataScrapper.Dtos;
-using Feirapp.Domain.Services.GroceryItems.Dtos.Command;
-using Feirapp.Domain.Services.GroceryItems.Dtos.Queries;
-using Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
+using Feirapp.Domain.Services.GroceryItems.Command;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
+using Feirapp.Domain.Services.GroceryItems.Queries;
+using Feirapp.Domain.Services.GroceryItems.Responses;
 using Feirapp.Domain.Services.Ncms.Interfaces;
 using Feirapp.Domain.Services.Stores.Interfaces;
 using Feirapp.Entities.Entities;
@@ -58,7 +58,7 @@ public sealed class GroceryItemService(
                 MeasureUnit = command.MeasureUnit,
             };
 
-            await InsertGroceryItem(groceryItem, command.Store!.Id, command.Price, DateTime.Now, ct);
+            await InsertGroceryItem(groceryItem, (long) command.Store!.Id!, command.Price, DateTime.Now, ct);
 
             await trans.CommitAsync(ct);
         }
@@ -69,7 +69,30 @@ public sealed class GroceryItemService(
         }
     }
 
-    public async Task InsertBatchAsync(List<InvoiceGroceryItem> invoiceItems, InvoiceStore invoiceStore, CancellationToken ct)
+    public async Task InsertListAsync(InsertListOfGroceryItemsCommand command, CancellationToken ct)
+    {
+        await using var trans = await groceryItemRepository.BeginTransactionAsync(ct);
+        try
+        {
+            var store = await storeRepository.AddIfNotExistsAsync(s => s.Cnpj == command.Store.Cnpj,
+                command.Store.MapToEntity(), ct);
+
+            foreach (var item in command.GroceryItems)
+            {
+                var insertGroceryItem = item.ToEntity();
+                if(insertGroceryItem.Barcode != "SEM GTIN" && insertGroceryItem.Barcode.Length > 13)
+                    insertGroceryItem.Barcode = insertGroceryItem.Barcode.Substring(1, 13);
+                await InsertGroceryItem(insertGroceryItem, store.Id, item.Price, DateTime.Now, ct);
+            }
+        }
+        catch (Exception)
+        {
+            await trans.RollbackAsync(ct);
+            throw;
+        }
+    }
+
+    public async Task InsertBatchAsync(List<InsertGroceryItem> invoiceItems, InvoiceStore invoiceStore, CancellationToken ct)
     {
         await using var trans = await groceryItemRepository.BeginTransactionAsync(ct);
         try

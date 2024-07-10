@@ -1,6 +1,7 @@
 ﻿using Feirapp.Domain.Services.DataScrapper.Dtos;
+using Feirapp.Domain.Services.GroceryItems.Command;
 using Feirapp.Domain.Services.GroceryItems.Dtos;
-using Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
+using Feirapp.Domain.Services.GroceryItems.Responses;
 using Feirapp.Entities.Entities;
 using Feirapp.Entities.Enums;
 
@@ -29,7 +30,7 @@ public static class GroceryItemMappers
         return models.Select(ToResponse).ToList();
     }
 
-    public static GroceryItem ToEntity(this InvoiceGroceryItem model)
+    public static GroceryItem ToEntity(this InsertGroceryItem model)
     {
         return new GroceryItem
         {
@@ -41,7 +42,7 @@ public static class GroceryItemMappers
         };
     }
     
-    public static List<GroceryItem> ToEntity(this List<InvoiceGroceryItem> models)
+    public static List<GroceryItem> ToEntity(this List<InsertGroceryItem> models)
     {
         return models.Select(m => m.ToEntity()).ToList();
     }

@@ -1,5 +1,6 @@
 ﻿using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
+using Feirapp.Domain.Services.GroceryItems.Command;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Options;
@@ -59,17 +60,17 @@ public class InvoiceReaderService : IInvoiceReaderService
         return new InvoiceImportResponse(store, groceryItems);
     }
 
-    private static List<InvoiceGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList,
+    private static List<InsertGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList,
         HtmlNode purchaseDateXml)
     {
-        var result = new List<InvoiceGroceryItem>();
+        var result = new List<InsertGroceryItem>();
         foreach (var groceryItemXml in groceryItemXmlList)
         {
             var xpath = groceryItemXml.XPath;
 
             var cest = groceryItemXml.SelectSingleNode($"{xpath}/cest")?.InnerText;
             var ncm = groceryItemXml.SelectSingleNode($"{xpath}/ncm").InnerText;
-            var groceryItem = new InvoiceGroceryItem
+            var groceryItem = new InsertGroceryItem
             (
                 Name: groceryItemXml.SelectSingleNode($"{xpath}/xprod").InnerText,
                 Price: ToDecimal(groceryItemXml.SelectSingleNode($"{xpath}/vuncom").InnerText),

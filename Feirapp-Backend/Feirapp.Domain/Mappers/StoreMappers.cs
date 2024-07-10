@@ -10,7 +10,7 @@ public static class StoreMappers
     {
         return new StoreDto
         (
-            Id: store.Id,
+            Id : store.Id,
             Name: store.Name,
             AltNames: store.AltNames,
             Cnpj: store.Cnpj,
@@ -19,8 +19,7 @@ public static class StoreMappers
             StreetNumber: store.StreetNumber,
             Neighborhood: store.Neighborhood,
             CityName: store.CityName,
-            State: store.State
-        );
+            State: store.State);
     }
     
     public static List<StoreDto> MapToDto(this List<Store> stores)

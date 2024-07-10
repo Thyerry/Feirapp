@@ -1,7 +1,7 @@
 using FluentValidation;
 using FluentValidation.Results;
 
-namespace Feirapp.Domain.Services.GroceryItems.Dtos.Command;
+namespace Feirapp.Domain.Services.GroceryItems.Command;
 
 public record UpdateGroceryItemCommand(
     long Id,

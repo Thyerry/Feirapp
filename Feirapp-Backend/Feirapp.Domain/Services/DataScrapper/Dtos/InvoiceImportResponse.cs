@@ -1,3 +1,5 @@
-﻿namespace Feirapp.Domain.Services.DataScrapper.Dtos;
+﻿using Feirapp.Domain.Services.GroceryItems.Command;
 
-public record InvoiceImportResponse(InvoiceStore Store, List<InvoiceGroceryItem> Items);
+namespace Feirapp.Domain.Services.DataScrapper.Dtos;
+
+public record InvoiceImportResponse(InvoiceStore Store, List<InsertGroceryItem> Items);

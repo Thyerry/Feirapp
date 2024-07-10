@@ -1,10 +1,10 @@
 using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
+using Feirapp.Domain.Services.GroceryItems.Command;
 using Feirapp.Domain.Services.GroceryItems.Dtos;
-using Feirapp.Domain.Services.GroceryItems.Dtos.Command;
-using Feirapp.Domain.Services.GroceryItems.Dtos.Queries;
-using Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
+using Feirapp.Domain.Services.GroceryItems.Queries;
+using Feirapp.Domain.Services.GroceryItems.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Feirapp.API.Controllers;
@@ -50,10 +50,10 @@ public class GroceryItemController(
         return Ok(result);
     }
 
-    [HttpGet("getFromStore/{storeId}")]
+    [HttpGet("from-store")]
     [ProducesResponseType(typeof(GetGroceryItemFromStoreIdResponse), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
-    public async Task<IActionResult> GetFromStore(long storeId, CancellationToken ct = default)
+    public async Task<IActionResult> GetFromStore([FromQuery]long storeId, CancellationToken ct = default)
     {
         var groceryItems = await _groceryItemService.GetByStoreAsync(storeId, ct);
         if (groceryItems.Items.Count == 0)
@@ -63,7 +63,7 @@ public class GroceryItemController(
     }
     
     
-    [HttpGet("getFromInvoice")]
+    [HttpGet("from-invoice")]
     [ProducesResponseType(typeof(InvoiceImportResponse), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetFromInvoice([FromQuery]string invoiceId, CancellationToken ct = default)
@@ -75,11 +75,11 @@ public class GroceryItemController(
         return Ok(groceryItems);
     }
     
-    [HttpGet("Random/{quantity:int}")]
+    [HttpGet("random")]
     [ProducesResponseType(typeof(List<SearchGroceryItemsResponse>), 200)]
     [ProducesResponseType(typeof(BadRequestResult), 400)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
-    public async Task<IActionResult> GetRandomGroceryItems(int quantity, CancellationToken ct = default)
+    public async Task<IActionResult> GetRandomGroceryItems([FromQuery]int quantity, CancellationToken ct = default)
     {
         if (quantity <= 0)
             return BadRequest();
@@ -95,13 +95,13 @@ public class GroceryItemController(
         return Created();
     }
     
-    // [HttpPost("InsertList")]
-    // [ProducesResponseType(typeof(CreatedResult), 201)]
-    // public async Task<IActionResult> InsertList(InsertListOfGroceryItems command, CancellationToken ct = default)
-    // {
-    //     await _groceryItemService.InsertListAsync(command, ct);
-    //     return Created();
-    // }
+    [HttpPost("insert-list")]
+    [ProducesResponseType(typeof(CreatedResult), 201)]
+    public async Task<IActionResult> InsertList(InsertListOfGroceryItemsCommand command, CancellationToken ct = default)
+    {
+        await _groceryItemService.InsertListAsync(command, ct);
+        return Created();
+    }
     
     // [HttpPut]
     // [ProducesResponseType(typeof(AcceptedResult), 204)]

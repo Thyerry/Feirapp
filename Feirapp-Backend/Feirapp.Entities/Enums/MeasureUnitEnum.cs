@@ -3,9 +3,9 @@
 public enum MeasureUnitEnum
 {
     EMPTY = 0,
-    KILO,
-    UNIT,
-    BOX,
-    LITER,
-    METER
+    KILO  = 1,
+    UNIT  = 2,
+    BOX   = 3,
+    LITER = 4,
+    METER = 5
 }

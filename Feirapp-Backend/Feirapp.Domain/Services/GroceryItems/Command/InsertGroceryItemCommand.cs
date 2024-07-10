@@ -1,6 +1,7 @@
+using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Entities.Enums;
 
-namespace Feirapp.Domain.Services.GroceryItems.Dtos.Command;
+namespace Feirapp.Domain.Services.GroceryItems.Command;
 
 public record InsertGroceryItemCommand(
     string Name,

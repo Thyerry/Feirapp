@@ -1,6 +1,6 @@
 using Feirapp.Domain.Services.BaseRepository;
 using Feirapp.Domain.Services.GroceryItems.Dtos;
-using Feirapp.Domain.Services.GroceryItems.Dtos.Queries;
+using Feirapp.Domain.Services.GroceryItems.Queries;
 using Feirapp.Entities.Entities;
 using Feirapp.Entities.Entities.Dtos;
 

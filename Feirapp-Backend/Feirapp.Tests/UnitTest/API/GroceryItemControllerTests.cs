@@ -1,5 +1,4 @@
 using Feirapp.API.Controllers;
-using Feirapp.Domain.Services.GroceryItems.Dtos.Responses;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
