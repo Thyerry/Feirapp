@@ -8,8 +8,6 @@ using Feirapp.Domain.Services.GroceryItems.Responses;
 using Feirapp.Domain.Services.Ncms.Interfaces;
 using Feirapp.Domain.Services.Stores.Interfaces;
 using Feirapp.Entities.Entities;
-using Microsoft.EntityFrameworkCore.ValueGeneration;
-using OpenQA.Selenium;
 
 namespace Feirapp.Domain.Services.GroceryItems.Implementations;
 
@@ -74,44 +72,20 @@ public sealed class GroceryItemService(
         await using var trans = await groceryItemRepository.BeginTransactionAsync(ct);
         try
         {
-            var store = await storeRepository.AddIfNotExistsAsync(s => s.Cnpj == command.Store.Cnpj,
-                command.Store.MapToEntity(), ct);
+            var store = await storeRepository.AddIfNotExistsAsync(s => s.Cnpj == command.Store.Cnpj, command.Store.MapToEntity(), ct);
 
+            var ncms = command.GroceryItems.GroupBy(g => g.NcmCode).Select(item => item.Key).ToList();
+            var cests = command.GroceryItems.GroupBy(g => g.CestCode).Select(item => item.Key).ToList();
+            
+            await ncmRepository.InsertListOfCodesAsync(ncms, ct);
+            await cestRepository.InsertListOfCodesAsync(cests, ct);
+            
             foreach (var item in command.GroceryItems)
             {
                 var insertGroceryItem = item.ToEntity();
                 if(insertGroceryItem.Barcode != "SEM GTIN" && insertGroceryItem.Barcode.Length > 13)
                     insertGroceryItem.Barcode = insertGroceryItem.Barcode.Substring(1, 13);
                 await InsertGroceryItem(insertGroceryItem, store.Id, item.Price, DateTime.Now, ct);
-            }
-        }
-        catch (Exception)
-        {
-            await trans.RollbackAsync(ct);
-            throw;
-        }
-    }
-
-    public async Task InsertBatchAsync(List<InsertGroceryItem> invoiceItems, InvoiceStore invoiceStore, CancellationToken ct)
-    {
-        await using var trans = await groceryItemRepository.BeginTransactionAsync(ct);
-        try
-        {
-            var store = await storeRepository.AddIfNotExistsAsync(s => s.Cnpj == invoiceStore.Cnpj,
-                invoiceStore.MapToEntity(), ct);
-
-            var ncms = invoiceItems.GroupBy(g => g.NcmCode).Select(item => item.Key).ToList();
-            var cests = invoiceItems.GroupBy(g => g.CestCode).Select(item => item.Key).ToList();
-
-            await ncmRepository.InsertListOfCodesAsync(ncms, ct);
-            await cestRepository.InsertListOfCodesAsync(cests, ct);
-            
-            foreach (var item in invoiceItems)
-            {
-                var insertGroceryItem = item.ToEntity();
-                if(insertGroceryItem.Barcode != "SEM GTIN" && insertGroceryItem.Barcode.Length > 13)
-                    insertGroceryItem.Barcode = insertGroceryItem.Barcode.Substring(1, 13);
-                await InsertGroceryItem(insertGroceryItem, store.Id, item.Price, item.PurchaseDate, ct);
             }
 
             await trans.CommitAsync(ct);

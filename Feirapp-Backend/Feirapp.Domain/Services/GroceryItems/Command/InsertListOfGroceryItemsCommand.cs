@@ -5,5 +5,4 @@ namespace Feirapp.Domain.Services.GroceryItems.Command;
 
 public record InsertListOfGroceryItemsCommand(
     List<InsertGroceryItem> GroceryItems,
-    StoreDto Store,
-    bool IsManualInsert = false);
+    StoreDto Store);
