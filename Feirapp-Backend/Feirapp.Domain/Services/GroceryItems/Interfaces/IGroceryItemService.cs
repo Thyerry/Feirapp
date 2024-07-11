@@ -13,4 +13,6 @@ public interface IGroceryItemService
     Task<List<SearchGroceryItemsResponse>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct);
     Task InsertAsync(InsertGroceryItemCommand command, CancellationToken ct);
     Task InsertListAsync(InsertListOfGroceryItemsCommand command, CancellationToken ct);
+    Task UpdateAsync(UpdateGroceryItemCommand groceryItem, CancellationToken ct);
+    Task DeleteAsync(long groceryId, CancellationToken ct);
 }

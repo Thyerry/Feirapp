@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Feirapp.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/store")]
 public class StoreController(IStoreService storeService) : ControllerBase
 {
     private readonly IStoreService _storeService = storeService;
@@ -32,7 +32,7 @@ public class StoreController(IStoreService storeService) : ControllerBase
         return Ok(stores);
     }
     
-    [HttpGet("getById")]
+    [HttpGet("by-id")]
     [ProducesResponseType(typeof(StoreDto), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetAllStores([FromQuery] long storeId, CancellationToken ct = default)

@@ -42,13 +42,12 @@ public class GroceryItemRepository(BaseContext context)
         return await query.FirstOrDefaultAsync(ct);
     }
 
-    public async Task<GroceryItem?> CheckIfGroceryItemExistsAsync(GroceryItem groceryItem, long storeId,
-        CancellationToken ct)
+    public async Task<GroceryItem?> CheckIfGroceryItemExistsAsync(GroceryItem groceryItem, long storeId, CancellationToken ct)
     {
         var query = _context.GroceryItems
             .Join(_context.PriceLogs, g => g.Id, p => p.GroceryItemId, (g, p) => new { g, p })
             .Where(x => groceryItem.Barcode == "SEM GTIN" 
-                ? x.g.Name == groceryItem.Name && x.p.StoreId == storeId
+                ? x.g.Name == groceryItem.Name && x.p!.StoreId == storeId
                 : x.g.Barcode == groceryItem.Barcode)
             .Select(x => x.g);
 
@@ -93,7 +92,18 @@ public class GroceryItemRepository(BaseContext context)
             .Take(quantity)
             .ToListAsync(ct);
     }
+    
+    public async Task<bool> UpdateNameAndBrandAsync(long id, string name, string brand, CancellationToken ct)
+    {
+        var groceryItem = await _context.GroceryItems.FindAsync(id, ct);
+        if (groceryItem == null)
+            return false;
 
+        groceryItem.Name = name;
+        groceryItem.Brand = brand;
+        await _context.SaveChangesAsync(ct);
+        return true;
+    }
     public new void Dispose()
     { }
 }
