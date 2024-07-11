@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Feirapp.API.Controllers;
 
+[ApiController]
+[Route("api/sandbox")]
 public class SandboxController : Controller
 {
     public SandboxController()
@@ -25,7 +27,7 @@ public class SandboxController : Controller
             .CustomInstantiator(f => new InsertGroceryItem(
                 f.Commerce.ProductName(),
                 Math.Round(f.Random.Decimal(1, 100), 2),
-                f.PickRandomWithout(MeasureUnitEnum.EMPTY).ToString(),
+                f.PickRandomWithout(MeasureUnitEnum.EMPTY).GetStringValue(),
                 f.Commerce.Ean13(),
                 date,
                 f.Commerce.Ean8(),
@@ -40,8 +42,8 @@ public class SandboxController : Controller
             .CustomInstantiator(f => new StoreDto(
                 Id: null,
                 Name: f.Company.CompanyName(),
-                AltNames: [f.Company.CompanyName(2)],
-                Cnpj: f.Company.Cnpj(),
+                AltNames: [f.Company.CompanyName(), f.Company.CompanyName()],
+                Cnpj: f.Company.Cnpj().Replace(".", "").Replace("/", "").Replace("-", ""),
                 Cep: f.Address.ZipCode(),
                 Street: f.Address.StreetName(),
                 StreetNumber: f.Address.BuildingNumber(),

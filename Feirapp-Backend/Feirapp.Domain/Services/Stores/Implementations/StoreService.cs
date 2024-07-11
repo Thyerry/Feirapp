@@ -15,7 +15,7 @@ public class StoreService(IStoreRepository storeRepository) : IStoreService
         var storeEntity = new Store
         {
             Name = store.Name,
-            AltNames = store.AltNames,
+            AltNames = string.Join(",", store.AltNames),
             Cnpj = store.Cnpj,
             Cep = store.Cep,
             Street = store.Street,

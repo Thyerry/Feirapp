@@ -12,7 +12,7 @@ public static class StoreMappers
         (
             Id : store.Id,
             Name: store.Name,
-            AltNames: store.AltNames!,
+            AltNames: store.AltNames.Split(",").ToList(),
             Cnpj: store.Cnpj,
             Cep: store.Cep,
             Street: store.Street,
@@ -33,6 +33,7 @@ public static class StoreMappers
         return new Store
         {
             Name = storeDto.Name,
+            AltNames = storeDto.AltNames != null ? string.Join(",", storeDto.AltNames) : null,
             Cnpj = storeDto.Cnpj,
             Cep = storeDto.Cep,
             Street = storeDto.Street,

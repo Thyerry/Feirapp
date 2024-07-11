@@ -49,7 +49,7 @@ public class GroceryItem
     public string? CestCode { get; set; }
     public Cest Cest { get; set; }
     
-    public List<string>? AltNames { get; set; }
+    public string? AltNames { get; set; }
 
     /// <summary>
     /// Gets or sets the price history of the grocery item.

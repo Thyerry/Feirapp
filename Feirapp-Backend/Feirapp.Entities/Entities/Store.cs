@@ -6,7 +6,7 @@ public class Store
 {
     public long Id { get; set; }
     public string Name { get; set; }
-    public List<string>? AltNames { get; set; }
+    public string? AltNames { get; set; }
     public string? Cnpj { get; set; }
     public string? Cep { get; set; }
     public string? Street { get; set; }

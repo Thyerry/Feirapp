@@ -1,5 +1,6 @@
 ﻿using Feirapp.Entities.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Feirapp.Infrastructure.Configuration;
 
