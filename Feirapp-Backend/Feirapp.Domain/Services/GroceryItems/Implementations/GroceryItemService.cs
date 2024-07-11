@@ -1,15 +1,13 @@
-using System.Runtime.CompilerServices;
 using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Services.Cests.Interfaces;
-using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.GroceryItems.Command;
+using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Queries;
 using Feirapp.Domain.Services.GroceryItems.Responses;
 using Feirapp.Domain.Services.Ncms.Interfaces;
 using Feirapp.Domain.Services.Stores.Interfaces;
 using Feirapp.Entities.Entities;
-using OpenQA.Selenium.DevTools.V121.Storage;
 
 namespace Feirapp.Domain.Services.GroceryItems.Implementations;
 
@@ -20,7 +18,8 @@ public sealed class GroceryItemService(
     ICestRepository cestRepository)
     : IGroceryItemService
 {
-    public async Task<List<SearchGroceryItemsResponse>> SearchGroceryItemsAsync(SearchGroceryItemsQuery query, CancellationToken ct)
+    public async Task<List<SearchGroceryItemsResponse>> SearchGroceryItemsAsync(SearchGroceryItemsQuery query,
+        CancellationToken ct)
     {
         var entities = await groceryItemRepository.SearchGroceryItemsAsync(query, ct);
         return entities.ToResponse();
@@ -58,7 +57,7 @@ public sealed class GroceryItemService(
                 MeasureUnit = command.MeasureUnit,
             };
 
-            await InsertGroceryItem(groceryItem, (long) command.Store!.Id!, command.Price, DateTime.Now, ct);
+            await InsertGroceryItem(groceryItem, (long)command.Store!.Id!, command.Price, DateTime.Now, ct);
 
             await trans.CommitAsync(ct);
         }
@@ -74,36 +73,9 @@ public sealed class GroceryItemService(
         await using var trans = await groceryItemRepository.BeginTransactionAsync(ct);
         try
         {
-            var store = await storeRepository.AddIfNotExistsAsync(s => s.Cnpj == command.Store.Cnpj, command.Store.MapToEntity(), ct);
-            var storeAltNames = store.AltNames != null ? store.AltNames?.Split(",").ToList() : [];
-            if(store.Name != command.Store.Name && storeAltNames?.Contains(command.Store.Name) == false)
-            {
-                storeAltNames.Add(command.Store.Name);
-                store.AltNames = string.Join(',', storeAltNames);
-                await storeRepository.UpdateAsync(store, ct);
-            }
-            
-            var ncms = command.GroceryItems
-                .GroupBy(g => g.NcmCode)
-                .Select(item => item.Key)
-                .ToList();
-            
-            var cests = command.GroceryItems
-                .GroupBy(g => g.CestCode)
-                .Select(item => item.Key)
-                .ToList();
-            
-            await ncmRepository.InsertListOfCodesAsync(ncms, ct);
-            await cestRepository.InsertListOfCodesAsync(cests, ct);
-
-            foreach (var item in command.GroceryItems)
-            {
-                var insertGroceryItem = item.ToEntity();
-                if(insertGroceryItem.Barcode != "SEM GTIN" && insertGroceryItem.Barcode.Length > 13)
-                    insertGroceryItem.Barcode = insertGroceryItem.Barcode.Substring(1, 13);
-                await InsertGroceryItem(insertGroceryItem, store.Id, item.Price, item.PurchaseDate, ct);
-            }
-
+            var store = await EnsureStoreExistsAsync(command.Store, ct);
+            await InsertNcmsAndCestsAsync(command, ct);
+            await InsertGroceryItemsAsync(command.GroceryItems, store.Id, ct);
             await trans.CommitAsync(ct);
         }
         catch (Exception)
@@ -113,13 +85,50 @@ public sealed class GroceryItemService(
         }
     }
 
-    private async Task InsertGroceryItem(GroceryItem item, long storeId, decimal price, DateTime purchaseDate, CancellationToken ct)
+    private async Task<Store> EnsureStoreExistsAsync(StoreDto storeDto, CancellationToken ct)
+    {
+        var store = await storeRepository.AddIfNotExistsAsync(s => s.Cnpj == storeDto.Cnpj, storeDto.MapToEntity(), ct);
+        var storeAltNames = store.AltNames?.Split(",").ToList() ?? new List<string>();
+        if (store.Name != storeDto.Name && !storeAltNames.Contains(storeDto.Name))
+        {
+            storeAltNames.Add(storeDto.Name);
+            store.AltNames = string.Join(',', storeAltNames);
+            await storeRepository.UpdateAsync(store, ct);
+        }
+
+        return store;
+    }
+
+    private async Task InsertNcmsAndCestsAsync(InsertListOfGroceryItemsCommand command, CancellationToken ct)
+    {
+        var ncms = command.GroceryItems.Select(g => g.NcmCode).Distinct().ToList();
+        var cests = command.GroceryItems.Select(g => g.CestCode).Distinct().ToList();
+        await ncmRepository.InsertListOfCodesAsync(ncms, ct);
+        await cestRepository.InsertListOfCodesAsync(cests, ct);
+    }
+
+    private async Task InsertGroceryItemsAsync(List<InsertGroceryItem> items, long storeId, CancellationToken ct)
+    {
+        foreach (var itemDto in items)
+        {
+            var groceryItem = itemDto.ToEntity();
+            groceryItem.Barcode = AdjustBarcode(groceryItem.Barcode);
+            await InsertGroceryItem(groceryItem, storeId, itemDto.Price, itemDto.PurchaseDate, ct);
+        }
+    }
+
+    private string AdjustBarcode(string barcode)
+    {
+        return barcode != "SEM GTIN" && barcode.Length > 13 ? barcode.Substring(1, 13) : barcode;
+    }
+
+    private async Task InsertGroceryItem(GroceryItem item, long storeId, decimal price, DateTime purchaseDate,
+        CancellationToken ct)
     {
         var itemFromDb = await groceryItemRepository.CheckIfGroceryItemExistsAsync(item, storeId, ct);
         if (itemFromDb == null)
-        {
             await groceryItemRepository.InsertAsync(item, ct);
-        }
+
         else
         {
             UpdateItemAltNamesIfNeeded(itemFromDb, item.Name);
@@ -139,10 +148,12 @@ public sealed class GroceryItemService(
         }
     }
 
-    private async Task InsertOrUpdatePriceLog(GroceryItem item, long storeId, decimal price, DateTime purchaseDate, CancellationToken ct)
+    private async Task InsertOrUpdatePriceLog(GroceryItem item, long storeId, decimal price, DateTime purchaseDate,
+        CancellationToken ct)
     {
         var lastPriceLog = await groceryItemRepository.GetLastPriceLogAsync(item.Id, storeId, ct);
-        if (lastPriceLog == null || (Math.Round(price, 2) != Math.Round(lastPriceLog.Price, 2) && purchaseDate.Ticks > lastPriceLog.LogDate.Ticks))
+        if (lastPriceLog == null || (Math.Round(price, 2) != Math.Round(lastPriceLog.Price, 2) &&
+                                     purchaseDate.Ticks > lastPriceLog.LogDate.Ticks))
         {
             var priceLog = new PriceLog
             {
