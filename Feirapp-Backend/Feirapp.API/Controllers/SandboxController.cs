@@ -2,7 +2,6 @@ using Bogus;
 using Bogus.Extensions.Brazil;
 using Feirapp.Domain.Services.GroceryItems.Command;
 using Feirapp.Domain.Services.GroceryItems.Dtos;
-using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Queries;
 using Feirapp.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;

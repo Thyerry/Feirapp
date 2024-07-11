@@ -83,8 +83,15 @@ public sealed class GroceryItemService(
                 await storeRepository.UpdateAsync(store, ct);
             }
             
-            var ncms = command.GroceryItems.GroupBy(g => g.NcmCode).Select(item => item.Key).ToList();
-            var cests = command.GroceryItems.GroupBy(g => g.CestCode).Select(item => item.Key).ToList();
+            var ncms = command.GroceryItems
+                .GroupBy(g => g.NcmCode)
+                .Select(item => item.Key)
+                .ToList();
+            
+            var cests = command.GroceryItems
+                .GroupBy(g => g.CestCode)
+                .Select(item => item.Key)
+                .ToList();
             
             await ncmRepository.InsertListOfCodesAsync(ncms, ct);
             await cestRepository.InsertListOfCodesAsync(cests, ct);
@@ -112,7 +119,32 @@ public sealed class GroceryItemService(
         if (itemFromDb == null)
         {
             await groceryItemRepository.InsertAsync(item, ct);
-            var priceLog = new PriceLog()
+        }
+        else
+        {
+            UpdateItemAltNamesIfNeeded(itemFromDb, item.Name);
+            await groceryItemRepository.UpdateAsync(itemFromDb, ct);
+        }
+
+        await InsertOrUpdatePriceLog(itemFromDb ?? item, storeId, price, purchaseDate, ct);
+    }
+
+    private void UpdateItemAltNamesIfNeeded(GroceryItem itemFromDb, string newName)
+    {
+        var altNames = itemFromDb.AltNames?.Split(',').ToList() ?? new List<string>();
+        if (itemFromDb.Name != newName && !altNames.Contains(newName))
+        {
+            altNames.Add(newName);
+            itemFromDb.AltNames = string.Join(',', altNames);
+        }
+    }
+
+    private async Task InsertOrUpdatePriceLog(GroceryItem item, long storeId, decimal price, DateTime purchaseDate, CancellationToken ct)
+    {
+        var lastPriceLog = await groceryItemRepository.GetLastPriceLogAsync(item.Id, storeId, ct);
+        if (lastPriceLog == null || (Math.Round(price, 2) != Math.Round(lastPriceLog.Price, 2) && purchaseDate.Ticks > lastPriceLog.LogDate.Ticks))
+        {
+            var priceLog = new PriceLog
             {
                 GroceryItemId = item.Id,
                 Barcode = item.Barcode,
@@ -120,33 +152,7 @@ public sealed class GroceryItemService(
                 Price = price,
                 LogDate = purchaseDate,
             };
-
             await groceryItemRepository.InsertPriceLog(priceLog, ct);
-        }
-        else
-        {
-            var lastPriceLog = await groceryItemRepository.GetLastPriceLogAsync(itemFromDb.Id, storeId, ct);
-            var altNames = itemFromDb.AltNames != null ? itemFromDb.AltNames.Split(',').ToList() : [];
-            
-            if (itemFromDb.Name != item.Name && altNames.Contains(item.Name) == false)
-            {
-                altNames.Add(item.Name);
-                itemFromDb.AltNames = string.Join(',', altNames);
-                await groceryItemRepository.UpdateAsync(itemFromDb, ct);
-            }
-            if (lastPriceLog == null || (Math.Round(price, 2) != Math.Round(lastPriceLog.Price, 2) && purchaseDate.Date.Ticks > lastPriceLog.LogDate.Ticks))
-            {
-                var priceLog = new PriceLog()
-                {
-                    GroceryItemId = itemFromDb.Id,
-                    Barcode = item.Barcode,
-                    StoreId = storeId,
-                    Price = price,
-                    LogDate = purchaseDate,
-                };
-
-                await groceryItemRepository.InsertPriceLog(priceLog, ct);
-            }
         }
     }
 }
