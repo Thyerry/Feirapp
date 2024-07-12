@@ -8,9 +8,9 @@ namespace Feirapp.Domain.Services.GroceryItems.Implementations;
 
 public partial class GroceryItemService
 {
-    private async Task<Store> EnsureStoreExistsAsync(StoreDto storeDto, CancellationToken ct)
+    private async Task<Store> EnsureStoreExistsAsync(InsertStore storeDto, CancellationToken ct)
     {
-        var store = await storeRepository.AddIfNotExistsAsync(s => s.Cnpj == storeDto.Cnpj, storeDto.MapToEntity(), ct);
+        var store = await storeRepository.AddIfNotExistsAsync(s => s.Cnpj == storeDto.Cnpj, storeDto.ToStore() , ct);
         var storeAltNames = store.AltNames?.Split(",").ToList() ?? [];
         if (store.Name != storeDto.Name && !storeAltNames.Contains(storeDto.Name))
         {

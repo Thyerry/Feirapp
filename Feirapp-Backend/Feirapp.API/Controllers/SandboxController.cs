@@ -37,9 +37,8 @@ public class SandboxController : Controller
             .UseSeed(payload.ProductSeed)
             .Generate(payload.Quantity);
         
-        var store = new Faker<StoreDto>()
-            .CustomInstantiator(f => new StoreDto(
-                Id: null,
+        var store = new Faker<InsertStore>()
+            .CustomInstantiator(f => new InsertStore(
                 Name: f.Company.CompanyName(),
                 AltNames: [f.Company.CompanyName(), f.Company.CompanyName()],
                 Cnpj: f.Company.Cnpj().Replace(".", "").Replace("/", "").Replace("-", ""),
@@ -48,7 +47,7 @@ public class SandboxController : Controller
                 StreetNumber: f.Address.BuildingNumber(),
                 Neighborhood: f.Address.SecondaryAddress(),
                 CityName: f.Address.City(),
-                State: f.PickRandom<StatesEnum>()))
+                State: f.PickRandom<StatesEnum>().GetStringValue()))
             .UseSeed(payload.StoreSeed)
             .Generate();
                 

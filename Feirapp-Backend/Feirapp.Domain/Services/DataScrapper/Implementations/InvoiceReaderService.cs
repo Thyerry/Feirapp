@@ -44,9 +44,7 @@ public class InvoiceReaderService : IInvoiceReaderService
         var storeNameXml = doc.DocumentNode.SelectSingleNode("//emit");
         var purchaseDateXml = doc.DocumentNode.SelectSingleNode("//ide//dhemi");
 
-        var store = new StoreDto
-        (
-            Id: null,
+        var store = new InsertStore(
             Name: storeNameXml.SelectSingleNode("//xnome").InnerText,
             AltNames: [],
             Cnpj: storeNameXml.SelectSingleNode("//cnpj").InnerText,
@@ -55,7 +53,7 @@ public class InvoiceReaderService : IInvoiceReaderService
             StreetNumber: storeNameXml.SelectSingleNode("//enderemit//nro").InnerText,
             Neighborhood: storeNameXml.SelectSingleNode("//enderemit//xbairro").InnerText,
             CityName: storeNameXml.SelectSingleNode("//enderemit//xmun").InnerText,
-            State: (StatesEnum)storeNameXml.SelectSingleNode("//enderemit//uf").InnerText.MapToStatesEnum()
+            State: storeNameXml.SelectSingleNode("//enderemit//uf").InnerText
         );
 
         var groceryItems = GetGroceryItemList(groceryItemXmlList, purchaseDateXml);
