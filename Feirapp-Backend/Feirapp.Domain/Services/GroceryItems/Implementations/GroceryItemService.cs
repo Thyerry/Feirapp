@@ -1,8 +1,8 @@
 using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Services.Cests.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Command;
-using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
+using Feirapp.Domain.Services.GroceryItems.Mappers;
 using Feirapp.Domain.Services.GroceryItems.Queries;
 using Feirapp.Domain.Services.GroceryItems.Responses;
 using Feirapp.Domain.Services.Ncms.Interfaces;
@@ -33,7 +33,8 @@ public partial class GroceryItemService(
     public async Task<GetGroceryItemFromStoreIdResponse> GetByStoreAsync(long storeId, CancellationToken ct)
     {
         var result = await groceryItemRepository.GetByStoreAsync(storeId, ct);
-        return new GetGroceryItemFromStoreIdResponse(result.Store.MapToDto(), result.Items.ToDto());
+        var resutldd = new GetGroceryItemFromStoreIdResponse(result.Store.MapToDto(), result.Items.ToStoreItem());
+        return resutldd;
     }
 
     public async Task<List<SearchGroceryItemsResponse>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct)
