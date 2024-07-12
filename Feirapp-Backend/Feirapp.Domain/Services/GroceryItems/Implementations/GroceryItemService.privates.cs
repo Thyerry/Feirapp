@@ -1,6 +1,7 @@
 using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Services.GroceryItems.Command;
 using Feirapp.Domain.Services.GroceryItems.Dtos;
+using Feirapp.Domain.Services.GroceryItems.Mappers;
 using Feirapp.Entities.Entities;
 
 namespace Feirapp.Domain.Services.GroceryItems.Implementations;

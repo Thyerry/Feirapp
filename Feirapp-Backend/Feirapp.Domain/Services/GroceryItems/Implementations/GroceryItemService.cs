@@ -21,7 +21,7 @@ public partial class GroceryItemService(
     public async Task<List<SearchGroceryItemsResponse>> SearchGroceryItemsAsync(SearchGroceryItemsQuery query, CancellationToken ct)
     {
         var entities = await groceryItemRepository.SearchGroceryItemsAsync(query, ct);
-        return entities.ToResponse();
+        return entities.ToSearchResponse();
     }
 
     public async Task<GetGroceryItemByIdResponse?> GetByIdAsync(long id, CancellationToken ct)
@@ -33,14 +33,13 @@ public partial class GroceryItemService(
     public async Task<GetGroceryItemFromStoreIdResponse> GetByStoreAsync(long storeId, CancellationToken ct)
     {
         var result = await groceryItemRepository.GetByStoreAsync(storeId, ct);
-        var resutldd = new GetGroceryItemFromStoreIdResponse(result.Store.MapToDto(), result.Items.ToStoreItem());
-        return resutldd;
+        return new GetGroceryItemFromStoreIdResponse(result.Store.MapToDto(), result.Items.ToStoreItem());
     }
 
     public async Task<List<SearchGroceryItemsResponse>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct)
     {
         var result = await groceryItemRepository.GetRandomGroceryItemsAsync(quantity, ct);
-        return result.ToResponse().OrderBy(p => Guid.NewGuid()).ToList();
+        return result.ToSearchResponse().OrderBy(p => Guid.NewGuid()).ToList();
     }
 
     public async Task InsertAsync(InsertGroceryItemCommand command, CancellationToken ct)
