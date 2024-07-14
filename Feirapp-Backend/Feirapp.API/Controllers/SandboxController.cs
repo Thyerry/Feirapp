@@ -30,10 +30,7 @@ public class SandboxController : Controller
                 f.Commerce.Ean13(),
                 date,
                 f.Commerce.Ean8(),
-                f.Commerce.Ean8())
-            {
-                Quantity = Math.Round(f.Random.Decimal(1, 100), 3)
-            })
+                f.Commerce.Ean8()))
             .UseSeed(payload.ProductSeed)
             .Generate(payload.Quantity);
         
@@ -47,7 +44,7 @@ public class SandboxController : Controller
                 StreetNumber: f.Address.BuildingNumber(),
                 Neighborhood: f.Address.SecondaryAddress(),
                 CityName: f.Address.City(),
-                State: f.PickRandom<StatesEnum>()))
+                State: f.PickRandom<StatesEnum>().GetStringValue()))
             .UseSeed(payload.StoreSeed)
             .Generate();
                 

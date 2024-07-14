@@ -1,13 +1,10 @@
 ﻿using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
-using Feirapp.Domain.Services.GroceryItems.Command;
 using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
-using Feirapp.Entities.Enums;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Options;
-using OpenQA.Selenium.DevTools.V85.Fetch;
 
 namespace Feirapp.Domain.Services.DataScrapper.Implementations;
 
@@ -44,36 +41,35 @@ public class InvoiceReaderService : IInvoiceReaderService
         var storeNameXml = doc.DocumentNode.SelectSingleNode("//emit");
         var purchaseDateXml = doc.DocumentNode.SelectSingleNode("//ide//dhemi");
 
-        var store = new InsertStore(
+        var sd = storeNameXml.SelectSingleNode("//enderemit//uf").InnerText.MapToStatesEnum();
+        
+        var store = new InvoiceScanStore(
             Name: storeNameXml.SelectSingleNode("//xnome").InnerText,
-            AltNames: [],
             Cnpj: storeNameXml.SelectSingleNode("//cnpj").InnerText,
             Cep: storeNameXml.SelectSingleNode("//enderemit//cep").InnerText,
             Street: storeNameXml.SelectSingleNode("//enderemit//xlgr").InnerText,
             StreetNumber: storeNameXml.SelectSingleNode("//enderemit//nro").InnerText,
             Neighborhood: storeNameXml.SelectSingleNode("//enderemit//xbairro").InnerText,
             CityName: storeNameXml.SelectSingleNode("//enderemit//xmun").InnerText,
-            State: storeNameXml.SelectSingleNode("//enderemit//uf").InnerText.MapToStatesEnum()
+            State: storeNameXml.SelectSingleNode("//enderemit//uf").InnerText
         );
 
         var groceryItems = GetGroceryItemList(groceryItemXmlList, purchaseDateXml);
 
-        if (isInsert) await _groceryItemService.InsertListAsync(new InsertListOfGroceryItemsCommand(groceryItems, store), ct);
-
         return new InvoiceImportResponse(store, groceryItems);
     }
 
-    private static List<InsertGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList,
+    private static List<InvoiceScanGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList,
         HtmlNode purchaseDateXml)
     {
-        var result = new List<InsertGroceryItem>();
+        var result = new List<InvoiceScanGroceryItem>();
         foreach (var groceryItemXml in groceryItemXmlList)
         {
             var xpath = groceryItemXml.XPath;
 
             var cest = groceryItemXml.SelectSingleNode($"{xpath}/cest")?.InnerText;
             var ncm = groceryItemXml.SelectSingleNode($"{xpath}/ncm").InnerText;
-            var groceryItem = new InsertGroceryItem
+            var groceryItem = new InvoiceScanGroceryItem
             (
                 Name: groceryItemXml.SelectSingleNode($"{xpath}/xprod").InnerText,
                 Price: ToDecimal(groceryItemXml.SelectSingleNode($"{xpath}/vuncom").InnerText),

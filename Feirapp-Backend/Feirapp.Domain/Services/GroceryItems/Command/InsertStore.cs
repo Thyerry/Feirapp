@@ -8,7 +8,7 @@ public record InsertStore(
     string Cnpj,
     string Name,
     string Neighborhood,
-    StatesEnum State,
+    string State,
     string Street,
     string StreetNumber,
     List<string>? AltNames);

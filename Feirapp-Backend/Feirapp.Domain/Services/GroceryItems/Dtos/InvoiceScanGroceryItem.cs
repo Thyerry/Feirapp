@@ -1,6 +1,6 @@
-﻿namespace Feirapp.Domain.Services.GroceryItems.Command;
+﻿namespace Feirapp.Domain.Services.GroceryItems.Dtos;
 
-public record InsertGroceryItem(
+public record InvoiceScanGroceryItem(
     string Name,
     decimal Price,
     string MeasureUnit,
@@ -8,4 +8,7 @@ public record InsertGroceryItem(
     DateTime PurchaseDate,
     string NcmCode,
     string CestCode
-);
+)
+{
+    public decimal Quantity { get; set; }
+};

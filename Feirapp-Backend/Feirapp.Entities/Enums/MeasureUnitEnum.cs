@@ -7,5 +7,6 @@ public enum MeasureUnitEnum
     [StringValue("UN")] UNIT = 2,
     [StringValue("CX")] BOX = 3,
     [StringValue("L")] LITER = 4,
-    [StringValue("M")] METER = 5
+    [StringValue("M")] METER = 5,
+    [StringValue("PCE")] PACKAGE = 6
 }
