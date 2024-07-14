@@ -1,3 +1,5 @@
+using Feirapp.Entities.Enums;
+
 namespace Feirapp.Domain.Services.GroceryItems.Command;
 
 public record InsertStore(
@@ -6,7 +8,7 @@ public record InsertStore(
     string Cnpj,
     string Name,
     string Neighborhood,
-    string State,
+    StatesEnum State,
     string Street,
     string StreetNumber,
     List<string>? AltNames);

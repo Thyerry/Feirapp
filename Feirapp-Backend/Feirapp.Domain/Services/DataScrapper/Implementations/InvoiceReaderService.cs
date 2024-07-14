@@ -53,7 +53,7 @@ public class InvoiceReaderService : IInvoiceReaderService
             StreetNumber: storeNameXml.SelectSingleNode("//enderemit//nro").InnerText,
             Neighborhood: storeNameXml.SelectSingleNode("//enderemit//xbairro").InnerText,
             CityName: storeNameXml.SelectSingleNode("//enderemit//xmun").InnerText,
-            State: storeNameXml.SelectSingleNode("//enderemit//uf").InnerText
+            State: storeNameXml.SelectSingleNode("//enderemit//uf").InnerText.MapToStatesEnum()
         );
 
         var groceryItems = GetGroceryItemList(groceryItemXmlList, purchaseDateXml);

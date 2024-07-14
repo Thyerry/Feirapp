@@ -29,39 +29,18 @@ public static class EnumMappers
             _ => "UN"
         };
     }
-
-    public static StatesEnum MapToStatesEnum(this string state)
+    
+    public static StatesEnum MapToStatesEnum(this string stateAbbreviation)
     {
-        return state switch
+        foreach (StatesEnum state in Enum.GetValues(typeof(StatesEnum)))
         {
-            "AC" => StatesEnum.AC,
-            "AL" => StatesEnum.AL,
-            "AP" => StatesEnum.AP,
-            "AM" => StatesEnum.AM,
-            "BA" => StatesEnum.BA,
-            "CE" => StatesEnum.CE,
-            "DF" => StatesEnum.DF,
-            "ES" => StatesEnum.ES,
-            "GO" => StatesEnum.GO,
-            "MA" => StatesEnum.MA,
-            "MT" => StatesEnum.MT,
-            "MS" => StatesEnum.MS,
-            "MG" => StatesEnum.MG,
-            "PA" => StatesEnum.PA,
-            "PB" => StatesEnum.PB,
-            "PR" => StatesEnum.PR,
-            "PE" => StatesEnum.PE,
-            "PI" => StatesEnum.PI,
-            "RJ" => StatesEnum.RJ,
-            "RN" => StatesEnum.RN,
-            "RS" => StatesEnum.RS,
-            "RO" => StatesEnum.RO,
-            "RR" => StatesEnum.RR,
-            "SC" => StatesEnum.SC,
-            "SP" => StatesEnum.SP,
-            "SE" => StatesEnum.SE,
-            "TO" => StatesEnum.TO,
-            _ => StatesEnum.EMPTY
-        };
+            var fieldInfo = state.GetType().GetField(state.ToString());
+            var attribute = (StringValueAttribute)fieldInfo.GetCustomAttributes(typeof(StringValueAttribute), false).FirstOrDefault();
+            if (attribute != null && attribute.Value == stateAbbreviation)
+            {
+                return state;
+            }
+        }
+        return StatesEnum.Empty;
     }
 }

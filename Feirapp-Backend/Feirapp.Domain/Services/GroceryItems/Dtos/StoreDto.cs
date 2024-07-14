@@ -13,7 +13,7 @@ public record StoreDto(
     string? StreetNumber = null,
     string? Neighborhood = null,
     string? CityName = null,
-    StatesEnum? State = StatesEnum.PE)
+    StatesEnum? State = StatesEnum.Empty)
 {
     public List<ValidationFailure> ValidateForInsertGroceryItem()
     {

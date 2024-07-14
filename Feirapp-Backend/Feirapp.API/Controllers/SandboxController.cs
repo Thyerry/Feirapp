@@ -47,7 +47,7 @@ public class SandboxController : Controller
                 StreetNumber: f.Address.BuildingNumber(),
                 Neighborhood: f.Address.SecondaryAddress(),
                 CityName: f.Address.City(),
-                State: f.PickRandom<StatesEnum>().GetStringValue()))
+                State: f.PickRandom<StatesEnum>()))
             .UseSeed(payload.StoreSeed)
             .Generate();
                 

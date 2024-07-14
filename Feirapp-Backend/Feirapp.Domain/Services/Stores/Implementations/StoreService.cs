@@ -3,6 +3,7 @@ using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Domain.Services.Stores.Dtos.Commands;
 using Feirapp.Domain.Services.Stores.Interfaces;
 using Feirapp.Entities.Entities;
+using Feirapp.Entities.Enums;
 
 namespace Feirapp.Domain.Services.Stores.Implementations;
 
@@ -22,7 +23,7 @@ public class StoreService(IStoreRepository storeRepository) : IStoreService
             StreetNumber = store.StreetNumber,
             Neighborhood = store.Neighborhood,
             CityName = store.CityName,
-            State = store.State?.MapToStatesEnum()
+            State = store.State.MapToStatesEnum()
         };
         await _storeRepository.InsertAsync(storeEntity, ct);
     }
