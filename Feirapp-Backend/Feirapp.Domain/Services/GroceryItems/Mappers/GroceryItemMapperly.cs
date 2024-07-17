@@ -57,12 +57,13 @@ public static partial class GroceryItemMapperly
 
     private static MeasureUnitEnum ToMeasureUnitEnum(this string measureUnit) => measureUnit switch
     {
-        "UN" => MeasureUnitEnum.UNIT,
-        "KG" => MeasureUnitEnum.KILO,
-        "L" => MeasureUnitEnum.LITER,
-        "M" => MeasureUnitEnum.METER,
-        "CX" => MeasureUnitEnum.BOX,
+        "UN"  => MeasureUnitEnum.UNIT,
+        "KG"  => MeasureUnitEnum.KILO,
+        "L"   => MeasureUnitEnum.LITER,
+        "M"   => MeasureUnitEnum.METER,
+        "CX"  => MeasureUnitEnum.BOX,
         "PCE" => MeasureUnitEnum.PACKAGE,
-        _ => MeasureUnitEnum.EMPTY
+        "CJ"  => MeasureUnitEnum.SET,
+        _     => MeasureUnitEnum.EMPTY
     };
 }
