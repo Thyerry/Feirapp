@@ -28,12 +28,14 @@ public class SandboxController : Controller
                 Math.Round(f.Random.Decimal(1, 100), 2),
                 f.PickRandomWithout(MeasureUnitEnum.EMPTY).GetStringValue(),
                 f.Commerce.Ean13(),
+                null,
+                null,
                 date,
                 f.Commerce.Ean8(),
                 f.Commerce.Ean8()))
             .UseSeed(payload.ProductSeed)
             .Generate(payload.Quantity);
-        
+
         var store = new Faker<InsertStore>()
             .CustomInstantiator(f => new InsertStore(
                 Name: f.Company.CompanyName(),
@@ -47,7 +49,7 @@ public class SandboxController : Controller
                 State: f.PickRandom<StatesEnum>().GetStringValue()))
             .UseSeed(payload.StoreSeed)
             .Generate();
-                
+
         return Ok(new InsertListOfGroceryItemsCommand(groceryItems, store));
     }
 }

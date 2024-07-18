@@ -18,7 +18,6 @@ public static partial class GroceryItemMapperly
     public static partial List<GroceryItem> ToEntity(this GroceryItemDto model);
     public static partial GetGroceryItemByIdResponse ToGetByIdResponse(this GroceryItem model);
     public static partial List<GetGroceryItemByIdResponse> ToGetByIdResponse(this List<GroceryItem> model);
-
     public static partial Store ToStore(this InsertStore model);
 
     private static List<string> SplitCommas(string nameList) => nameList.Split(",").ToList();

@@ -5,6 +5,8 @@ public record InsertGroceryItem(
     decimal Price,
     string MeasureUnit,
     string Barcode,
+    string? Brand,
+    string? AltNames,
     DateTime PurchaseDate,
     string NcmCode,
     string CestCode
