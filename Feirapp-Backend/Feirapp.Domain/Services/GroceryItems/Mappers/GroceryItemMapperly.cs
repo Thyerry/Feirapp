@@ -63,6 +63,7 @@ public static partial class GroceryItemMapperly
         "CX"  => MeasureUnitEnum.BOX,
         "PCE" => MeasureUnitEnum.PACKAGE,
         "CJ"  => MeasureUnitEnum.SET,
+        "SC"  => MeasureUnitEnum.SACK,
         _     => MeasureUnitEnum.EMPTY
     };
 }

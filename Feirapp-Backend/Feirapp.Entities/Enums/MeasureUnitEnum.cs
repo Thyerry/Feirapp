@@ -9,5 +9,6 @@ public enum MeasureUnitEnum
     [StringValue("L")] LITER = 4,
     [StringValue("M")] METER = 5,
     [StringValue("PCE")] PACKAGE = 6,
-    [StringValue("CJ")] SET = 7
+    [StringValue("CJ")] SET = 7,
+    [StringValue("SC")] SACK = 8,
 }
