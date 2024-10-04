@@ -1,8 +1,8 @@
-﻿using Feirapp.Domain.Mappers;
-using Feirapp.Domain.Services.DataScrapper.Dtos;
+﻿using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
+using Feirapp.Entities.Enums;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Options;
 
@@ -55,7 +55,7 @@ public class InvoiceReaderService : IInvoiceReaderService
 
         var groceryItems = GetGroceryItemList(groceryItemXmlList, purchaseDateXml);
 
-        return new InvoiceImportResponse(store, groceryItems);
+        return new InvoiceImportResponse(store, groceryItems);                                              
     }
 
     private static List<InvoiceScanGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList,
@@ -82,7 +82,13 @@ public class InvoiceReaderService : IInvoiceReaderService
                 Quantity = ToDecimal(groceryItemXml.SelectSingleNode($"{xpath}/qcom").InnerText)
             };
 
-            var objectExists = result.FirstOrDefault(g => g.Barcode == groceryItem.Barcode);
+            var objectExists = result.FirstOrDefault(g => groceryItem.Name == g.Name
+                                                          && groceryItem.Price == g.Price
+                                                          && groceryItem.MeasureUnit == g.MeasureUnit
+                                                          && groceryItem.MeasureUnit != MeasureUnitEnum.KILO.StringValue() 
+                                                          && groceryItem.Barcode == g.Barcode 
+                                                          && groceryItem.NcmCode == g.NcmCode
+                                                          && groceryItem.CestCode == g.CestCode);
             if (objectExists is null)
                 result.Add(groceryItem);
             else

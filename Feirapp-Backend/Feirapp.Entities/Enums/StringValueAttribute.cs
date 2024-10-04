@@ -7,7 +7,7 @@ public class StringValueAttribute(string value) : Attribute
 
 public static class StringValueAttributeExtensions
 {
-    public static string GetStringValue(this Enum value)
+    public static string StringValue(this Enum value)
     {
         var type = value.GetType();
         var fieldInfo = type.GetField(value.ToString());

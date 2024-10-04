@@ -22,7 +22,7 @@ public class SandboxController : Controller
             .CustomInstantiator(f => new InsertGroceryItem(
                 f.Commerce.ProductName(),
                 Math.Round(f.Random.Decimal(1, 100), 2),
-                f.PickRandomWithout(MeasureUnitEnum.EMPTY).GetStringValue(),
+                f.PickRandomWithout(MeasureUnitEnum.EMPTY).StringValue(),
                 f.Commerce.Ean13(),
                 null,
                 null,
@@ -42,7 +42,7 @@ public class SandboxController : Controller
                 StreetNumber: f.Address.BuildingNumber(),
                 Neighborhood: f.Address.SecondaryAddress(),
                 CityName: f.Address.City(),
-                State: f.PickRandom<StatesEnum>().GetStringValue()))
+                State: f.PickRandom<StatesEnum>().StringValue()))
             .UseSeed(payload.StoreSeed)
             .Generate();
         
