@@ -1,5 +1,4 @@
-﻿using Feirapp.Domain.Services.BaseRepository;
-using Feirapp.Domain.Services.Ncms.Interfaces;
+﻿using Feirapp.Domain.Services.Ncms.Interfaces;
 using Feirapp.Entities.Entities;
 using Feirapp.Infrastructure.Configuration;
 using Feirapp.Infrastructure.Repository.BaseRepository;
@@ -27,11 +26,11 @@ public class NcmRepository(BaseContext context) : BaseRepository<Ncm>(context), 
 
     public Task InsertListOfCodesAsync(List<string> entities, CancellationToken ct)
     {
-        var ncms = entities.Select(x => new Ncm {Code = x}).ToList();
+        var ncms = entities.Select(x => new Ncm { Code = x }).ToList();
         return _context.Ncms.BulkInsertAsync(ncms, options =>
         {
             options.InsertIfNotExists = true;
             options.ColumnPrimaryKeyExpression = c => c.Code;
-        },ct);
+        }, ct);
     }
 }

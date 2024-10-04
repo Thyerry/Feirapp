@@ -5,10 +5,10 @@ using Feirapp.Entities.Entities;
 using Feirapp.Entities.Enums;
 using Riok.Mapperly.Abstractions;
 
-namespace Feirapp.Domain.Services.GroceryItems.Mappers;
+namespace Feirapp.Domain.Mappers;
 
 [Mapper]
-public static partial class GroceryItemMapperly
+public static partial class GroceryItemMappers
 {
     public static partial GroceryItemByStore ToStoreItem(this GroceryItem model);
     public static partial List<GroceryItemByStore> ToStoreItem(this List<GroceryItem> model);
@@ -18,8 +18,7 @@ public static partial class GroceryItemMapperly
     public static partial List<GroceryItem> ToEntity(this GroceryItemDto model);
     public static partial GetGroceryItemByIdResponse ToGetByIdResponse(this GroceryItem model);
     public static partial List<GetGroceryItemByIdResponse> ToGetByIdResponse(this List<GroceryItem> model);
-    public static partial Store ToStore(this InsertStore model);
-
+    
     private static List<string> SplitCommas(string nameList) => nameList.Split(",").ToList();
 
     private static StatesEnum ToStatesEnum(this string state) => state switch
@@ -37,7 +36,7 @@ public static partial class GroceryItemMapperly
         "MT" => StatesEnum.MatoGrosso,
         "MS" => StatesEnum.MatoGrossoDoSul,
         "MG" => StatesEnum.MinasGerais,
-        "PA" => StatesEnum.Parana,
+        "PA" => StatesEnum.Para,
         "PB" => StatesEnum.Paraiba,
         "PR" => StatesEnum.Parana,
         "PE" => StatesEnum.Pernambuco,
@@ -56,14 +55,14 @@ public static partial class GroceryItemMapperly
 
     private static MeasureUnitEnum ToMeasureUnitEnum(this string measureUnit) => measureUnit switch
     {
-        "UN"  => MeasureUnitEnum.UNIT,
-        "KG"  => MeasureUnitEnum.KILO,
-        "L"   => MeasureUnitEnum.LITER,
-        "M"   => MeasureUnitEnum.METER,
-        "CX"  => MeasureUnitEnum.BOX,
+        "UN" => MeasureUnitEnum.UNIT,
+        "KG" => MeasureUnitEnum.KILO,
+        "L" => MeasureUnitEnum.LITER,
+        "M" => MeasureUnitEnum.METER,
+        "CX" => MeasureUnitEnum.BOX,
         "PCE" => MeasureUnitEnum.PACKAGE,
-        "CJ"  => MeasureUnitEnum.SET,
-        "SC"  => MeasureUnitEnum.SACK,
-        _     => MeasureUnitEnum.EMPTY
+        "CJ" => MeasureUnitEnum.SET,
+        "SC" => MeasureUnitEnum.SACK,
+        _ => MeasureUnitEnum.EMPTY
     };
 }

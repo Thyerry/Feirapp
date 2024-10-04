@@ -2,7 +2,6 @@ using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Services.Cests.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Command;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
-using Feirapp.Domain.Services.GroceryItems.Mappers;
 using Feirapp.Domain.Services.GroceryItems.Queries;
 using Feirapp.Domain.Services.GroceryItems.Responses;
 using Feirapp.Domain.Services.Ncms.Interfaces;
@@ -15,8 +14,7 @@ public partial class GroceryItemService(
     IGroceryItemRepository groceryItemRepository,
     IStoreRepository storeRepository,
     INcmRepository ncmRepository,
-    ICestRepository cestRepository)
-    : IGroceryItemService
+    ICestRepository cestRepository) : IGroceryItemService
 {
     public async Task<List<SearchGroceryItemsResponse>> SearchGroceryItemsAsync(SearchGroceryItemsQuery query, CancellationToken ct)
     {
@@ -33,7 +31,7 @@ public partial class GroceryItemService(
     public async Task<GetGroceryItemFromStoreIdResponse> GetByStoreAsync(long storeId, CancellationToken ct)
     {
         var result = await groceryItemRepository.GetByStoreAsync(storeId, ct);
-        return new GetGroceryItemFromStoreIdResponse(result.Store.MapToDto(), result.Items.ToStoreItem());
+        return new GetGroceryItemFromStoreIdResponse(result.Store?.ToDto(), result.Items.ToStoreItem());
     }
 
     public async Task<List<SearchGroceryItemsResponse>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct)
@@ -93,6 +91,4 @@ public partial class GroceryItemService(
     {
         throw new NotImplementedException();
     }
-
-    
 }

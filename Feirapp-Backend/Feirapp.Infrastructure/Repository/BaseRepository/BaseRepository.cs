@@ -6,14 +6,10 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Feirapp.Infrastructure.Repository.BaseRepository;
 
-public class BaseRepository<T> : IBaseRepository<T>, IDisposable where T : class
+public class BaseRepository<T>(BaseContext context) : IBaseRepository<T>, IDisposable
+    where T : class
 {
-    private readonly BaseContext _context;
-
-    public BaseRepository(BaseContext context)
-    {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
-    }
+    private readonly BaseContext _context = context ?? throw new ArgumentNullException(nameof(context));
 
     public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken ct)
     {

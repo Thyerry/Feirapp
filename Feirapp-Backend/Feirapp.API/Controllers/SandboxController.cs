@@ -12,10 +12,6 @@ namespace Feirapp.API.Controllers;
 [Route("api/sandbox")]
 public class SandboxController : Controller
 {
-    public SandboxController()
-    {
-    }
-
     [HttpGet("create-grocery-item")]
     [ProducesResponseType(typeof(InsertListOfGroceryItemsCommand), 200)]
     public async Task<IActionResult> CreateGroceryItem([FromQuery] CreateGroceryItemPayload payload,
@@ -49,7 +45,7 @@ public class SandboxController : Controller
                 State: f.PickRandom<StatesEnum>().GetStringValue()))
             .UseSeed(payload.StoreSeed)
             .Generate();
-
+        
         return Ok(new InsertListOfGroceryItemsCommand(groceryItems, store));
     }
 }

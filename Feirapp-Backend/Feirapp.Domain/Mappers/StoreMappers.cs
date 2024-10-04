@@ -1,61 +1,18 @@
-using Feirapp.Domain.Services.DataScrapper.Dtos;
+﻿using Feirapp.Domain.Services.DataScrapper.Dtos;
+using Feirapp.Domain.Services.GroceryItems.Command;
 using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Entities.Entities;
+using Riok.Mapperly.Abstractions;
 
 namespace Feirapp.Domain.Mappers;
 
-public static class StoreMappers
+[Mapper]
+public static partial class StoreMappers
 {
-    public static StoreDto MapToDto(this Store store)
-    {
-        return new StoreDto
-        (
-            Id : store.Id,
-            Name: store.Name,
-            AltNames: store.AltNames.Split(",").ToList(),
-            Cnpj: store.Cnpj,
-            Cep: store.Cep,
-            Street: store.Street,
-            StreetNumber: store.StreetNumber,
-            Neighborhood: store.Neighborhood,
-            CityName: store.CityName,
-            State: store.State
-        );
-    }
-    
-    public static List<StoreDto> MapToDto(this List<Store> stores)
-    {
-        return stores.Select(store => store.MapToDto()).ToList();
-    }
-
-    public static Store MapToEntity(this StoreDto storeDto)
-    {
-        return new Store
-        {
-            Name = storeDto.Name,
-            AltNames = storeDto.AltNames != null ? string.Join(",", storeDto.AltNames) : null,
-            Cnpj = storeDto.Cnpj,
-            Cep = storeDto.Cep,
-            Street = storeDto.Street,
-            StreetNumber = storeDto.StreetNumber,
-            Neighborhood = storeDto.Neighborhood,
-            CityName = storeDto.CityName,
-            State = storeDto.State
-        };
-    }
-
-    public static Store MapToEntity(this InvoiceStore store)
-    {
-        return new Store
-        {
-            Name = store.Name,
-            Cnpj = store.Cnpj,
-            Cep = store.Cep,
-            Street = store.Street,
-            StreetNumber = store.StreetNumber,
-            Neighborhood = store.Neighborhood,
-            CityName = store.CityName,
-            State = store.State.MapToStatesEnum()
-        };
-    }
+    public static partial Store ToEntity(this InsertStore command);
+    public static partial Store ToEntity(this InvoiceStore command);
+    public static partial Store ToEntity(this StoreDto dto);
+    public static partial List<Store> ToEntityList(this List<StoreDto> dto);
+    public static partial StoreDto ToDto(this Store entity);
+    public static partial List<StoreDto> ToDtoList(this List<Store> entity);
 }

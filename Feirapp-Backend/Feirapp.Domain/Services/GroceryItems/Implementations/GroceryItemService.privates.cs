@@ -1,7 +1,5 @@
 using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Services.GroceryItems.Command;
-using Feirapp.Domain.Services.GroceryItems.Dtos;
-using Feirapp.Domain.Services.GroceryItems.Mappers;
 using Feirapp.Entities.Entities;
 
 namespace Feirapp.Domain.Services.GroceryItems.Implementations;
@@ -10,7 +8,7 @@ public partial class GroceryItemService
 {
     private async Task<Store> EnsureStoreExistsAsync(InsertStore storeDto, CancellationToken ct)
     {
-        var store = await storeRepository.AddIfNotExistsAsync(s => s.Cnpj == storeDto.Cnpj, storeDto.ToStore() , ct);
+        var store = await storeRepository.AddIfNotExistsAsync(s => s.Cnpj == storeDto.Cnpj, storeDto.ToEntity() , ct);
         var storeAltNames = store.AltNames?.Split(",").ToList() ?? [];
         if (store.Name != storeDto.Name && !storeAltNames.Contains(storeDto.Name))
         {

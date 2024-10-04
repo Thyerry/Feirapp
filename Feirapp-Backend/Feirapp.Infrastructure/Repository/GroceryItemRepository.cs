@@ -25,13 +25,14 @@ public class GroceryItemRepository(BaseContext context)
                 (string.IsNullOrEmpty(queryParams.Name) || g.Name.Contains(queryParams.Name))
                 && (queryParams.StoreId <= 0 || s.Id == queryParams.StoreId)
             select new SearchGroceryItemsDto(g.Id, g.Name, g.Description, p.Price, g.ImageUrl, g.Barcode, p.LogDate, g.MeasureUnit, s.Id, s.Name);
-        
+
         return await query
             .Skip(queryParams.PageSize * queryParams.Page)
             .Take(queryParams.PageSize)
             .AsNoTracking()
             .ToListAsync(ct);
     }
+    
     public override async Task<GroceryItem?> GetByIdAsync(long id, CancellationToken ct)
     {
         var query = _context.GroceryItems
@@ -70,12 +71,13 @@ public class GroceryItemRepository(BaseContext context)
 
     public async Task<StoreWithItems> GetByStoreAsync(long storeId, CancellationToken ct)
     {
+        var store = await _context.Stores.FindAsync(storeId, ct);
+        
         var items = await (from g in _context.GroceryItems
             join p in _context.PriceLogs on g.Id equals p.GroceryItemId
             where p.StoreId == storeId
             select g).ToListAsync(ct);
 
-        var store = await _context.Stores.FindAsync(storeId, ct);
         return new StoreWithItems { Store = store, Items = items };
     }
 
