@@ -1,7 +1,9 @@
 using Feirapp.Domain.Services.Cests.Interfaces;
 using Feirapp.Entities.Entities;
 using Feirapp.Infrastructure.Configuration;
+using Feirapp.Infrastructure.Extensions;
 using Feirapp.Infrastructure.Repository.BaseRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace Feirapp.Infrastructure.Repository;
 
@@ -9,13 +11,30 @@ public class CestRepository(BaseContext context) : BaseRepository<Cest>(context)
 {
     private readonly BaseContext _context = context ?? throw new ArgumentNullException(nameof(context));
 
-    public Task InsertListOfCodesAsync(List<string>? cestCodes, CancellationToken ct)
+    public async Task InsertListOfCodesAsync(List<string?> cestCodes, CancellationToken ct)
     {
-        var cests = cestCodes.Select(x => new Cest { Code = x }).ToList();
-        return _context.Cests.BulkInsertAsync(cests, options =>
+        var validCestCodes = cestCodes
+            .Where(code => !string.IsNullOrEmpty(code))
+            .Distinct()
+            .ToList();
+
+        if (!validCestCodes.Any())
+            return;
+
+        var existingCestCodes = _context.Cests
+            .Where(c => validCestCodes.Contains(c.Code))
+            .Select(c => c.Code)
+            .ToHashSet(); 
+
+        var newCestCodes = validCestCodes
+            .Where(code => !existingCestCodes.Contains(code))
+            .Select(code => new Cest { Code = code })
+            .ToList();
+
+        if (newCestCodes.Any())
         {
-            options.InsertIfNotExists = true;
-            options.ColumnPrimaryKeyExpression = c => c.Code;
-        }, ct);
+            await _context.Cests.AddRangeAsync(newCestCodes, ct);
+            await _context.SaveChangesAsync(ct);
+        }
     }
 }

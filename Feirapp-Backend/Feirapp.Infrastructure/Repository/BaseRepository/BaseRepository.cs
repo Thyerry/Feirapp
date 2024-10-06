@@ -25,7 +25,7 @@ public class BaseRepository<T>(BaseContext context) : IBaseRepository<T>, IDispo
 
     public async Task InsertListAsync(List<T> entities, CancellationToken ct)
     {
-        await _context.Set<T>().BulkInsertAsync(entities, ct);
+        await _context.Set<T>().AddRangeAsync(entities, ct);
         await _context.SaveChangesAsync(ct);
     }
 

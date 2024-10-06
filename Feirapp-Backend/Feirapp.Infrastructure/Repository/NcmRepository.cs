@@ -24,13 +24,30 @@ public class NcmRepository(BaseContext context) : BaseRepository<Ncm>(context), 
             .FirstOrDefaultAsync(x => x.Code == code, ct);
     }
 
-    public Task InsertListOfCodesAsync(List<string> entities, CancellationToken ct)
+    public async Task InsertListOfCodesAsync(List<string> ncmCodes, CancellationToken ct)
     {
-        var ncms = entities.Select(x => new Ncm { Code = x }).ToList();
-        return _context.Ncms.BulkInsertAsync(ncms, options =>
+        var validNcms = ncmCodes
+            .Where(code => !string.IsNullOrEmpty(code))
+            .Distinct() 
+            .ToList();
+
+        if (!validNcms.Any())
+            return;
+
+        var existingNcms = _context.Cests
+            .Where(c => validNcms.Contains(c.Code))
+            .Select(c => c.Code)
+            .ToHashSet();
+
+        var newNcms = validNcms
+            .Where(code => !existingNcms.Contains(code))
+            .Select(code => new Ncm { Code = code })
+            .ToList();
+
+        if (newNcms.Any())
         {
-            options.InsertIfNotExists = true;
-            options.ColumnPrimaryKeyExpression = c => c.Code;
-        }, ct);
+            await _context.Ncms.AddRangeAsync(newNcms, ct);
+            await _context.SaveChangesAsync(ct);
+        }
     }
 }

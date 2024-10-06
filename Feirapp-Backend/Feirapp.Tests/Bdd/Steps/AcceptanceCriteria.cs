@@ -11,7 +11,6 @@ namespace Feirapp.Tests.Bdd.Steps;
 public class AcceptanceCriteria
 {
     private readonly List<GroceryItem> _groceryItems = new();
-    private readonly HttpClient _httpClient;
 
     [When(@"the client provides the right Grocery Item data")]
     public void WhenTheClientProvidesTheRightGroceryItemData(Table table)

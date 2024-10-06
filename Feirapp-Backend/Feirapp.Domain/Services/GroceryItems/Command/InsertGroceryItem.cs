@@ -9,5 +9,5 @@ public record InsertGroceryItem(
     string? AltNames,
     DateTime PurchaseDate,
     string NcmCode,
-    string CestCode
+    string? CestCode
 );

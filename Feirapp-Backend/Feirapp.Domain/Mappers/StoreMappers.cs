@@ -2,6 +2,7 @@
 using Feirapp.Domain.Services.GroceryItems.Command;
 using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Entities.Entities;
+using Feirapp.Entities.Enums;
 using Riok.Mapperly.Abstractions;
 
 namespace Feirapp.Domain.Mappers;
@@ -15,4 +16,6 @@ public static partial class StoreMappers
     public static partial List<Store> ToEntityList(this List<StoreDto> dto);
     public static partial StoreDto ToDto(this Store entity);
     public static partial List<StoreDto> ToDtoList(this List<Store> entity);
+    
+    private static StatesEnum ToStatesEnum(this string state) => EnumMappers.ToStatesEnum(state);
 }

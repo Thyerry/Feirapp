@@ -41,7 +41,6 @@ public class InvoiceReaderService : IInvoiceReaderService
         var storeNameXml = doc.DocumentNode.SelectSingleNode("//emit");
         var purchaseDateXml = doc.DocumentNode.SelectSingleNode("//ide//dhemi");
 
-
         var store = new InvoiceScanStore(
             Name: storeNameXml.SelectSingleNode("//xnome").InnerText,
             Cnpj: storeNameXml.SelectSingleNode("//cnpj").InnerText,

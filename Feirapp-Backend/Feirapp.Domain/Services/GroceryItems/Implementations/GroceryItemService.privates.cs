@@ -25,7 +25,8 @@ public partial class GroceryItemService
         var ncms = command.GroceryItems.Select(g => g.NcmCode).Distinct().ToList();
         var cests = command.GroceryItems.Select(g => g.CestCode).Distinct().ToList();
         await ncmRepository.InsertListOfCodesAsync(ncms, ct);
-        await cestRepository.InsertListOfCodesAsync(cests, ct);
+        if(cests.Count != 0)
+            await cestRepository.InsertListOfCodesAsync(cests, ct);
     }
 
     private async Task InsertGroceryItemsAsync(List<InsertGroceryItem> items, long storeId, CancellationToken ct)
