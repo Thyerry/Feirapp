@@ -10,12 +10,13 @@ public partial class GroceryItemService
     {
         var store = await storeRepository.AddIfNotExistsAsync(s => s.Cnpj == storeDto.Cnpj, storeDto.ToEntity() , ct);
         var storeAltNames = store.AltNames?.Split(",").ToList() ?? [];
-        if (store.Name != storeDto.Name && !storeAltNames.Contains(storeDto.Name))
-        {
-            storeAltNames.Add(storeDto.Name);
-            store.AltNames = string.Join(',', storeAltNames);
-            await storeRepository.UpdateAsync(store, ct);
-        }
+        
+        if (store.Name == storeDto.Name || storeAltNames.Contains(storeDto.Name))
+            return store;
+        
+        storeAltNames.Add(storeDto.Name);
+        store.AltNames = string.Join(',', storeAltNames);
+        await storeRepository.UpdateAsync(store, ct);
 
         return store;
     }

@@ -5,6 +5,7 @@ using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Entities.Enums;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Options;
+using OpenQA.Selenium.DevTools;
 
 namespace Feirapp.Domain.Services.DataScrapper.Implementations;
 
@@ -37,6 +38,10 @@ public class InvoiceReaderService : IInvoiceReaderService
         var web = new HtmlWeb();
         var doc = await web.LoadFromWebAsync(_sefazPe.SefazUrl.Replace("{INVOICE_CODE}", invoiceCode), ct);
 
+        // TODO Implement error handling
+        // if(doc.DocumentNode.SelectSingleNode("//erro") != null)
+        //     return new InvoiceImportResponse(null, []);
+        
         var groceryItemXmlList = doc.DocumentNode.SelectNodes("//prod");
         var storeNameXml = doc.DocumentNode.SelectSingleNode("//emit");
         var purchaseDateXml = doc.DocumentNode.SelectSingleNode("//ide//dhemi");

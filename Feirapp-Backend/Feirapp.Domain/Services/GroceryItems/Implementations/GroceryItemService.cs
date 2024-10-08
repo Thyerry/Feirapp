@@ -71,7 +71,7 @@ public partial class GroceryItemService(
         try
         {
             var store = await EnsureStoreExistsAsync(command.Store, ct);
-            await InsertNcmsAndCestsAsync(command, ct);
+            await InsertNcmsAndCestsAsync(command, ct); 
             await InsertGroceryItemsAsync(command.GroceryItems, store.Id, ct);
             await trans.CommitAsync(ct);
         }
