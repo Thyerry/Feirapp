@@ -8,6 +8,8 @@ using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Domain.Services.Ncms.Interfaces;
 using Feirapp.Domain.Services.Stores.Implementations;
 using Feirapp.Domain.Services.Stores.Interfaces;
+using Feirapp.Domain.Services.Users.Implementations;
+using Feirapp.Domain.Services.Users.Interfaces;
 using Feirapp.Infrastructure.Configuration;
 using Feirapp.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
@@ -67,6 +69,7 @@ void ConfigurationsAndServices(IServiceCollection services, IConfiguration confi
     services.AddScoped<IInvoiceReaderService, InvoiceReaderService>();
     services.AddScoped<INcmCestDataScrapper, NcmCestDataScrapper>();
     services.AddScoped<IStoreService, StoreService>();
+    services.AddScoped<IUserService, UserService>();
 
     #endregion Services
 
@@ -76,6 +79,7 @@ void ConfigurationsAndServices(IServiceCollection services, IConfiguration confi
     services.AddScoped<IStoreRepository, StoreRepository>();
     services.AddScoped<INcmRepository, NcmRepository>();
     services.AddScoped<ICestRepository, CestRepository>();
+    services.AddScoped<IUserRepository, UserRepository>();
 
     #endregion Repositories
 }
