@@ -15,6 +15,7 @@ public partial class BaseContext : DbContext
     public DbSet<Store> Stores { get; set; }
     public DbSet<Ncm> Ncms { get; set; }
     public DbSet<Cest> Cests { get; set; }
+    public DbSet<User> Users { get; set; }
 
     
     [DbFunction("RAND")]
@@ -67,8 +68,14 @@ public partial class BaseContext : DbContext
             entity.HasMany(e => e.GroceryItems).WithOne(e => e.Cest).HasForeignKey(e => e.CestCode);
         });
 
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Email).IsRequired();
+        });
+
         modelBuilder
-            .HasDbFunction(typeof(BaseContext).GetMethod(nameof(Random), new Type[]{}) ?? throw new InvalidOperationException())
+            .HasDbFunction(typeof(BaseContext).GetMethod(nameof(Random), []) ?? throw new InvalidOperationException())
             .HasName("RAND");
     }
 }

@@ -1,4 +1,6 @@
-namespace Feirapp.Entities.Entities.Dtos;
+using Feirapp.Entities.Entities;
+
+namespace Feirapp.Entities.Dtos;
 
 public class StoreWithItems
 {
