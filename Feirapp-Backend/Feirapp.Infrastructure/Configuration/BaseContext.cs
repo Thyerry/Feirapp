@@ -15,7 +15,7 @@ public partial class BaseContext : DbContext
     public DbSet<Store> Stores { get; set; }
     public DbSet<Ncm> Ncms { get; set; }
     public DbSet<Cest> Cests { get; set; }
-    public DbSet<User> Users { get; set; }
+    public DbSet<User?> Users { get; set; }
 
     
     [DbFunction("RAND")]

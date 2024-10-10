@@ -4,7 +4,7 @@ using FluentValidation.Results;
 
 namespace Feirapp.Domain.Services.Users.Commands;
 
-public record CreateUserCommand(string Name, string Email, string Password)
+public record CreateUserCommand(string Name, string Email, string Password, string ConfirmPassword)
 {
     public void Validate()
     {
@@ -25,11 +25,12 @@ public record CreateUserCommand(string Name, string Email, string Password)
             errors.Add(new ValidationFailure(nameof(Password), "The password must contain at least one digit.", Password));
         if (!Regex.IsMatch(Password, @"[\W_]"))
             errors.Add(new ValidationFailure(nameof(Password), "The password must contain at least one special character.", Password));
-        
+        if (Password != ConfirmPassword)
+            errors.Add(new ValidationFailure(nameof(ConfirmPassword), "The password and confirmation password do not match.", ConfirmPassword));
         
         if (errors.Count > 0)
         {
-            throw new ValidationException(" failed", errors);
+            throw new ValidationException("Validation failed", errors);
         }
     }
 };
