@@ -18,4 +18,6 @@ public static partial class StoreMappers
     public static partial List<StoreDto> ToDtoList(this List<Store> entity);
     
     private static StatesEnum ToStatesEnum(this string state) => EnumMappers.ToStatesEnum(state);
+    private static List<string> ListAltNames(string nameList) => MapperUtils.ListAltNames(nameList);
+    private static string StringAltNames(List<string> altNames) => MapperUtils.StringAltNames(altNames);
 }

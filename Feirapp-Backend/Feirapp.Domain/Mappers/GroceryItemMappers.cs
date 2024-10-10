@@ -19,7 +19,7 @@ public static partial class GroceryItemMappers
     public static partial GetGroceryItemByIdResponse ToGetByIdResponse(this GroceryItem model);
     public static partial List<GetGroceryItemByIdResponse> ToGetByIdResponse(this List<GroceryItem> model);
     
-    private static List<string> SplitCommas(string nameList) => nameList.Split(",").ToList();
-
+    private static string StringAltNames(List<string> altNames) => MapperUtils.StringAltNames(altNames);
+    private static List<string> ListAltNames(string nameList) => MapperUtils.ListAltNames(nameList);
     private static MeasureUnitEnum ToMeasureUnitEnum(this string measureUnit) => EnumMappers.ToMeasureUnitEnum(measureUnit);
 }

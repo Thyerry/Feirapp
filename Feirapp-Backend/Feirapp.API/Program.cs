@@ -1,3 +1,4 @@
+using System.Text;
 using Feirapp.API.Helpers;
 using Feirapp.Domain.Services.Cests.Interfaces;
 using Feirapp.Domain.Services.DataScrapper.Dtos;
@@ -12,7 +13,9 @@ using Feirapp.Domain.Services.Users.Implementations;
 using Feirapp.Domain.Services.Users.Interfaces;
 using Feirapp.Infrastructure.Configuration;
 using Feirapp.Infrastructure.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +29,30 @@ builder.Services.AddDbContext<BaseContext>(options =>
 
 #endregion DB Context Configuration
 
-ConfigurationsAndServices(builder.Services, builder.Configuration);
+DependencyInjection(builder.Services, builder.Configuration);
+
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"] ?? throw new InvalidOperationException("Secret key not found."));
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(option =>
+{
+    option.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(secretKey),
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -44,18 +70,19 @@ app.UseCors(x => x
     .AllowAnyMethod()
     .AllowAnyHeader());
 
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseMiddleware<ExceptionHandlerMiddleware>();
-
-//app.UseHttpsRedirection();
-
-//app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
 return;
 
-void ConfigurationsAndServices(IServiceCollection services, IConfiguration configuration)
+void DependencyInjection(IServiceCollection services, IConfiguration configuration)
 {
     #region Configurations
 

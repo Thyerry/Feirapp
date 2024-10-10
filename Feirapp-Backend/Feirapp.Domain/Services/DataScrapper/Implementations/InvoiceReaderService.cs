@@ -35,7 +35,8 @@ public class InvoiceReaderService : IInvoiceReaderService
         CancellationToken ct)
     {
         var web = new HtmlWeb();
-        var doc = await web.LoadFromWebAsync(_sefazPe.SefazUrl.Replace("{INVOICE_CODE}", invoiceCode), ct);
+        var url = _sefazPe.SefazUrl.Replace("{INVOICE_CODE}", invoiceCode);
+        var doc = await web.LoadFromWebAsync(url, ct);
 
         var groceryItemXmlList = doc.DocumentNode.SelectNodes("//prod");
         var storeNameXml = doc.DocumentNode.SelectSingleNode("//emit");
@@ -81,13 +82,14 @@ public class InvoiceReaderService : IInvoiceReaderService
                 Quantity = ToDecimal(groceryItemXml.SelectSingleNode($"{xpath}/qcom").InnerText)
             };
 
-            var objectExists = result.FirstOrDefault(g => groceryItem.Name == g.Name
-                                                          && groceryItem.Price == g.Price
-                                                          && groceryItem.MeasureUnit == g.MeasureUnit
-                                                          && groceryItem.MeasureUnit != MeasureUnitEnum.KILO.StringValue() 
-                                                          && groceryItem.Barcode == g.Barcode 
-                                                          && groceryItem.NcmCode == g.NcmCode
-                                                          && groceryItem.CestCode == g.CestCode);
+            var objectExists = result.FirstOrDefault(g =>
+                groceryItem.Name == g.Name
+                && groceryItem.Price == g.Price
+                && groceryItem.MeasureUnit == g.MeasureUnit
+                && groceryItem.MeasureUnit != MeasureUnitEnum.KILO.StringValue()
+                && groceryItem.Barcode == g.Barcode
+                && groceryItem.NcmCode == g.NcmCode
+                && groceryItem.CestCode == g.CestCode);
             if (objectExists is null)
                 result.Add(groceryItem);
             else
