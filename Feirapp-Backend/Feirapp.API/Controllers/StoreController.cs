@@ -1,6 +1,7 @@
 using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Domain.Services.Stores.Dtos.Commands;
 using Feirapp.Domain.Services.Stores.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Feirapp.API.Controllers;
@@ -19,6 +20,7 @@ public class StoreController(IStoreService storeService) : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(List<StoreDto>), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetAllStores(CancellationToken ct = default)
@@ -31,6 +33,7 @@ public class StoreController(IStoreService storeService) : ControllerBase
     }
 
     [HttpGet("by-id")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(StoreDto), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetAllStores([FromQuery] long storeId, CancellationToken ct = default)

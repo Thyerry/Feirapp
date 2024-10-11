@@ -64,5 +64,4 @@ public static class EnumMappers
         "SC" => MeasureUnitEnum.SACK,
         _ => MeasureUnitEnum.EMPTY
     };
-
 }

@@ -5,11 +5,13 @@ using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Queries;
 using Feirapp.Domain.Services.GroceryItems.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Feirapp.API.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/grocery-item")]
 public class GroceryItemController(
     IGroceryItemService groceryItemService,
@@ -17,6 +19,7 @@ public class GroceryItemController(
     ILogger<GroceryItemController> logger) : ControllerBase
 {
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(List<SearchGroceryItemsResponse>), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> SearchGroceryItems([FromQuery]SearchGroceryItemsQuery query, CancellationToken ct = default)
@@ -29,6 +32,7 @@ public class GroceryItemController(
     }
     
     [HttpGet("by-id")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(GroceryItemDto), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetById([FromQuery]long id, CancellationToken ct = default)
@@ -42,6 +46,7 @@ public class GroceryItemController(
     }
 
     [HttpGet("by-store")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(GetGroceryItemFromStoreIdResponse), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetFromStore([FromQuery]long storeId, CancellationToken ct = default)
@@ -55,6 +60,7 @@ public class GroceryItemController(
     
     
     [HttpGet("by-invoice")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(InvoiceImportResponse), 200)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]
     public async Task<IActionResult> GetFromInvoice([FromQuery]string invoiceId, CancellationToken ct = default)
@@ -67,6 +73,7 @@ public class GroceryItemController(
     }
     
     [HttpGet("random")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(List<SearchGroceryItemsResponse>), 200)]
     [ProducesResponseType(typeof(BadRequestResult), 400)]
     [ProducesResponseType(typeof(NotFoundResult), 404)]

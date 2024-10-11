@@ -36,7 +36,7 @@ public class UserService(IUserRepository userRepository) : IUserService
         if (user == null)
         {
             throw new ValidationException([
-                new ValidationFailure(nameof(command.Email), "The user email or password is incorrect.")
+                new ValidationFailure("Email or Password", "The user email or password is incorrect.")
             ]);
         }
 
@@ -44,12 +44,13 @@ public class UserService(IUserRepository userRepository) : IUserService
         if (user.Password != passwordHash)
         {
             throw new ValidationException([
-                new ValidationFailure(nameof(command.Password), "The user email or password is incorrect.")
+                new ValidationFailure("Email or Password", "The user email or password is incorrect.")
             ]);
         }
+
         user.LastLogin = DateTime.UtcNow;
         await userRepository.UpdateAsync(user, ct);
-        
+
         return user.ToLoginResponse();
     }
 }
