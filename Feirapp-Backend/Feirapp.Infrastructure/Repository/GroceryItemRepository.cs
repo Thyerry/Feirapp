@@ -1,8 +1,8 @@
 using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Queries;
+using Feirapp.Entities.Dtos;
 using Feirapp.Entities.Entities;
-using Feirapp.Entities.Entities.Dtos;
 using Feirapp.Infrastructure.Configuration;
 using Feirapp.Infrastructure.Repository.BaseRepository;
 using Microsoft.EntityFrameworkCore;

@@ -1,3 +1,4 @@
+using System.Text;
 using Feirapp.API.Helpers;
 using Feirapp.Domain.Services.Cests.Interfaces;
 using Feirapp.Domain.Services.DataScrapper.Dtos;
@@ -8,9 +9,14 @@ using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Domain.Services.Ncms.Interfaces;
 using Feirapp.Domain.Services.Stores.Implementations;
 using Feirapp.Domain.Services.Stores.Interfaces;
+using Feirapp.Domain.Services.Users.Implementations;
+using Feirapp.Domain.Services.Users.Interfaces;
 using Feirapp.Infrastructure.Configuration;
 using Feirapp.Infrastructure.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,10 +30,63 @@ builder.Services.AddDbContext<BaseContext>(options =>
 
 #endregion DB Context Configuration
 
-ConfigurationsAndServices(builder.Services, builder.Configuration);
+DependencyInjection(builder.Services, builder.Configuration);
+
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"] ?? throw new InvalidOperationException("Secret key not found."));
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(option =>
+{
+    option.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(secretKey),
+        ClockSkew = TimeSpan.Zero
+    };
+});
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Feirapp", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Por favor, insira o token JWT no formato: Bearer {seu token}",
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header,
+
+            },
+            new List<string>()
+        }
+    });
+});
 
 var app = builder.Build();
 
@@ -42,18 +101,19 @@ app.UseCors(x => x
     .AllowAnyMethod()
     .AllowAnyHeader());
 
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseMiddleware<ExceptionHandlerMiddleware>();
-
-//app.UseHttpsRedirection();
-
-//app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
 return;
 
-void ConfigurationsAndServices(IServiceCollection services, IConfiguration configuration)
+void DependencyInjection(IServiceCollection services, IConfiguration configuration)
 {
     #region Configurations
 
@@ -67,6 +127,7 @@ void ConfigurationsAndServices(IServiceCollection services, IConfiguration confi
     services.AddScoped<IInvoiceReaderService, InvoiceReaderService>();
     services.AddScoped<INcmCestDataScrapper, NcmCestDataScrapper>();
     services.AddScoped<IStoreService, StoreService>();
+    services.AddScoped<IUserService, UserService>();
 
     #endregion Services
 
@@ -76,6 +137,7 @@ void ConfigurationsAndServices(IServiceCollection services, IConfiguration confi
     services.AddScoped<IStoreRepository, StoreRepository>();
     services.AddScoped<INcmRepository, NcmRepository>();
     services.AddScoped<ICestRepository, CestRepository>();
+    services.AddScoped<IUserRepository, UserRepository>();
 
     #endregion Repositories
 }

@@ -14,7 +14,7 @@ public class SandboxController : Controller
 {
     [HttpGet("create-grocery-item")]
     [ProducesResponseType(typeof(InsertListOfGroceryItemsCommand), 200)]
-    public async Task<IActionResult> CreateGroceryItem([FromQuery] CreateGroceryItemPayload payload,
+    public async Task<IActionResult> CreateGroceryItem([FromQuery] CreateGroceryItemQuery query,
         CancellationToken ct)
     {
         var date = new Faker().Date.Past(1);
@@ -29,8 +29,8 @@ public class SandboxController : Controller
                 date,
                 f.Commerce.Ean8(),
                 f.Commerce.Ean8()))
-            .UseSeed(payload.ProductSeed)
-            .Generate(payload.Quantity);
+            .UseSeed(query.ProductSeed)
+            .Generate(query.Quantity);
 
         var store = new Faker<InsertStore>()
             .CustomInstantiator(f => new InsertStore(
@@ -43,7 +43,7 @@ public class SandboxController : Controller
                 Neighborhood: f.Address.SecondaryAddress(),
                 CityName: f.Address.City(),
                 State: f.PickRandom<StatesEnum>().StringValue()))
-            .UseSeed(payload.StoreSeed)
+            .UseSeed(query.StoreSeed)
             .Generate();
         
         return Ok(new InsertListOfGroceryItemsCommand(groceryItems, store));

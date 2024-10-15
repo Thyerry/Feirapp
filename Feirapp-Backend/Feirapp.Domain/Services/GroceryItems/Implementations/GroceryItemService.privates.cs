@@ -11,7 +11,7 @@ public partial class GroceryItemService
         var store = await storeRepository.AddIfNotExistsAsync(s => s.Cnpj == storeDto.Cnpj, storeDto.ToEntity() , ct);
         var storeAltNames = store.AltNames?.Split(",").ToList() ?? [];
         
-        if (store.Name == storeDto.Name || storeAltNames.Contains(storeDto.Name))
+        if (store.Name == storeDto.Name || storeAltNames.Contains(storeDto.Name)) 
             return store;
         
         storeAltNames.Add(storeDto.Name);
@@ -38,6 +38,7 @@ public partial class GroceryItemService
             groceryItem.Barcode = AdjustBarcode(groceryItem.Barcode);
             await InsertGroceryItem(groceryItem, storeId, itemDto.Price, itemDto.PurchaseDate, ct);
         }
+        
     }
 
     private string AdjustBarcode(string barcode)
@@ -73,8 +74,8 @@ public partial class GroceryItemService
     private async Task InsertOrUpdatePriceLog(GroceryItem item, long storeId, decimal price, DateTime purchaseDate, CancellationToken ct)
     {
         var lastPriceLog = await groceryItemRepository.GetLastPriceLogAsync(item.Id, storeId, ct);
-        if (lastPriceLog == null || (Math.Round(price, 2) != Math.Round(lastPriceLog.Price, 2) &&
-                                     purchaseDate.Ticks > lastPriceLog.LogDate.Ticks))
+        if (lastPriceLog == null 
+            || (Math.Round(price, 2) != Math.Round(lastPriceLog.Price, 2) && purchaseDate.Ticks > lastPriceLog.LogDate.Ticks))
         {
             var priceLog = new PriceLog
             {
