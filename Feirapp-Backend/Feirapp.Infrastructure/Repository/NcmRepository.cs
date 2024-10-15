@@ -31,10 +31,10 @@ public class NcmRepository(BaseContext context) : BaseRepository<Ncm>(context), 
             .Distinct() 
             .ToList();
 
-        if (!validNcms.Any())
+        if (validNcms.Count == 0)
             return;
 
-        var existingNcms = _context.Cests
+        var existingNcms = _context.Ncms
             .Where(c => validNcms.Contains(c.Code))
             .Select(c => c.Code)
             .ToHashSet();

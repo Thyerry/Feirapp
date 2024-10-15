@@ -1,9 +1,7 @@
 using Feirapp.Domain.Services.Cests.Interfaces;
 using Feirapp.Entities.Entities;
 using Feirapp.Infrastructure.Configuration;
-using Feirapp.Infrastructure.Extensions;
 using Feirapp.Infrastructure.Repository.BaseRepository;
-using Microsoft.EntityFrameworkCore;
 
 namespace Feirapp.Infrastructure.Repository;
 
@@ -18,7 +16,7 @@ public class CestRepository(BaseContext context) : BaseRepository<Cest>(context)
             .Distinct()
             .ToList();
 
-        if (!validCestCodes.Any())
+        if (validCestCodes.Count == 0)
             return;
 
         var existingCestCodes = _context.Cests
