@@ -5,7 +5,6 @@ using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Entities.Enums;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Options;
-using OpenQA.Selenium.DevTools;
 
 namespace Feirapp.Domain.Services.DataScrapper.Implementations;
 
@@ -95,6 +94,7 @@ public class InvoiceReaderService : IInvoiceReaderService
                 && groceryItem.Barcode == g.Barcode
                 && groceryItem.NcmCode == g.NcmCode
                 && groceryItem.CestCode == g.CestCode);
+            
             if (objectExists is null)
                 result.Add(groceryItem);
             else

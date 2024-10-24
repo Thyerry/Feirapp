@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using Feirapp.API.Helpers;
 using Feirapp.Domain.Services.Cests.Interfaces;
@@ -28,13 +29,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<BaseContext>(options =>
 {
     var mysql = builder.Configuration.GetConnectionString("MySqlConnection");
-    options.UseMySql(mysql, new MySqlServerVersion(new Version(8, 3, 0)), mySqlOptions =>
-    {
-        mySqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 5,
-            maxRetryDelay: TimeSpan.FromSeconds(10),
-            errorNumbersToAdd: null);
-    });
+    options.UseMySql(mysql, new MySqlServerVersion(new Version(8, 3, 0)));
 });
 
 #endregion DB Context Configuration
@@ -44,6 +39,10 @@ DependencyInjection(builder.Services, builder.Configuration);
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey =
     Encoding.UTF8.GetBytes(jwtSettings["SecretKey"] ?? throw new InvalidOperationException("Secret key not found."));
+
+var cultureInfo = new CultureInfo("pt-BR");
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
 builder.Services.AddAuthentication(options =>
 {
@@ -96,6 +95,7 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
 
 var app = builder.Build();
 

@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Feirapp.API.Controllers;
 
 [ApiController]
-[Authorize]
+//[Authorize]
 [Route("api/grocery-item")]
 public class GroceryItemController(
     IGroceryItemService groceryItemService,
