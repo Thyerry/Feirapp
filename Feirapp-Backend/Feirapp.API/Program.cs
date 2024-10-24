@@ -14,6 +14,7 @@ using Feirapp.Domain.Services.Users.Interfaces;
 using Feirapp.Infrastructure.Configuration;
 using Feirapp.Infrastructure.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -25,15 +26,24 @@ builder.Services.AddControllers();
 #region DB Context Configuration
 
 builder.Services.AddDbContext<BaseContext>(options =>
-    options.UseMySql(builder.Configuration.GetConnectionString("MySqlConnection"),
-        new MySqlServerVersion(new Version(8, 3, 0))));
+{
+    var mysql = builder.Configuration.GetConnectionString("MySqlConnection");
+    options.UseMySql(mysql, new MySqlServerVersion(new Version(8, 3, 0)), mySqlOptions =>
+    {
+        mySqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(10),
+            errorNumbersToAdd: null);
+    });
+});
 
 #endregion DB Context Configuration
 
 DependencyInjection(builder.Services, builder.Configuration);
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"] ?? throw new InvalidOperationException("Secret key not found."));
+var secretKey =
+    Encoding.UTF8.GetBytes(jwtSettings["SecretKey"] ?? throw new InvalidOperationException("Secret key not found."));
 
 builder.Services.AddAuthentication(options =>
 {
@@ -81,7 +91,6 @@ builder.Services.AddSwaggerGen(c =>
                 Scheme = "oauth2",
                 Name = "Bearer",
                 In = ParameterLocation.Header,
-
             },
             new List<string>()
         }
@@ -89,6 +98,8 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+ApplyMigrations(app);
 
 if (app.Environment.IsDevelopment())
 {
@@ -102,6 +113,8 @@ app.UseCors(x => x
     .AllowAnyHeader());
 
 app.UseRouting();
+
+app.Urls.Add("http://0.0.0.0:8080");
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -140,4 +153,23 @@ void DependencyInjection(IServiceCollection services, IConfiguration configurati
     services.AddScoped<IUserRepository, UserRepository>();
 
     #endregion Repositories
+}
+
+void ApplyMigrations(IApplicationBuilder application)
+{
+    using var scope = application.ApplicationServices.CreateScope();
+    var services = scope.ServiceProvider;
+
+    using var context = services.GetRequiredService<BaseContext>(); 
+    Console.WriteLine($"""
+                      Migrating database...
+                      Server: {context.Database.GetDbConnection().DataSource}
+                      Connection String: {context.Database.GetConnectionString()}
+                      Database Provider: {context.Database.ProviderName}
+                      Database Name: {context.Database.GetDbConnection().Database}
+                      """);
+    if (!context.Database.GetPendingMigrations().Any()) return;
+    
+    Console.WriteLine("Applying migrations...");
+    context.Database.Migrate();
 }

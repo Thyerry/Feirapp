@@ -4,12 +4,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Feirapp.Infrastructure.Configuration;
 
-public partial class BaseContext : DbContext
+public class BaseContext(DbContextOptions options) : DbContext(options)
 {
-    public BaseContext(DbContextOptions options) : base(options)
-    {
-    }
-
     public DbSet<GroceryItem> GroceryItems { get; set; }
     public DbSet<PriceLog?> PriceLogs { get; set; }
     public DbSet<Store> Stores { get; set; }
@@ -78,9 +74,4 @@ public partial class BaseContext : DbContext
             .HasDbFunction(typeof(BaseContext).GetMethod(nameof(Random), []) ?? throw new InvalidOperationException())
             .HasName("RAND");
     }
-}
-
-public partial class BaseContext 
-{
-
 }

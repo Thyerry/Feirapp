@@ -1,0 +1,41 @@
+﻿services:
+  feirapp-api:
+    image: ${DOCKER_REGISTRY-}feirapp-api:1.1
+    container_name: feirapp-api
+    build:
+      context: .
+      dockerfile: Feirapp.API/Dockerfile
+    depends_on:
+      - feirapp-db
+    ports:
+      - "5000:8080"
+      - "5001:8081"
+      - "5002:8443"
+    restart: always
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:8080;https://+:8443"
+        
+  feirapp-db:
+    image: mysql:8.3.0
+    container_name: feirapp-db
+    ports:
+      - "3306:3306"
+    expose:
+      - 3306
+    volumes:
+      - db-volume:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: --
+      MYSQL_USER: --
+      MYSQL_PASSWORD: --
+      MYSQL_DATABASE: --
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -h localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      
+volumes:
+  db-volume:
