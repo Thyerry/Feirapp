@@ -37,10 +37,10 @@ public class InvoiceReaderService : IInvoiceReaderService
         var web = new HtmlWeb();
         var url = _sefazPe.SefazUrl.Replace("{INVOICE_CODE}", invoiceCode);
         var doc = await web.LoadFromWebAsync(url, ct);
-
-        // TODO Implement error handling
-        // if(doc.DocumentNode.SelectSingleNode("//erro") != null)
-        //     return new InvoiceImportResponse(null, []);
+        var err = doc.DocumentNode.SelectSingleNode("//erro");
+        
+        if(!string.IsNullOrWhiteSpace(err.InnerText))
+            return new InvoiceImportResponse(null, []);
         
         var groceryItemXmlList = doc.DocumentNode.SelectNodes("//prod");
         var storeNameXml = doc.DocumentNode.SelectSingleNode("//emit");
