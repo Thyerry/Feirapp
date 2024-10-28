@@ -39,7 +39,7 @@ public class InvoiceReaderService : IInvoiceReaderService
         var doc = await web.LoadFromWebAsync(url, ct);
         var err = doc.DocumentNode.SelectSingleNode("//erro");
         
-        if(!string.IsNullOrWhiteSpace(err.InnerText))
+        if(!string.IsNullOrWhiteSpace(err?.InnerText))
             return new InvoiceImportResponse(null, []);
         
         var groceryItemXmlList = doc.DocumentNode.SelectNodes("//prod");
