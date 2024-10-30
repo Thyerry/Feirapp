@@ -1,4 +1,5 @@
-﻿using Feirapp.Domain.Services.DataScrapper.Dtos;
+﻿using Feirapp.Domain.Mappers;
+using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
@@ -31,8 +32,7 @@ public class InvoiceReaderService : IInvoiceReaderService
     /// <param name="isInsert"></param>
     /// <param name="ct">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the list of invoice grocery items.</returns>
-    public async Task<InvoiceImportResponse> InvoiceDataScrapperAsync(string invoiceCode, bool isInsert,
-        CancellationToken ct)
+    public async Task<InvoiceImportResponse> InvoiceDataScrapperAsync(string invoiceCode, bool isInsert, CancellationToken ct)
     {
         var web = new HtmlWeb();
         var url = _sefazPe.SefazUrl.Replace("{INVOICE_CODE}", invoiceCode);
@@ -62,8 +62,7 @@ public class InvoiceReaderService : IInvoiceReaderService
         return new InvoiceImportResponse(store, groceryItems);                                              
     }
 
-    private static List<InvoiceScanGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList,
-        HtmlNode purchaseDateXml)
+    private static List<InvoiceScanGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList, HtmlNode purchaseDateXml)
     {
         var result = new List<InvoiceScanGroceryItem>();
         foreach (var groceryItemXml in groceryItemXmlList)
@@ -76,7 +75,7 @@ public class InvoiceReaderService : IInvoiceReaderService
             (
                 Name: groceryItemXml.SelectSingleNode($"{xpath}/xprod").InnerText,
                 Price: ToDecimal(groceryItemXml.SelectSingleNode($"{xpath}/vuncom").InnerText),
-                MeasureUnit: groceryItemXml.SelectSingleNode($"{xpath}/ucom").InnerText,
+                MeasureUnit: groceryItemXml.SelectSingleNode($"{xpath}/ucom").InnerText.NormalizeMeasureUnit(),
                 Barcode: groceryItemXml.SelectSingleNode($"{xpath}/cean").InnerText,
                 PurchaseDate: DateTime.Parse(purchaseDateXml.InnerText),
                 NcmCode: ncm ?? string.Empty,

@@ -60,8 +60,27 @@ public static class EnumMappers
         "M" => MeasureUnitEnum.METER,
         "CX" => MeasureUnitEnum.BOX,
         "PCE" => MeasureUnitEnum.PACKAGE,
+        "PC" => MeasureUnitEnum.PACKAGE,
         "CJ" => MeasureUnitEnum.SET,
         "SC" => MeasureUnitEnum.SACK,
         _ => MeasureUnitEnum.EMPTY
     };
+    
+    public static string NormalizeMeasureUnit(this string value)
+    {
+        return value switch
+        {
+            "UN" => "UN",
+            "UNID" => "UN",
+            "KG" => "KG",
+            "L" => "L",
+            "M" => "M",
+            "CX" => "CX",
+            "PCE" => "PC",
+            "PC" => "PC",
+            "CJ" => "CJ",
+            "SC" => "SC",
+            _ => string.Empty
+        };        
+    }
 }

@@ -58,7 +58,6 @@ public class GroceryItemController(
         return Ok(groceryItems);
     }
     
-    
     [HttpGet("by-invoice")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(InvoiceImportResponse), 200)]
