@@ -26,14 +26,10 @@
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_HOST: '%'
       MYSQL_USER: feirapp-user
       MYSQL_PASSWORD: feirapp-password
       MYSQL_DATABASE: feirapp-db
-    healthcheck:
-      test: [ "CMD-SHELL", "mysqladmin ping -h localhost" ]
-      interval: 10s
-      timeout: 5s
-      retries: 3
       
 volumes:
   db-volume:

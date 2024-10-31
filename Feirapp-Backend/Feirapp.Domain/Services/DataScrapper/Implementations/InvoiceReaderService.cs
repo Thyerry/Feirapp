@@ -37,10 +37,14 @@ public class InvoiceReaderService : IInvoiceReaderService
         var web = new HtmlWeb();
         var url = _sefazPe.SefazUrl.Replace("{INVOICE_CODE}", invoiceCode);
         var doc = await web.LoadFromWebAsync(url, ct);
+
+        if (doc == null)
+            throw new Exception("NFC-e Service is down.");
+
         var err = doc.DocumentNode.SelectSingleNode("//erro");
         
         if(!string.IsNullOrWhiteSpace(err?.InnerText))
-            return new InvoiceImportResponse(null, []);
+            throw new Exception("NFC-e not found.");
         
         var groceryItemXmlList = doc.DocumentNode.SelectNodes("//prod");
         var storeNameXml = doc.DocumentNode.SelectSingleNode("//emit");
