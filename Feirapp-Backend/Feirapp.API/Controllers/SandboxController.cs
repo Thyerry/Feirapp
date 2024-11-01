@@ -1,5 +1,6 @@
 using Bogus;
 using Bogus.Extensions.Brazil;
+using Feirapp.API.Helpers.Response;
 using Feirapp.Domain.Services.GroceryItems.Command;
 using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Domain.Services.GroceryItems.Queries;
@@ -13,8 +14,9 @@ namespace Feirapp.API.Controllers;
 public class SandboxController : Controller
 {
     [HttpGet("create-grocery-item")]
-    [ProducesResponseType(typeof(InsertListOfGroceryItemsCommand), 200)]
-    public async Task<IActionResult> CreateGroceryItem([FromQuery] CreateGroceryItemQuery query,
+    [ProducesResponseType(typeof(ApiResponse<InsertListOfGroceryItemsCommand>), 200)]
+    public async Task<IActionResult> CreateGroceryItem(
+        [FromQuery] CreateGroceryItemQuery query,
         CancellationToken ct)
     {
         var date = new Faker().Date.Past(1);
@@ -45,7 +47,7 @@ public class SandboxController : Controller
                 State: f.PickRandom<StatesEnum>().StringValue()))
             .UseSeed(query.StoreSeed)
             .Generate();
-        
-        return Ok(new InsertListOfGroceryItemsCommand(groceryItems, store));
+
+        return Ok(ApiResponseFactory.Success(new InsertListOfGroceryItemsCommand(groceryItems, store)));
     }
 }

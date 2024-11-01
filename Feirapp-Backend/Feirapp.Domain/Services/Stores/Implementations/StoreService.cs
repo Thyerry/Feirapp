@@ -25,7 +25,7 @@ public class StoreService(IStoreRepository storeRepository) : IStoreService
         await storeRepository.InsertAsync(storeEntity, ct);
     }
 
-    public async Task<List<StoreDto>?> GetAllStoresAsync(CancellationToken ct)
+    public async Task<List<StoreDto>> GetAllStoresAsync(CancellationToken ct)
     {
         var result = await storeRepository.GetAllAsync(ct);
         return result.ToDtoList();
