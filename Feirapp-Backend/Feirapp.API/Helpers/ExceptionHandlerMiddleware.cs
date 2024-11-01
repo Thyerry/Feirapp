@@ -1,7 +1,7 @@
 using FluentValidation;
 using System.Net;
 using System.Text.Json;
-using Humanizer;
+using Feirapp.API.Helpers.Response;
 
 namespace Feirapp.API.Helpers;
 
@@ -20,49 +20,63 @@ public class ExceptionHandlerMiddleware
         {
             await _next(context);
         }
-        catch (Exception exception)
+        catch (Exception ex)
         {
-            var response = context.Response;
-            response.ContentType = "application/json";
+            await HandleExceptionAsync(context, ex);
+        }
+    }
 
-            string result;
-            switch (exception)
-            {
-                case ValidationException e:
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    var errorObj = new
+    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+        var response = new ApiResponse<object>
+        (
+            Status: "error",
+            Message: "An unexpected error ocurred",
+            Data: default,
+            Errors: [exception.Message]
+        );
+
+        return context.Response.WriteAsJsonAsync(response);
+    }
+    
+    private string Process(Exception exception, HttpContext context)
+    {
+        var response = context.Response;
+        response.ContentType = "application/json";
+        switch (exception)
+        {
+            case ValidationException e:
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                var errorObj = new
+                {
+                    Message = "There was some validation errors",
+                    Errors = e.Errors.Select(x => new
                     {
-                        Message = "There was some validation errors",
-                        Errors = e.Errors.Select(x => new
-                        {
-                            x.PropertyName,
-                            x.ErrorMessage,
-                            x.AttemptedValue,
-                        })
-                    };
+                        x.PropertyName,
+                        x.ErrorMessage,
+                        x.AttemptedValue,
+                    })
+                };
 
-                    result = JsonSerializer.Serialize(errorObj);
-                    break;
+                return JsonSerializer.Serialize(errorObj);
 
-                case InvalidOperationException e:
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    result = JsonSerializer.Serialize(new
-                    {
-                        message = e.Message,
-                    });
-                    break;
+            case InvalidOperationException e:
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return JsonSerializer.Serialize(new
+                {
+                    message = e.Message,
+                });
 
-                default:
-                    response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    result = JsonSerializer.Serialize(new
-                    {
-                        message = exception.Message,
-                        innerException = exception.InnerException?.Message,
-                    });
-                    break;
-            }
-
-            await response.WriteAsync(result);
+            default:
+                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return JsonSerializer.Serialize(new
+                {
+                    message = exception.Message,
+                    innerException = exception.InnerException?.Message,
+                });
         }
     }
 }
