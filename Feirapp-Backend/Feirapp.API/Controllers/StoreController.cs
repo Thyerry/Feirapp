@@ -59,6 +59,7 @@ public class StoreController(IStoreService storeService) : ControllerBase
     [AllowAnonymous]
     [SwaggerOperation(Summary = "Retrieves a store by ID", Description = "Retrieves a store by its ID.")]
     [SwaggerResponse(200, "Store retrieved successfully.", typeof(ApiResponse<StoreDto>))]
+    [SwaggerResponse(400, "Invalid store id.", typeof(ApiResponse<StoreDto>))]
     [SwaggerResponse(404, "Store not found.", typeof(ApiResponse<object>))]
     public async Task<IActionResult> GetAllStores([FromQuery] long storeId, CancellationToken ct = default)
     {

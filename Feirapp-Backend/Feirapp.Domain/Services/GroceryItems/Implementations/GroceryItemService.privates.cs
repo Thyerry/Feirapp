@@ -38,10 +38,9 @@ public partial class GroceryItemService
             groceryItem.Barcode = AdjustBarcode(groceryItem.Barcode);
             await InsertGroceryItem(groceryItem, storeId, itemDto.Price, itemDto.PurchaseDate, ct);
         }
-        
     }
 
-    private string AdjustBarcode(string barcode)
+    private static string AdjustBarcode(string barcode)
     {
         return barcode != "SEM GTIN" && barcode.Length > 13 ? barcode.Substring(1, 13) : barcode;
     }
@@ -54,21 +53,20 @@ public partial class GroceryItemService
 
         else
         {
-            UpdateItemAltNamesIfNeeded(itemFromDb, item.Name);
+            InsertAltName(itemFromDb, item.Name);
             await groceryItemRepository.UpdateAsync(itemFromDb, ct);
         }
 
         await InsertOrUpdatePriceLog(itemFromDb ?? item, storeId, price, purchaseDate, ct);
     }
 
-    private void UpdateItemAltNamesIfNeeded(GroceryItem itemFromDb, string newName)
+    private static void InsertAltName(GroceryItem itemFromDb, string newName)
     {
-        var altNames = itemFromDb.AltNames?.Split(',').ToList() ?? new List<string>();
-        if (itemFromDb.Name != newName && !altNames.Contains(newName))
-        {
-            altNames.Add(newName);
-            itemFromDb.AltNames = string.Join(',', altNames);
-        }
+        var altNames = itemFromDb.AltNames?.Split(',').ToList() ?? [];
+        if (itemFromDb.Name == newName || altNames.Contains(newName)) return;
+        
+        altNames.Add(newName);
+        itemFromDb.AltNames = string.Join(',', altNames);
     }
 
     private async Task InsertOrUpdatePriceLog(GroceryItem item, long storeId, decimal price, DateTime purchaseDate, CancellationToken ct)
