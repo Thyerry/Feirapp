@@ -34,7 +34,18 @@ public class InvoiceReaderService : IInvoiceReaderService
     /// <returns>A task that represents the asynchronous operation. The task result contains the list of invoice grocery items.</returns>
     public async Task<InvoiceImportResponse> InvoiceDataScrapperAsync(string invoiceCode, bool isInsert, CancellationToken ct)
     {
-        var web = new HtmlWeb();
+        var timeout = TimeSpan.FromSeconds(15);
+        using var httpClient = new HttpClient();
+        httpClient.Timeout = timeout;
+
+        var web = new HtmlWeb
+        {
+            PreRequest = request =>
+            {
+                request.Timeout = (int)timeout.TotalMilliseconds;
+                return true;
+            },
+        };
         var url = _sefazPe.SefazUrl.Replace("{INVOICE_CODE}", invoiceCode);
         var doc = await web.LoadFromWebAsync(url, ct);
 
@@ -43,7 +54,7 @@ public class InvoiceReaderService : IInvoiceReaderService
 
         var err = doc.DocumentNode.SelectSingleNode("//erro");
         
-        if(!string.IsNullOrWhiteSpace(err?.InnerText))
+        if(err == null || !string.IsNullOrWhiteSpace(err.InnerText))
             throw new Exception("NFC-e not found.");
         
         var groceryItemXmlList = doc.DocumentNode.SelectNodes("//prod");

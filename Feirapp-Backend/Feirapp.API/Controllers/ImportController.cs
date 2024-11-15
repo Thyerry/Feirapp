@@ -1,4 +1,5 @@
-﻿using Feirapp.Domain.Services.DataScrapper.Interfaces;
+﻿using Feirapp.API.Helpers.Response;
+using Feirapp.Domain.Services.DataScrapper.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Feirapp.API.Controllers;
@@ -24,26 +25,11 @@ public class ImportController : ControllerBase
         _ncmCestDataScrapper = ncmCestDataScrapper;
     }
 
-    /// <summary>
-    /// Gets the grocery items for a given invoice code.
-    /// </summary>
-    /// <param name="invoiceCode">The invoice code.</param>
-    /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the action result.</returns>
-    [HttpGet("invoice")]
-    public async Task<IActionResult> ImportFromInvoice([FromQuery] string invoiceCode, CancellationToken ct)
-    {
-        var result = await _invoiceReaderService.InvoiceDataScrapperAsync(invoiceCode, true, ct);
-        if (!result.Items.Any())
-            return NotFound();
-
-        return Ok();
-    }
-
     [HttpPut("update-ncm")]
+    [ProducesResponseType(typeof(ApiResponse<bool>), 200)]
     public async Task<IActionResult> ImportFromNcmCest(CancellationToken ct)
     {
         await _ncmCestDataScrapper.UpdateNcmAndCestsDetails(ct);
-        return Ok();
+        return Ok(ApiResponseFactory.Success(true));
     }
 }

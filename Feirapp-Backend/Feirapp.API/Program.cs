@@ -15,7 +15,6 @@ using Feirapp.Domain.Services.Users.Interfaces;
 using Feirapp.Infrastructure.Configuration;
 using Feirapp.Infrastructure.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -94,6 +93,8 @@ builder.Services.AddSwaggerGen(c =>
             new List<string>()
         }
     });
+    
+    c.EnableAnnotations();
 });
 
 

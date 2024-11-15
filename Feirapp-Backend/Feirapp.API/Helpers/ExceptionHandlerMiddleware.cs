@@ -1,11 +1,10 @@
 using FluentValidation;
 using System.Net;
-using System.Text.Json;
-using Humanizer;
+using Feirapp.API.Helpers.Response;
 
 namespace Feirapp.API.Helpers;
 
-public class ExceptionHandlerMiddleware
+public partial class ExceptionHandlerMiddleware
 {
     private readonly RequestDelegate _next;
 
@@ -20,49 +19,34 @@ public class ExceptionHandlerMiddleware
         {
             await _next(context);
         }
-        catch (Exception exception)
+        catch (Exception ex)
         {
-            var response = context.Response;
-            response.ContentType = "application/json";
-
-            string result;
-            switch (exception)
-            {
-                case ValidationException e:
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    var errorObj = new
-                    {
-                        Message = "There was some validation errors",
-                        Errors = e.Errors.Select(x => new
-                        {
-                            x.PropertyName,
-                            x.ErrorMessage,
-                            x.AttemptedValue,
-                        })
-                    };
-
-                    result = JsonSerializer.Serialize(errorObj);
-                    break;
-
-                case InvalidOperationException e:
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    result = JsonSerializer.Serialize(new
-                    {
-                        message = e.Message,
-                    });
-                    break;
-
-                default:
-                    response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    result = JsonSerializer.Serialize(new
-                    {
-                        message = exception.Message,
-                        innerException = exception.InnerException?.Message,
-                    });
-                    break;
-            }
-
-            await response.WriteAsync(result);
+            await HandleExceptionAsync(context, ex);
         }
+    }
+
+    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
+        context.Response.ContentType = "application/json";
+
+        switch (exception)
+        {
+            case ValidationException validationException:
+                return HandleValidationException(context, validationException);
+            case InvalidOperationException invalidOperationException:
+                return HandleInvalidOperationException(context, invalidOperationException);
+        }
+
+        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+        var genericResponse = new ApiResponse<object>
+        (
+            Status: "error",
+            Message: "An unexpected error ocurred",
+            Data: default,
+            Errors: [exception.Message]
+        );
+
+        return context.Response.WriteAsJsonAsync(genericResponse);
     }
 }
