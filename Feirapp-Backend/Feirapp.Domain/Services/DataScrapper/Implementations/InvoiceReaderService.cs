@@ -86,12 +86,17 @@ public class InvoiceReaderService : IInvoiceReaderService
 
             var cest = groceryItemXml.SelectSingleNode($"{xpath}/cest")?.InnerText;
             var ncm = groceryItemXml.SelectSingleNode($"{xpath}/ncm").InnerText;
+            var productCode = groceryItemXml.SelectSingleNode($"{xpath}/cprod").InnerText;
+            var barcode = productCode.StartsWith("000000")
+                ? groceryItemXml.SelectSingleNode($"{xpath}/cean").InnerText
+                : productCode;
+            
             var groceryItem = new InvoiceScanGroceryItem
             (
                 Name: groceryItemXml.SelectSingleNode($"{xpath}/xprod").InnerText,
                 Price: ToDecimal(groceryItemXml.SelectSingleNode($"{xpath}/vuncom").InnerText),
                 MeasureUnit: groceryItemXml.SelectSingleNode($"{xpath}/ucom").InnerText.NormalizeMeasureUnit(),
-                Barcode: groceryItemXml.SelectSingleNode($"{xpath}/cean").InnerText,
+                Barcode: barcode,
                 PurchaseDate: DateTime.Parse(purchaseDateXml.InnerText),
                 NcmCode: ncm ?? string.Empty,
                 CestCode: cest ?? string.Empty
