@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using Feirapp.API.Helpers;
@@ -36,8 +37,7 @@ builder.Services.AddDbContext<BaseContext>(options =>
 DependencyInjection(builder.Services, builder.Configuration);
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey =
-    Encoding.UTF8.GetBytes(jwtSettings["SecretKey"] ?? throw new InvalidOperationException("Secret key not found."));
+var secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"] ?? throw new InvalidOperationException("Secret key not found."));
 
 var cultureInfo = new CultureInfo("pt-BR");
 CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
@@ -115,7 +115,10 @@ app.UseCors(x => x
 
 app.UseRouting();
 
-app.Urls.Add("http://0.0.0.0:8080");
+if (!Debugger.IsAttached)
+{
+    app.Urls.Add("http://0.0.0.0:8080");
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -162,7 +165,7 @@ void ApplyMigrations(IApplicationBuilder application)
     var services = scope.ServiceProvider;
 
     using var context = services.GetRequiredService<BaseContext>(); 
-    Console.WriteLine($"""
+    Console.WriteLine($"""  
                       Migrating database...
                       Server: {context.Database.GetDbConnection().DataSource}
                       Connection String: {context.Database.GetConnectionString()}

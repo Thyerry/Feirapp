@@ -9,8 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Feirapp.Infrastructure.Repository;
 
-
-
 public class GroceryItemRepository(BaseContext context)
     : BaseRepository<GroceryItem>(context), IGroceryItemRepository, IDisposable
 {
@@ -46,7 +44,10 @@ public class GroceryItemRepository(BaseContext context)
     public async Task<GroceryItem?> CheckIfGroceryItemExistsAsync(GroceryItem groceryItem, long storeId, CancellationToken ct)
     {
         var query = _context.GroceryItems
-            .Join(_context.PriceLogs, g => g.Id, p => p.GroceryItemId, (g, p) => new { g, p })
+            .Join(_context.PriceLogs,
+                g => g.Id,
+                p => p.GroceryItemId,
+                (g, p) => new { g, p })
             .Where(x => groceryItem.Barcode == "SEM GTIN" 
                 ? x.g.Name == groceryItem.Name && x.p!.StoreId == storeId
                 : x.g.Barcode == groceryItem.Barcode)
@@ -73,10 +74,12 @@ public class GroceryItemRepository(BaseContext context)
     {
         var store = await _context.Stores.FindAsync(storeId, ct);
         
-        var items = await (from g in _context.GroceryItems
+        var items = await (
+            from g in _context.GroceryItems
             join p in _context.PriceLogs on g.Id equals p.GroceryItemId
             where p.StoreId == storeId
-            select g).ToListAsync(ct);
+            select g
+            ).ToListAsync(ct);
 
         return new StoreWithItems { Store = store, Items = items };
     }
@@ -106,6 +109,7 @@ public class GroceryItemRepository(BaseContext context)
         await _context.SaveChangesAsync(ct);
         return true;
     }
+    
     public new void Dispose()
     { }
 }

@@ -37,7 +37,7 @@ public class GroceryItemController(
     {
         var groceryItems = await groceryItemService.SearchGroceryItemsAsync(query, ct);
         return groceryItems.Count == 0
-            ? BadRequest(ApiResponseFactory.Failure<List<SearchGroceryItemsResponse>>("No Grocery Items Found"))
+            ? NotFound(ApiResponseFactory.Failure<List<SearchGroceryItemsResponse>>("No Grocery Items Found"))
             : Ok(ApiResponseFactory.Success(groceryItems));
     }
 
@@ -57,7 +57,7 @@ public class GroceryItemController(
         var result = await groceryItemService.GetByIdAsync(id, ct);
 
         return result == null
-            ? BadRequest(ApiResponseFactory.Failure<GetGroceryItemByIdResponse>("Grocery item not found"))
+            ? NotFound(ApiResponseFactory.Failure<GetGroceryItemByIdResponse>("Grocery item not found"))
             : Ok(ApiResponseFactory.Success(result));
     }
 
@@ -175,7 +175,7 @@ public class GroceryItemController(
     [SwaggerOperation(Summary = "Deletes a grocery item", Description = "Deletes a grocery item by its ID.")]
     [SwaggerResponse(200, "Grocery item deleted successfully.", typeof(OkResult))]
     [SwaggerResponse(400, "Invalid grocery item ID.", typeof(ApiResponse<object>))]
-    public async Task<IActionResult> Delete([FromQuery][SwaggerParameter("blablabals")]long groceryId, CancellationToken ct = default)
+    public async Task<IActionResult> Delete([FromQuery]long groceryId, CancellationToken ct = default)
     {
         await groceryItemService.DeleteAsync(groceryId, ct);
         return Accepted(ApiResponseFactory.Success(true));

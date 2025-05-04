@@ -3,6 +3,4 @@ using Feirapp.Domain.Services.GroceryItems.Dtos;
 
 namespace Feirapp.Domain.Services.GroceryItems.Command;
 
-public record InsertListOfGroceryItemsCommand(
-    List<InsertGroceryItem> GroceryItems,
-    InsertStore Store);
+public record InsertListOfGroceryItemsCommand(List<InsertGroceryItem> GroceryItems, InsertStore Store);

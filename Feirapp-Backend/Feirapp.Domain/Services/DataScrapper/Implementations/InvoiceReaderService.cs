@@ -87,9 +87,10 @@ public class InvoiceReaderService : IInvoiceReaderService
             var cest = groceryItemXml.SelectSingleNode($"{xpath}/cest")?.InnerText;
             var ncm = groceryItemXml.SelectSingleNode($"{xpath}/ncm").InnerText;
             var productCode = groceryItemXml.SelectSingleNode($"{xpath}/cprod").InnerText;
-            var barcode = productCode.StartsWith("000000")
-                ? groceryItemXml.SelectSingleNode($"{xpath}/cean").InnerText
-                : productCode;
+            var cean = groceryItemXml.SelectSingleNode($"{xpath}/cean")?.InnerText;
+            var barcode = string.IsNullOrWhiteSpace(cean) || cean == "SEM GTIN"
+                ? productCode
+                : cean;
             
             var groceryItem = new InvoiceScanGroceryItem
             (
