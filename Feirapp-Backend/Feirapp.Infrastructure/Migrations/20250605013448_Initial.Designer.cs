@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Feirapp.Infrastructure.Migrations
 {
     [DbContext(typeof(BaseContext))]
-    [Migration("20241010202414_initial")]
-    partial class initial
+    [Migration("20250605013448_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.3")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -95,6 +95,35 @@ namespace Feirapp.Infrastructure.Migrations
                     b.ToTable("GroceryItems");
                 });
 
+            modelBuilder.Entity("Feirapp.Entities.Entities.Invoice", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("ScanDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Invoices");
+                });
+
             modelBuilder.Entity("Feirapp.Entities.Entities.Ncm", b =>
                 {
                     b.Property<string>("Code")
@@ -126,16 +155,26 @@ namespace Feirapp.Infrastructure.Migrations
                     b.Property<long>("GroceryItemId")
                         .HasColumnType("bigint");
 
+                    b.Property<long>("InvoiceId")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime>("LogDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("ProductCode")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<long>("StoreId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("InvoiceId");
 
                     b.HasIndex("StoreId");
 
@@ -254,11 +293,28 @@ namespace Feirapp.Infrastructure.Migrations
                     b.Navigation("Ncm");
                 });
 
+            modelBuilder.Entity("Feirapp.Entities.Entities.Invoice", b =>
+                {
+                    b.HasOne("Feirapp.Entities.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Feirapp.Entities.Entities.PriceLog", b =>
                 {
                     b.HasOne("Feirapp.Entities.Entities.GroceryItem", "GroceryItem")
                         .WithMany("PriceHistory")
                         .HasForeignKey("GroceryItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Feirapp.Entities.Entities.Invoice", "Invoice")
+                        .WithMany()
+                        .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -269,6 +325,8 @@ namespace Feirapp.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("GroceryItem");
+
+                    b.Navigation("Invoice");
 
                     b.Navigation("Store");
                 });

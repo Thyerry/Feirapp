@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Feirapp.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -112,6 +112,31 @@ namespace Feirapp.Infrastructure.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Invoices",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Code = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Url = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ScanDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Invoices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Invoices_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "GroceryItems",
                 columns: table => new
                 {
@@ -158,12 +183,15 @@ namespace Feirapp.Infrastructure.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Price = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
                     LogDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     GroceryItemId = table.Column<long>(type: "bigint", nullable: false),
                     Barcode = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    StoreId = table.Column<long>(type: "bigint", nullable: false)
+                    ProductCode = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    StoreId = table.Column<long>(type: "bigint", nullable: false),
+                    InvoiceId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -172,6 +200,12 @@ namespace Feirapp.Infrastructure.Migrations
                         name: "FK_PriceLogs_GroceryItems_GroceryItemId",
                         column: x => x.GroceryItemId,
                         principalTable: "GroceryItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PriceLogs_Invoices_InvoiceId",
+                        column: x => x.InvoiceId,
+                        principalTable: "Invoices",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -204,10 +238,20 @@ namespace Feirapp.Infrastructure.Migrations
                 column: "NcmCode");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Invoices_UserId",
+                table: "Invoices",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PriceLogs_GroceryItemId_Barcode_LogDate_StoreId",
                 table: "PriceLogs",
                 columns: new[] { "GroceryItemId", "Barcode", "LogDate", "StoreId" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PriceLogs_InvoiceId",
+                table: "PriceLogs",
+                column: "InvoiceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PriceLogs_StoreId",
@@ -228,16 +272,19 @@ namespace Feirapp.Infrastructure.Migrations
                 name: "PriceLogs");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "GroceryItems");
 
             migrationBuilder.DropTable(
-                name: "GroceryItems");
+                name: "Invoices");
 
             migrationBuilder.DropTable(
                 name: "Stores");
 
             migrationBuilder.DropTable(
                 name: "Cests");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Ncms");
