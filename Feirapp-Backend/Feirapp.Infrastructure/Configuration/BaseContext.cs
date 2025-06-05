@@ -7,12 +7,12 @@ namespace Feirapp.Infrastructure.Configuration;
 public class BaseContext(DbContextOptions options) : DbContext(options)
 {
     public DbSet<GroceryItem> GroceryItems { get; set; }
-    public DbSet<PriceLog?> PriceLogs { get; set; }
+    public DbSet<PriceLog> PriceLogs { get; set; }
     public DbSet<Store> Stores { get; set; }
     public DbSet<Ncm> Ncms { get; set; }
     public DbSet<Cest> Cests { get; set; }
-    public DbSet<User?> Users { get; set; }
-
+    public DbSet<User> Users { get; set; }
+    public DbSet<Invoice> Invoices { get; set; }
     
     [DbFunction("RAND")]
     public static double Random()
@@ -47,7 +47,7 @@ public class BaseContext(DbContextOptions options) : DbContext(options)
         modelBuilder.Entity<PriceLog>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Price).IsRequired();
+            entity.Property(e => e.Price).HasPrecision(10,2).IsRequired();
             entity.Property(e => e.LogDate).IsRequired();
             entity.HasIndex(e => new { e.GroceryItemId, e.Barcode, e.LogDate, e.StoreId }).IsUnique();
         });
@@ -68,6 +68,14 @@ public class BaseContext(DbContextOptions options) : DbContext(options)
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Email).IsRequired();
+        });
+        
+        modelBuilder.Entity<Invoice>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Code).IsRequired();
+            entity.Property(e => e.ScanDate).IsRequired();
+            entity.HasOne(e => e.User).WithMany().HasForeignKey(e => e.UserId);
         });
 
         modelBuilder
