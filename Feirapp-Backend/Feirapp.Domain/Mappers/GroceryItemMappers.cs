@@ -18,7 +18,6 @@ public static partial class GroceryItemMappers
     public static partial List<GroceryItem> ToEntity(this GroceryItemDto model);
     public static partial GetGroceryItemByIdResponse ToGetByIdResponse(this GroceryItem model);
     public static partial List<GetGroceryItemByIdResponse> ToGetByIdResponse(this List<GroceryItem> model);
-    
     private static string StringAltNames(List<string> altNames) => MapperUtils.StringAltNames(altNames);
     private static List<string> ListAltNames(string nameList) => MapperUtils.ListAltNames(nameList);
     private static MeasureUnitEnum ToMeasureUnitEnum(this string measureUnit) => EnumMappers.ToMeasureUnitEnum(measureUnit);

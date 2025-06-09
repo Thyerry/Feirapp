@@ -9,6 +9,7 @@ public record InsertGroceryItemCommand(
     string? Description,
     string? ImageUrl,
     string Barcode,
+    string ProductCode,
     MeasureUnitEnum MeasureUnit,
     StoreDto? Store,
     DateTime? PurchaseDate = null);

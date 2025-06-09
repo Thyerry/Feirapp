@@ -14,24 +14,12 @@ public class InvoiceReaderService : IInvoiceReaderService
     private readonly SefazPE _sefazPe;
     private readonly IGroceryItemService _groceryItemService;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="InvoiceReaderService"/> class.
-    /// </summary>
-    /// <param name="options">The options for the SefazPE service.</param>
-    /// <param name="groceryItemService"></param>
     public InvoiceReaderService(IOptions<SefazPE> options, IGroceryItemService groceryItemService)
     {
         _groceryItemService = groceryItemService;
         _sefazPe = options.Value;
     }
 
-    /// <summary>
-    /// Scrapes invoice data asynchronously.
-    /// </summary>
-    /// <param name="invoiceCode">The invoice code.</param>
-    /// <param name="isInsert"></param>
-    /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the list of invoice grocery items.</returns>
     public async Task<InvoiceImportResponse> InvoiceDataScrapperAsync(string invoiceCode, bool isInsert, CancellationToken ct)
     {
         var timeout = TimeSpan.FromSeconds(15);
@@ -124,12 +112,5 @@ public class InvoiceReaderService : IInvoiceReaderService
         return result;
     }
 
-    /// <summary>
-    /// Converts a string to a decimal.
-    /// </summary>
-    /// <param name="text">The string to be converted.</param>
-    /// <returns>
-    /// A decimal number that is equivalent to the number in the string, or 0 (zero) if the conversion fails.
-    /// </returns>
     private static decimal ToDecimal(string text) => Convert.ToDecimal(string.Join(",", text.Split(".")));
 }

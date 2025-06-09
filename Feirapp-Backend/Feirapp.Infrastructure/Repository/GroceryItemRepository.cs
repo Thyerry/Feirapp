@@ -4,21 +4,18 @@ using Feirapp.Domain.Services.GroceryItems.Queries;
 using Feirapp.Entities.Dtos;
 using Feirapp.Entities.Entities;
 using Feirapp.Infrastructure.Configuration;
-using Feirapp.Infrastructure.Repository.BaseRepository;
+using Feirapp.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Feirapp.Infrastructure.Repository;
 
-public class GroceryItemRepository(BaseContext context)
-    : BaseRepository<GroceryItem>(context), IGroceryItemRepository, IDisposable
+public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository, IDisposable
 {
-    private readonly BaseContext _context = context;
-
     public async Task<List<SearchGroceryItemsDto>> SearchGroceryItemsAsync(SearchGroceryItemsQuery queryParams, CancellationToken ct)
     {
         var query = 
-            from g in _context.GroceryItems join p in _context.PriceLogs on g.Id equals p.GroceryItemId into pg
-            from p in pg.OrderByDescending(p => p.LogDate).Take(1) join s in _context.Stores on p.StoreId equals s.Id
+            from g in context.GroceryItems join p in context.PriceLogs on g.Id equals p.GroceryItemId into pg
+            from p in pg.OrderByDescending(p => p.LogDate).Take(1) join s in context.Stores on p.StoreId equals s.Id
             where 
                 (string.IsNullOrEmpty(queryParams.Name) || g.Name.Contains(queryParams.Name))
                 && (queryParams.StoreId <= 0 || s.Id == queryParams.StoreId)
@@ -30,10 +27,40 @@ public class GroceryItemRepository(BaseContext context)
             .AsNoTracking()
             .ToListAsync(ct);
     }
-    
-    public override async Task<GroceryItem?> GetByIdAsync(long id, CancellationToken ct)
+
+    public async Task<GroceryItem> InsertAsync(GroceryItem entity, CancellationToken ct)
     {
-        var query = _context.GroceryItems
+        await context.GroceryItems.AddAsync(entity, ct);
+        return entity;
+    }
+
+    public async Task InsertListAsync(List<GroceryItem> entities, CancellationToken ct)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task DeleteAsync(long id, CancellationToken ct)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task UpdateAsync(GroceryItem entity, CancellationToken ct)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<List<GroceryItem>> GetAllAsync(CancellationToken ct)
+    {
+        return await context.GroceryItems
+            .Include(g => g.PriceHistory)!
+            .ThenInclude(p => p.Store)
+            .AsNoTracking()
+            .ToListAsync(ct);
+    }
+
+    public async Task<GroceryItem?> GetByIdAsync(long id, CancellationToken ct)
+    {
+        var query = context.GroceryItems
             .Where(g => g.Id == id)
             .Include(g => g.PriceHistory)!
             .ThenInclude(p => p.Store);
@@ -41,10 +68,20 @@ public class GroceryItemRepository(BaseContext context)
         return await query.FirstOrDefaultAsync(ct);
     }
 
+    public async Task<GroceryItem> AddIfNotExistsAsync(Func<GroceryItem, bool> predicate, GroceryItem entity, CancellationToken ct = default)
+    {
+        return await context.GroceryItems.AddIfNotExistsAsync(entity, predicate, ct);
+    }
+
+    public List<GroceryItem> GetByQuery(Func<GroceryItem, bool> predicate, CancellationToken ct)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<GroceryItem?> CheckIfGroceryItemExistsAsync(GroceryItem groceryItem, long storeId, CancellationToken ct)
     {
-        var query = _context.GroceryItems
-            .Join(_context.PriceLogs,
+        var query = context.GroceryItems
+            .Join(context.PriceLogs,
                 g => g.Id,
                 p => p.GroceryItemId,
                 (g, p) => new { g, p })
@@ -58,13 +95,12 @@ public class GroceryItemRepository(BaseContext context)
 
     public async Task InsertPriceLog(PriceLog? priceLog, CancellationToken ct)
     {
-        await _context.PriceLogs.AddAsync(priceLog, ct);
-        await _context.SaveChangesAsync(ct);
+        await context.PriceLogs.AddAsync(priceLog, ct);
     }
 
     public async Task<PriceLog?> GetLastPriceLogAsync(long groceryItemId, long storeId, CancellationToken ct)
     {
-        return await _context.PriceLogs
+        return await context.PriceLogs
             .Where(p => p.GroceryItemId == groceryItemId && p.StoreId == storeId)
             .OrderByDescending(p => p.LogDate)
             .FirstOrDefaultAsync(ct);
@@ -72,11 +108,11 @@ public class GroceryItemRepository(BaseContext context)
 
     public async Task<StoreWithItems> GetByStoreAsync(long storeId, CancellationToken ct)
     {
-        var store = await _context.Stores.FindAsync(storeId, ct);
+        var store = await context.Stores.FindAsync(storeId, ct);
         
         var items = await (
-            from g in _context.GroceryItems
-            join p in _context.PriceLogs on g.Id equals p.GroceryItemId
+            from g in context.GroceryItems
+            join p in context.PriceLogs on g.Id equals p.GroceryItemId
             where p.StoreId == storeId
             select g
             ).ToListAsync(ct);
@@ -87,9 +123,9 @@ public class GroceryItemRepository(BaseContext context)
     public async Task<List<SearchGroceryItemsDto>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct)
     {
         var query = 
-            from g in _context.GroceryItems
-            join p in _context.PriceLogs on g.Id equals p.GroceryItemId
-            join s in _context.Stores on p.StoreId equals s.Id
+            from g in context.GroceryItems
+            join p in context.PriceLogs on g.Id equals p.GroceryItemId
+            join s in context.Stores on p.StoreId equals s.Id
             orderby BaseContext.Random()
             select new SearchGroceryItemsDto(g.Id, g.Name, g.Description, p.Price, g.ImageUrl, g.Barcode, p.LogDate, g.MeasureUnit, s.Id, s.Name);
 
@@ -100,16 +136,18 @@ public class GroceryItemRepository(BaseContext context)
     
     public async Task<bool> UpdateNameAndBrandAsync(long id, string name, string brand, CancellationToken ct)
     {
-        var groceryItem = await _context.GroceryItems.FindAsync(id, ct);
+        var groceryItem = await context.GroceryItems.FindAsync(id, ct);
         if (groceryItem == null)
             return false;
 
         groceryItem.Name = name;
         groceryItem.Brand = brand;
-        await _context.SaveChangesAsync(ct);
         return true;
     }
-    
-    public new void Dispose()
-    { }
+
+    public void Dispose()
+    {
+        context?.Dispose();
+        GC.SuppressFinalize(this);
+    }
 }

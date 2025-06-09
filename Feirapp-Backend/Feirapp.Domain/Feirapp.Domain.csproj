@@ -19,8 +19,4 @@
         <ProjectReference Include="..\Feirapp.Entities\Feirapp.Entities.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="Services\BaseRepository\"/>
-    </ItemGroup>
-
 </Project>

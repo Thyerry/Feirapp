@@ -2,7 +2,6 @@ using Bogus;
 using Bogus.Extensions.Brazil;
 using Feirapp.API.Helpers.Response;
 using Feirapp.Domain.Services.GroceryItems.Command;
-using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Domain.Services.GroceryItems.Queries;
 using Feirapp.Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +25,7 @@ public class SandboxController : Controller
                 Math.Round(f.Random.Decimal(1, 100), 2),
                 f.PickRandomWithout(MeasureUnitEnum.EMPTY).StringValue(),
                 f.Commerce.Ean13(),
+                f.Commerce.Ean8(),
                 null,
                 null,
                 date,

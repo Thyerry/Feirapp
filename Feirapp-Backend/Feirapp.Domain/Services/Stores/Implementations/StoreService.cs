@@ -2,11 +2,12 @@ using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Services.GroceryItems.Dtos;
 using Feirapp.Domain.Services.Stores.Dtos.Commands;
 using Feirapp.Domain.Services.Stores.Interfaces;
+using Feirapp.Domain.Services.UnitOfWork;
 using Feirapp.Entities.Entities;
 
 namespace Feirapp.Domain.Services.Stores.Implementations;
 
-public class StoreService(IStoreRepository storeRepository) : IStoreService
+public class StoreService(IUnitOfWork uow) : IStoreService
 {
     public async Task InsertStoreAsync(InsertStoreCommand store, CancellationToken ct)
     {
@@ -22,18 +23,18 @@ public class StoreService(IStoreRepository storeRepository) : IStoreService
             CityName = store.CityName,
             State = store.State.MapToStatesEnum()
         };
-        await storeRepository.InsertAsync(storeEntity, ct);
+        await uow.StoreRepository.InsertAsync(storeEntity, ct);
     }
 
     public async Task<List<StoreDto>> GetAllStoresAsync(CancellationToken ct)
     {
-        var result = await storeRepository.GetAllAsync(ct);
+        var result = await uow.StoreRepository.GetAllAsync(ct);
         return result.ToDtoList();
     }
 
     public async Task<StoreDto?> GetStoreById(long storeId, CancellationToken ct)
     {
-        var result = await storeRepository.GetByIdAsync(storeId, ct);
-        return result?.ToDto();
+        var result = await uow.StoreRepository.GetByIdAsync(storeId, ct);
+        return result.ToDto();
     }
 }

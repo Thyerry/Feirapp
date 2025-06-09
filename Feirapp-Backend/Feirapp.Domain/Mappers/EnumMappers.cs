@@ -1,4 +1,5 @@
-﻿using Feirapp.Entities.Enums;
+﻿using System.Diagnostics;
+using Feirapp.Entities.Enums;
 
 namespace Feirapp.Domain.Mappers;
 
@@ -9,9 +10,7 @@ public static class EnumMappers
         foreach (StatesEnum state in Enum.GetValues(typeof(StatesEnum)))
         {
             var fieldInfo = state.GetType().GetField(state.ToString());
-            var attribute = (StringValueAttribute)fieldInfo.GetCustomAttributes(typeof(StringValueAttribute), false)
-                .FirstOrDefault();
-            if (attribute != null && attribute.Value == stateAbbreviation)
+            if (fieldInfo?.GetCustomAttributes(typeof(StringValueAttribute), false).FirstOrDefault() is StringValueAttribute attribute && attribute.Value == stateAbbreviation)
             {
                 return state;
             }
