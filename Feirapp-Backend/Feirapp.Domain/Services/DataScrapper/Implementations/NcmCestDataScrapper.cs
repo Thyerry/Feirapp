@@ -1,31 +1,24 @@
-﻿using Feirapp.Domain.Services.BaseRepository;
-using Feirapp.Domain.Services.Cests.Interfaces;
-using Feirapp.Domain.Services.DataScrapper.Interfaces;
-using Feirapp.Domain.Services.Ncms.Interfaces;
+﻿using Feirapp.Domain.Services.DataScrapper.Interfaces;
+using Feirapp.Domain.Services.UnitOfWork;
 using Feirapp.Entities.Entities;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
 namespace Feirapp.Domain.Services.DataScrapper.Implementations;
 
-public class NcmCestDataScrapper : INcmCestDataScrapper
+public class NcmCestDataScrapper(IUnitOfWork uow) : INcmCestDataScrapper
 {
     private const string BaseUrl = "https://codigocest.com.br/consulta-codigo-cest-pelo-ncm";
-    private readonly INcmRepository _ncmRepository;
-    private readonly ICestRepository _cestRepository;
-
-    public NcmCestDataScrapper(INcmRepository ncmRepository, ICestRepository cestRepository)
-    {
-        _ncmRepository = ncmRepository;
-        _cestRepository = cestRepository;
-    }
-
+    
     public async Task UpdateNcmAndCestsDetails(CancellationToken ct)
     {
-        var ncms = _ncmRepository.GetByQuery(c => string.IsNullOrEmpty(c.Description), ct);
+        var ncms = await uow.NcmRepository.GetByQuery(c => string.IsNullOrEmpty(c.Description), ct);
         var driver = new ChromeDriver();
-        driver.Navigate().GoToUrl(BaseUrl);
-        foreach (var ncm in ncms) await GetNcmData(ncm.Code, driver, ct);
+        await driver.Navigate().GoToUrlAsync(BaseUrl);
+        
+        foreach (var ncm in ncms)
+            await GetNcmData(ncm.Code, driver, ct);
+        
         driver.Close();
     }
 
@@ -65,9 +58,11 @@ public class NcmCestDataScrapper : INcmCestDataScrapper
                 NcmCode = ncmCode
             });
 
-            await _ncmRepository.UpdateAsync(ncmUpdate, ct);
+            await uow.NcmRepository.UpdateAsync(ncmUpdate, ct);
             foreach (var cest in cests)
-                await _cestRepository.AddIfNotExistsAsync(c => c.Code == cest.Code, cest, ct);
+                await uow.CestRepository.AddIfNotExistsAsync(c => c.Code == cest.Code, cest, ct);
+            
+            await uow.SaveChangesAsync(ct);
         }
         catch (Exception)
         {

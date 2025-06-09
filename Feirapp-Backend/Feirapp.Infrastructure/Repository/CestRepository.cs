@@ -1,14 +1,12 @@
 using Feirapp.Domain.Services.Cests.Interfaces;
 using Feirapp.Entities.Entities;
 using Feirapp.Infrastructure.Configuration;
-using Feirapp.Infrastructure.Repository.BaseRepository;
+using Feirapp.Infrastructure.Extensions;
 
 namespace Feirapp.Infrastructure.Repository;
 
-public class CestRepository(BaseContext context) : BaseRepository<Cest>(context), ICestRepository
+public class CestRepository(BaseContext context) : ICestRepository
 {
-    private readonly BaseContext _context = context ?? throw new ArgumentNullException(nameof(context));
-
     public async Task InsertListOfCodesAsync(List<string?> cestCodes, CancellationToken ct)
     {
         var validCestCodes = cestCodes
@@ -19,7 +17,7 @@ public class CestRepository(BaseContext context) : BaseRepository<Cest>(context)
         if (validCestCodes.Count == 0)
             return;
 
-        var existingCestCodes = _context.Cests
+        var existingCestCodes = context.Cests
             .Where(c => validCestCodes.Contains(c.Code))
             .Select(c => c.Code)
             .ToHashSet(); 
@@ -31,8 +29,12 @@ public class CestRepository(BaseContext context) : BaseRepository<Cest>(context)
 
         if (newCestCodes.Any())
         {
-            await _context.Cests.AddRangeAsync(newCestCodes, ct);
-            await _context.SaveChangesAsync(ct);
+            await context.Cests.AddRangeAsync(newCestCodes, ct);
         }
+    }
+
+    public async Task<Cest> AddIfNotExistsAsync(Func<Cest, bool> func, Cest cest, CancellationToken ct)
+    {
+        return await context.Cests.AddIfNotExistsAsync(cest, c => c.Code == cest.Code, ct);
     }
 }

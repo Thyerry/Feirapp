@@ -2,19 +2,17 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using Feirapp.API.Helpers;
-using Feirapp.Domain.Services.Cests.Interfaces;
 using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.DataScrapper.Implementations;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Implementations;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
-using Feirapp.Domain.Services.Ncms.Interfaces;
 using Feirapp.Domain.Services.Stores.Implementations;
 using Feirapp.Domain.Services.Stores.Interfaces;
+using Feirapp.Domain.Services.UnitOfWork;
 using Feirapp.Domain.Services.Users.Implementations;
 using Feirapp.Domain.Services.Users.Interfaces;
 using Feirapp.Infrastructure.Configuration;
-using Feirapp.Infrastructure.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -140,6 +138,7 @@ void DependencyInjection(IServiceCollection services, IConfiguration configurati
 
     #region Services
 
+    services.AddScoped<IUnitOfWork, UnitOfWork>();
     services.AddScoped<IGroceryItemService, GroceryItemService>();
     services.AddScoped<IInvoiceReaderService, InvoiceReaderService>();
     services.AddScoped<INcmCestDataScrapper, NcmCestDataScrapper>();
@@ -147,16 +146,6 @@ void DependencyInjection(IServiceCollection services, IConfiguration configurati
     services.AddScoped<IUserService, UserService>();
 
     #endregion Services
-
-    #region Repositories
-
-    services.AddScoped<IGroceryItemRepository, GroceryItemRepository>();
-    services.AddScoped<IStoreRepository, StoreRepository>();
-    services.AddScoped<INcmRepository, NcmRepository>();
-    services.AddScoped<ICestRepository, CestRepository>();
-    services.AddScoped<IUserRepository, UserRepository>();
-
-    #endregion Repositories
 }
 
 void ApplyMigrations(IApplicationBuilder application)
