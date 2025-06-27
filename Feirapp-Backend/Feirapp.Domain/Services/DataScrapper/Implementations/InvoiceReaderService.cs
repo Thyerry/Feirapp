@@ -2,23 +2,15 @@
 using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Dtos;
-using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Entities.Enums;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Options;
 
 namespace Feirapp.Domain.Services.DataScrapper.Implementations;
 
-public class InvoiceReaderService : IInvoiceReaderService
+public class InvoiceReaderService(IOptions<SefazPE> options) : IInvoiceReaderService
 {
-    private readonly SefazPE _sefazPe;
-    private readonly IGroceryItemService _groceryItemService;
-
-    public InvoiceReaderService(IOptions<SefazPE> options, IGroceryItemService groceryItemService)
-    {
-        _groceryItemService = groceryItemService;
-        _sefazPe = options.Value;
-    }
+    private readonly SefazPE _sefazPe = options.Value;
 
     public async Task<InvoiceImportResponse> InvoiceDataScrapperAsync(string invoiceCode, bool isInsert, CancellationToken ct)
     {
@@ -62,7 +54,7 @@ public class InvoiceReaderService : IInvoiceReaderService
 
         var groceryItems = GetGroceryItemList(groceryItemXmlList, purchaseDateXml);
 
-        return new InvoiceImportResponse(store, groceryItems);                                              
+        return new InvoiceImportResponse(invoiceCode, store, groceryItems);                                              
     }
 
     private static List<InvoiceScanGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList, HtmlNode purchaseDateXml)
@@ -76,16 +68,14 @@ public class InvoiceReaderService : IInvoiceReaderService
             var ncm = groceryItemXml.SelectSingleNode($"{xpath}/ncm").InnerText;
             var productCode = groceryItemXml.SelectSingleNode($"{xpath}/cprod").InnerText;
             var cean = groceryItemXml.SelectSingleNode($"{xpath}/cean")?.InnerText;
-            var barcode = string.IsNullOrWhiteSpace(cean) || cean == "SEM GTIN"
-                ? productCode
-                : cean;
-            
+
             var groceryItem = new InvoiceScanGroceryItem
             (
                 Name: groceryItemXml.SelectSingleNode($"{xpath}/xprod").InnerText,
                 Price: ToDecimal(groceryItemXml.SelectSingleNode($"{xpath}/vuncom").InnerText),
                 MeasureUnit: groceryItemXml.SelectSingleNode($"{xpath}/ucom").InnerText.NormalizeMeasureUnit(),
-                Barcode: barcode,
+                Barcode: cean ?? string.Empty,
+                ProductCode: productCode,
                 PurchaseDate: DateTime.Parse(purchaseDateXml.InnerText),
                 NcmCode: ncm ?? string.Empty,
                 CestCode: cest ?? string.Empty

@@ -19,7 +19,7 @@ public partial class GroceryItemService(IUnitOfWork uow) : IGroceryItemService
     public async Task<GetGroceryItemByIdResponse?> GetByIdAsync(long id, CancellationToken ct)
     {
         var entity = await uow.GroceryItemRepository.GetByIdAsync(id, ct);
-        return entity.ToGetByIdResponse();
+        return entity?.ToGetByIdResponse();
     }
 
     public async Task<GetGroceryItemFromStoreIdResponse> GetByStoreAsync(long storeId, CancellationToken ct)

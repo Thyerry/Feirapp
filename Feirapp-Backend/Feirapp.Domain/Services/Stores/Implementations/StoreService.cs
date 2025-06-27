@@ -14,14 +14,14 @@ public class StoreService(IUnitOfWork uow) : IStoreService
         var storeEntity = new Store
         {
             Name = store.Name,
-            AltNames = string.Join(",", store.AltNames),
+            AltNames = string.Join(",", store.AltNames ?? []),
             Cnpj = store.Cnpj,
             Cep = store.Cep,
             Street = store.Street,
             StreetNumber = store.StreetNumber,
             Neighborhood = store.Neighborhood,
             CityName = store.CityName,
-            State = store.State.MapToStatesEnum()
+            State = store.State?.MapToStatesEnum()
         };
         await uow.StoreRepository.InsertAsync(storeEntity, ct);
     }
@@ -35,6 +35,6 @@ public class StoreService(IUnitOfWork uow) : IStoreService
     public async Task<StoreDto?> GetStoreById(long storeId, CancellationToken ct)
     {
         var result = await uow.StoreRepository.GetByIdAsync(storeId, ct);
-        return result.ToDto();
+        return result?.ToDto();
     }
 }

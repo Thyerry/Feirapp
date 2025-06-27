@@ -41,12 +41,26 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
 
     public async Task DeleteAsync(long id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var groceryItem = await context.GroceryItems.FindAsync([new { Id = id }], ct);
+
+        if (groceryItem == null)
+        {
+            throw new KeyNotFoundException($"Grocery item with ID {id} not found.");
+        }
+
+        context.GroceryItems.Remove(groceryItem);
     }
 
     public async Task UpdateAsync(GroceryItem entity, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var existingItem = await context.GroceryItems.FindAsync([new { entity.Id }], ct);
+
+        if (existingItem == null)
+        {
+            throw new KeyNotFoundException($"Store with ID {entity.Id} not found.");
+        }
+
+        context.Entry(existingItem).CurrentValues.SetValues(entity);
     }
 
     public async Task<List<GroceryItem>> GetAllAsync(CancellationToken ct)
@@ -86,14 +100,14 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
                 p => p.GroceryItemId,
                 (g, p) => new { g, p })
             .Where(x => groceryItem.Barcode == "SEM GTIN" 
-                ? x.g.Name == groceryItem.Name && x.p!.StoreId == storeId
+                ? x.g.Name == groceryItem.Name && x.p.StoreId == storeId
                 : x.g.Barcode == groceryItem.Barcode)
             .Select(x => x.g);
 
         return await query.FirstOrDefaultAsync(ct);
     }
 
-    public async Task InsertPriceLog(PriceLog? priceLog, CancellationToken ct)
+    public async Task InsertPriceLog(PriceLog priceLog, CancellationToken ct)
     {
         await context.PriceLogs.AddAsync(priceLog, ct);
     }
@@ -108,14 +122,16 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
 
     public async Task<StoreWithItems> GetByStoreAsync(long storeId, CancellationToken ct)
     {
-        var store = await context.Stores.FindAsync(storeId, ct);
+        var store = await context.Stores.FindAsync([new { Id = storeId }], ct);
+        
+        if (store == null)
+            throw new KeyNotFoundException("Store not found");
         
         var items = await (
             from g in context.GroceryItems
             join p in context.PriceLogs on g.Id equals p.GroceryItemId
             where p.StoreId == storeId
-            select g
-            ).ToListAsync(ct);
+            select g).ToListAsync(ct);
 
         return new StoreWithItems { Store = store, Items = items };
     }
@@ -129,14 +145,12 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
             orderby BaseContext.Random()
             select new SearchGroceryItemsDto(g.Id, g.Name, g.Description, p.Price, g.ImageUrl, g.Barcode, p.LogDate, g.MeasureUnit, s.Id, s.Name);
 
-        return await query
-            .Take(quantity)
-            .ToListAsync(ct);
+        return await query.Take(quantity).ToListAsync(ct);
     }
     
     public async Task<bool> UpdateNameAndBrandAsync(long id, string name, string brand, CancellationToken ct)
     {
-        var groceryItem = await context.GroceryItems.FindAsync(id, ct);
+        var groceryItem = await context.GroceryItems.FindAsync([new { Id = id }], ct);
         if (groceryItem == null)
             return false;
 
@@ -147,7 +161,7 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
 
     public void Dispose()
     {
-        context?.Dispose();
+        context.Dispose();
         GC.SuppressFinalize(this);
     }
 }
