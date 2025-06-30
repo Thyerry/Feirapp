@@ -7,7 +7,7 @@ public record InsertGroceryItem(
     string Barcode,
     string ProductCode,
     string? Brand,
-    string? AltNames,
+    List<string>? AltNames,
     DateTime PurchaseDate,
     string NcmCode,
     string? CestCode

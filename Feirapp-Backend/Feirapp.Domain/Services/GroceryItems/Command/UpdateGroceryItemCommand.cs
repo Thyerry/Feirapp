@@ -4,9 +4,9 @@ using FluentValidation.Results;
 namespace Feirapp.Domain.Services.GroceryItems.Command;
 
 public record UpdateGroceryItemCommand(
-    long Id,
+    Guid Id,
     string Barcode,
-    long StoreId,
+    Guid StoreId,
     string? Brand,
     string? Description,
     string? ImageUrl,
@@ -16,16 +16,12 @@ public record UpdateGroceryItemCommand(
     public void Validate()
     {
         var errors = new List<ValidationFailure>();
-        if (Id <= 0)
-            errors.Add(new ValidationFailure(nameof(Id), "Id must be greater than 0.", Id));
         if (string.IsNullOrWhiteSpace(Barcode))
             errors.Add(new ValidationFailure(nameof(Barcode), "Barcode cannot be null or empty.", Barcode));
         if (Barcode.Length <= 13)
             errors.Add(new ValidationFailure(nameof(Barcode), "Barcode must have 13 characters.", Barcode));
         if (Barcode.Any(c => !char.IsDigit(c)))
             errors.Add(new ValidationFailure(nameof(Barcode), "Barcode must contain only digits.", Barcode));
-        if (StoreId <= 0)
-            errors.Add(new ValidationFailure(nameof(StoreId), "StoreId must be greater than 0.", StoreId));
         if (Price <= 0)
             errors.Add(new ValidationFailure(nameof(Price), "Price must be greater than 0.", Price));
 

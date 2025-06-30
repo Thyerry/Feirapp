@@ -1,6 +1,6 @@
 ﻿namespace Feirapp.Domain.Services.DataScrapper.Dtos;
 
-public class SefazPE
+public class SefazPe
 {
     public string SefazUrl { get; set; } = string.Empty;
 }

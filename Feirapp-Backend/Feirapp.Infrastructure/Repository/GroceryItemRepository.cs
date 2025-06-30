@@ -13,14 +13,16 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
 {
     public async Task<List<SearchGroceryItemsDto>> SearchGroceryItemsAsync(SearchGroceryItemsQuery queryParams, CancellationToken ct)
     {
-        var query = 
-            from g in context.GroceryItems join p in context.PriceLogs on g.Id equals p.GroceryItemId into pg
-            from p in pg.OrderByDescending(p => p.LogDate).Take(1) join s in context.Stores on p.StoreId equals s.Id
-            where 
-                (string.IsNullOrEmpty(queryParams.Name) || g.Name.Contains(queryParams.Name))
-                && (queryParams.StoreId <= 0 || s.Id == queryParams.StoreId)
+        var query =
+            from g in context.GroceryItems
+            join p in context.PriceLogs on g.Id equals p.GroceryItemId into pg
+            from p in pg.OrderByDescending(p => p.LogDate).Take(1)
+            join s in context.Stores on p.StoreId equals s.Id
+            where
+                (string.IsNullOrEmpty(queryParams.Name) || g.Name.Contains(queryParams.Name)) &&
+                (!queryParams.StoreId.HasValue || s.Id == queryParams.StoreId.Value)
             select new SearchGroceryItemsDto(g.Id, g.Name, g.Description, p.Price, g.ImageUrl, g.Barcode, p.LogDate, g.MeasureUnit, s.Id, s.Name);
-
+        
         return await query
             .Skip(queryParams.PageSize * queryParams.Page)
             .Take(queryParams.PageSize)
@@ -39,7 +41,7 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
         throw new NotImplementedException();
     }
 
-    public async Task DeleteAsync(long id, CancellationToken ct)
+    public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
         var groceryItem = await context.GroceryItems.FindAsync([new { Id = id }], ct);
 
@@ -72,13 +74,15 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
             .ToListAsync(ct);
     }
 
-    public async Task<GroceryItem?> GetByIdAsync(long id, CancellationToken ct)
+    public async Task<GroceryItem?> GetByIdAsync(Guid id, CancellationToken ct)
     {
         var query = context.GroceryItems
             .Where(g => g.Id == id)
             .Include(g => g.PriceHistory)!
             .ThenInclude(p => p.Store);
 
+        var sd = query.ToQueryString();
+        
         return await query.FirstOrDefaultAsync(ct);
     }
 
@@ -92,7 +96,7 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
         throw new NotImplementedException();
     }
 
-    public async Task<GroceryItem?> CheckIfGroceryItemExistsAsync(GroceryItem groceryItem, long storeId, CancellationToken ct)
+    public async Task<GroceryItem?> CheckIfGroceryItemExistsAsync(GroceryItem groceryItem, Guid storeId, CancellationToken ct)
     {
         var query = context.GroceryItems
             .Join(context.PriceLogs,
@@ -112,7 +116,7 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
         await context.PriceLogs.AddAsync(priceLog, ct);
     }
 
-    public async Task<PriceLog?> GetLastPriceLogAsync(long groceryItemId, long storeId, CancellationToken ct)
+    public async Task<PriceLog?> GetLastPriceLogAsync(Guid groceryItemId, Guid storeId, CancellationToken ct)
     {
         return await context.PriceLogs
             .Where(p => p.GroceryItemId == groceryItemId && p.StoreId == storeId)
@@ -120,9 +124,9 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
             .FirstOrDefaultAsync(ct);
     }
 
-    public async Task<StoreWithItems> GetByStoreAsync(long storeId, CancellationToken ct)
+    public async Task<StoreWithItems> GetByStoreAsync(Guid storeId, CancellationToken ct)
     {
-        var store = await context.Stores.FindAsync([new { Id = storeId }], ct);
+        var store = await context.Stores.FindAsync([storeId], ct);
         
         if (store == null)
             throw new KeyNotFoundException("Store not found");
@@ -148,7 +152,7 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
         return await query.Take(quantity).ToListAsync(ct);
     }
     
-    public async Task<bool> UpdateNameAndBrandAsync(long id, string name, string brand, CancellationToken ct)
+    public async Task<bool> UpdateNameAndBrandAsync(Guid id, string name, string brand, CancellationToken ct)
     {
         var groceryItem = await context.GroceryItems.FindAsync([new { Id = id }], ct);
         if (groceryItem == null)

@@ -3,7 +3,7 @@
 namespace Feirapp.Domain.Services.GroceryItems.Dtos;
 
 public record SearchGroceryItemsDto(
-    long Id,
+    Guid Id,
     string Name,
     string? Description,
     decimal LastPrice,
@@ -11,5 +11,5 @@ public record SearchGroceryItemsDto(
     string Barcode,
     DateTime LastUpdate,
     MeasureUnitEnum MeasureUnit,
-    long StoreId,
+    Guid StoreId,
     string StoreName);

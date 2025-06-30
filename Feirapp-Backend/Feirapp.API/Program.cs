@@ -26,8 +26,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContext<BaseContext>(options =>
 {
-    var mysql = builder.Configuration.GetConnectionString("MySqlConnection");
-    options.UseMySql(mysql, new MySqlServerVersion(new Version(8, 3, 0)));
+    var pgsql = builder.Configuration.GetConnectionString("PostgresConnection");
+    options.UseNpgsql(pgsql);
 });
 
 #endregion DB Context Configuration
@@ -132,7 +132,7 @@ void DependencyInjection(IServiceCollection services, IConfiguration configurati
 {
     #region Configurations
 
-    services.Configure<SefazPE>(configuration.GetSection("DataScrappingResources:SefazPE"));
+    services.Configure<SefazPe>(configuration.GetSection("DataScrappingResources:SefazPE"));
 
     #endregion Configurations
 

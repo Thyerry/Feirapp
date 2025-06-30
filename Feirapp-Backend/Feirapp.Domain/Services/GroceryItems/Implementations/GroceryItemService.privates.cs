@@ -1,6 +1,7 @@
 using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Services.GroceryItems.Command;
 using Feirapp.Entities.Entities;
+using Feirapp.Entities.Utils;
 
 namespace Feirapp.Domain.Services.GroceryItems.Implementations;
 
@@ -8,16 +9,30 @@ public partial class GroceryItemService
 {
     private async Task<Store> EnsureStoreExistsAsync(InsertStore storeDto, CancellationToken ct)
     {
-        var store = await uow.StoreRepository.AddIfNotExistsAsync(s => s.Cnpj == storeDto.Cnpj, storeDto.ToEntity() , ct);
-        var storeAltNames = store.AltNames?.Split(",").ToList() ?? [];
+        var store = await AddIfNotExistsAsync(storeDto.ToEntity(), ct);
         
-        if (store.Name == storeDto.Name || storeAltNames.Contains(storeDto.Name)) 
+        if (store.Name == storeDto.Name || (store.AltNames ?? []).Contains(storeDto.Name)) 
             return store;
+
+        store.AltNames = store.AltNames == null 
+            ? [storeDto.Name] 
+            : store.AltNames.Append(storeDto.Name).ToList();
         
-        storeAltNames.Add(storeDto.Name);
-        store.AltNames = string.Join(',', storeAltNames);
         await uow.StoreRepository.UpdateAsync(store, ct);
 
+        return store;
+    }
+
+    private async Task<Store> AddIfNotExistsAsync(Store store, CancellationToken ct)
+    {
+        var existingStore = await uow.StoreRepository.GetByCnpjAsync(store.Cnpj, ct);
+        if (existingStore != null)
+        {
+            store.Id = existingStore.Id;
+            return existingStore;
+        }
+
+        await uow.StoreRepository.InsertAsync(store, ct);
         return store;
     }
 
@@ -30,7 +45,7 @@ public partial class GroceryItemService
             await uow.CestRepository.InsertListOfCodesAsync(cests, ct);
     }
 
-    private async Task InsertGroceryItemsAsync(List<InsertGroceryItem> items, long storeId, CancellationToken ct)
+    private async Task InsertGroceryItemsAsync(List<InsertGroceryItem> items, Guid storeId, CancellationToken ct)
     {
         foreach (var itemDto in items)
         {
@@ -45,11 +60,14 @@ public partial class GroceryItemService
         return barcode != "SEM GTIN" && barcode.Length > 13 ? barcode.Substring(1, 13) : barcode;
     }
 
-    private async Task InsertGroceryItem(GroceryItem item, long storeId, decimal price, DateTime purchaseDate, string productCode, CancellationToken ct)
+    private async Task InsertGroceryItem(GroceryItem item, Guid storeId, decimal price, DateTime purchaseDate, string productCode, CancellationToken ct)
     {
         var itemFromDb = await uow.GroceryItemRepository.CheckIfGroceryItemExistsAsync(item, storeId, ct);
         if (itemFromDb == null)
+        {
+            item.Id = GuidGenerator.Generate();
             await uow.GroceryItemRepository.InsertAsync(item, ct);
+        }
         else
         {
             InsertAltName(itemFromDb, item.Name);
@@ -61,20 +79,22 @@ public partial class GroceryItemService
 
     private static void InsertAltName(GroceryItem itemFromDb, string newName)
     {
-        var altNames = itemFromDb.AltNames?.Split(',').ToList() ?? [];
-        if (itemFromDb.Name == newName || altNames.Contains(newName)) return;
+        if (itemFromDb.Name == newName || (itemFromDb.AltNames ?? []).Contains(newName))
+            return;
         
-        altNames.Add(newName);
-        itemFromDb.AltNames = string.Join(',', altNames);
+        itemFromDb.AltNames = itemFromDb.AltNames == null
+            ? [newName]
+            : itemFromDb.AltNames.Append(newName).ToList();
     }
 
-    private async Task InsertOrUpdatePriceLog(GroceryItem item, long storeId, decimal price, DateTime purchaseDate, string productCode, CancellationToken ct)
+    private async Task InsertOrUpdatePriceLog(GroceryItem item, Guid storeId, decimal price, DateTime purchaseDate, string productCode, CancellationToken ct)
     {
         var lastPriceLog = await uow.GroceryItemRepository.GetLastPriceLogAsync(item.Id, storeId, ct);
-        if (lastPriceLog == null || (Math.Round(price, 2) != Math.Round(lastPriceLog.Price, 2) && purchaseDate.Ticks > lastPriceLog.LogDate.Ticks))
+        if (lastPriceLog == null || (Math.Round(price, 2) != Math.Round(lastPriceLog.Price, 2) && purchaseDate > lastPriceLog.LogDate))
         {
             var priceLog = new PriceLog
             {
+                Id = GuidGenerator.Generate(),
                 GroceryItemId = item.Id,
                 Barcode = item.Barcode,
                 StoreId = storeId,

@@ -2,18 +2,36 @@
 
 namespace Feirapp.Entities.Entities;
 
-[Table("PriceLogs")]
+[Table("price_logs")]
 public class PriceLog
 {
-    public long Id { get; set; }
+    [Column("id")]
+    public Guid Id { get; set; }
+
+    [Column("price")]
     public decimal Price { get; set; }
+
+    [Column("log_date")]
     public DateTime LogDate { get; set; }
-    public long GroceryItemId { get; set; }
+
+    [Column("grocery_item_id")]
+    public Guid GroceryItemId { get; set; }
+
+    [Column("barcode")]
     public string Barcode { get; set; }
+
+    [Column("product_code")]
     public string? ProductCode { get; set; }
+
     public GroceryItem GroceryItem { get; set; }
-    public long StoreId;
+
+    [Column("store_id")]
+    public Guid StoreId;
+
     public Store Store { get; set; }
-    public long? InvoiceId { get; set; }
+
+    [Column("invoice_id")]
+    public Guid? InvoiceId { get; set; }
+
     public Invoice Invoice { get; set; }
 }

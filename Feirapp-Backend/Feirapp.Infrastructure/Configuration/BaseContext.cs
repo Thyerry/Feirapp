@@ -1,6 +1,6 @@
 ﻿using Feirapp.Entities.Entities;
+using Feirapp.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Feirapp.Infrastructure.Configuration;
 
@@ -14,7 +14,7 @@ public class BaseContext(DbContextOptions options) : DbContext(options)
     public DbSet<User> Users { get; set; }
     public DbSet<Invoice> Invoices { get; set; }
     
-    [DbFunction("RAND")]
+    [DbFunction("random", IsBuiltIn = true)]
     public static double Random()
     {
         throw new NotImplementedException();
@@ -32,6 +32,10 @@ public class BaseContext(DbContextOptions options) : DbContext(options)
                 .Property(e => e.Name)
                 .HasMaxLength(1024)
                 .IsRequired();
+            entity
+                .Property(e => e.AltNames)
+                .HasColumnType("text[]");
+
             entity
                 .Property(e => e.State)
                 .HasConversion<string>()
@@ -51,12 +55,17 @@ public class BaseContext(DbContextOptions options) : DbContext(options)
             entity
                 .Property(e => e.CityName)
                 .HasMaxLength(1024);
-            entity
-                .HasMany(e => e.PriceLogs)
-                .WithOne(e => e.Store);
+            
             entity
                 .HasIndex(e => e.Cnpj)
                 .IsUnique();
+            entity
+                .HasIndex(e => e.AltNames)
+                .HasMethod("GIN");
+            entity
+                .HasIndex(e => e.Name);
+            entity
+                .HasIndex(e => e.CityName);
         });
 
         modelBuilder.Entity<GroceryItem>(entity =>
@@ -74,18 +83,9 @@ public class BaseContext(DbContextOptions options) : DbContext(options)
                 .Property(e => e.ImageUrl)
                 .HasMaxLength(1024);
             entity
-                .HasMany(e => e.PriceHistory)
-                .WithOne(e => e.GroceryItem);
-            entity
-                .HasOne(e => e.Ncm)
-                .WithMany()
-                .HasForeignKey(e => e.NcmCode);
-            entity
-                .HasOne(e => e.Cest)
-                .WithMany()
-                .HasForeignKey(e => e.CestCode);
-            entity
                 .HasIndex(e => e.Barcode);
+            entity
+                .HasIndex(e => e.Name);
             entity
                 .Property(e => e.MeasureUnit)
                 .IsRequired()
@@ -99,7 +99,7 @@ public class BaseContext(DbContextOptions options) : DbContext(options)
                 .HasKey(e => e.Id);
             entity
                 .Property(e => e.Price)
-                .HasPrecision(10,2)
+                .HasPrecision(10, 2)
                 .IsRequired();
             entity
                 .Property(e => e.LogDate)
@@ -107,29 +107,22 @@ public class BaseContext(DbContextOptions options) : DbContext(options)
             entity
                 .Property(e => e.ProductCode)
                 .HasMaxLength(20);
-            entity
-                .HasIndex(e => new { e.GroceryItemId, e.Barcode, e.LogDate, e.StoreId })
-                .IsUnique();
+            entity.HasIndex(e => e.GroceryItemId);
+            entity.HasIndex(e => e.Barcode);
+            entity.HasIndex(e => e.StoreId);
+            entity.HasIndex(e => e.InvoiceId);
+            entity.HasIndex(e => new { e.GroceryItemId, e.Barcode, e.LogDate, e.StoreId }).IsUnique();
+            entity.HasIndex(e => e.LogDate).HasDatabaseName("idx_pricelogs_logdate_desc");
         });
 
         modelBuilder.Entity<Ncm>(entity =>
         {
-            entity
-                .HasKey(e => e.Code);
-            entity
-                .HasMany(e => e.Cests)
-                .WithOne(e => e.Ncm)
-                .HasForeignKey(e => e.NcmCode);
+            entity.HasKey(e => e.Code);
         });
 
         modelBuilder.Entity<Cest>(entity =>
         {
-            entity
-                .HasKey(e => e.Code);
-            entity
-                .HasMany(e => e.GroceryItems)
-                .WithOne(e => e.Cest)
-                .HasForeignKey(e => e.CestCode);
+            entity.HasKey(e => e.Code);
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -145,11 +138,11 @@ public class BaseContext(DbContextOptions options) : DbContext(options)
                 .IsRequired();
             entity
                 .Property(e => e.Password)
-                .HasColumnType("char(50)")
-                .IsRequired();
+                .HasMaxLength(50)
+                .IsFixedLength();
             entity
                 .Property(e => e.PasswordSalt)
-                .HasColumnType("char(50)");
+                .HasMaxLength(50);
             entity
                 .Property(e => e.Status)
                 .HasConversion<string>()
@@ -166,19 +159,31 @@ public class BaseContext(DbContextOptions options) : DbContext(options)
                 .IsRequired();
             entity
                 .Property(e => e.ScanDate)
+                .HasColumnType("timestamp with time zone")
                 .IsRequired();
             entity
                 .Property(e => e.Url)
                 .HasMaxLength(1024)
                 .IsRequired();
-            entity
-                .HasOne(e => e.User)
-                .WithMany()
-                .HasForeignKey(e => e.UserId);
+            entity.HasIndex(e => e.Code);
+            entity.HasIndex(e => e.ScanDate);
         });
 
         modelBuilder
             .HasDbFunction(typeof(BaseContext).GetMethod(nameof(Random), []) ?? throw new InvalidOperationException())
-            .HasName("RAND");
+            .HasName("RANDOM");
+        
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var properties = entityType.ClrType.GetProperties()
+                .Where(p => p.PropertyType == typeof(DateTime));
+
+            foreach (var prop in properties)
+            {
+                modelBuilder.Entity(entityType.ClrType)
+                    .Property(prop.Name)
+                    .HasConversion(new UtcDateTimeConverter());
+            }
+        }
     }
 }

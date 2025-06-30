@@ -4,7 +4,7 @@ using Feirapp.Entities.Enums;
 namespace Feirapp.Domain.Services.GroceryItems.Responses;
 
 public record GetGroceryItemByIdResponse(
-    long Id,
+    Guid Id,
     string Name,
     string? Description,
     string? ImageUrl,

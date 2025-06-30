@@ -20,7 +20,7 @@ public class StoreRepository(BaseContext context) : IStoreRepository, IDisposabl
 
     public async Task UpdateAsync(Store store, CancellationToken ct)
     {
-        var existingStore = await context.Stores.FindAsync([new  { store.Id }], ct);
+        var existingStore = await context.Stores.FindAsync([store.Id], ct);
         if(existingStore == null)
             throw new KeyNotFoundException($"Store with ID {store.Id} not found.");
 
@@ -44,7 +44,7 @@ public class StoreRepository(BaseContext context) : IStoreRepository, IDisposabl
 
     public async Task<Store?> GetByIdAsync(long storeId, CancellationToken ct)
     {
-        return await context.Stores.FindAsync([new  { Id = storeId }], ct); 
+        return await context.Stores.FindAsync([storeId], ct); 
     }
 
     public void Dispose()
