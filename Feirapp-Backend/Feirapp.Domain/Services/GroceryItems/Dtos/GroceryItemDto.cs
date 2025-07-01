@@ -3,7 +3,7 @@
 namespace Feirapp.Domain.Services.GroceryItems.Dtos;
 
 public record GroceryItemDto(
-    long Id,
+    Guid Id,
     string Name,
     string Description,
     string ImageUrl,

@@ -7,17 +7,13 @@ using Feirapp.Domain.Services.GroceryItems.Queries;
 using Feirapp.Domain.Services.GroceryItems.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace Feirapp.API.Controllers;
 
 [ApiController]
 //[Authorize]
 [Route("api/grocery-item")]
-public class GroceryItemController(
-    IGroceryItemService groceryItemService,
-    IInvoiceReaderService invoiceService,
-    ILogger<GroceryItemController> logger) : ControllerBase
+public class GroceryItemController(IGroceryItemService groceryItemService, IInvoiceReaderService invoiceService) : ControllerBase
 {
     [HttpGet]
     [AllowAnonymous]
@@ -31,7 +27,7 @@ public class GroceryItemController(
 
     [HttpGet("by-id")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetById([FromQuery]long id, CancellationToken ct = default)
+    public async Task<IActionResult> GetById([FromQuery]Guid id, CancellationToken ct = default)
     {
         var result = await groceryItemService.GetByIdAsync(id, ct);
 
@@ -42,7 +38,7 @@ public class GroceryItemController(
 
     [HttpGet("by-store")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetFromStore([FromQuery]long storeId, CancellationToken ct = default)
+    public async Task<IActionResult> GetFromStore([FromQuery]Guid storeId, CancellationToken ct = default)
     {
         var groceryItems = await groceryItemService.GetByStoreAsync(storeId, ct);
         return groceryItems.Items.Count == 0
@@ -93,7 +89,7 @@ public class GroceryItemController(
     }
     
     [HttpDelete]
-    public async Task<IActionResult> Delete([FromQuery]long groceryId, CancellationToken ct = default)
+    public async Task<IActionResult> Delete([FromQuery]Guid groceryId, CancellationToken ct = default)
     {
         await groceryItemService.DeleteAsync(groceryId, ct);
         return Accepted(ApiResponseFactory.Success(true));

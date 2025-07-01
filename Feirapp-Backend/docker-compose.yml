@@ -15,21 +15,16 @@
       ASPNETCORE_URLS: "http://+:8080;"
         
   feirapp-db:
-    image: mysql:8.3.0
+    image: postgres:16
     container_name: feirapp-db
-    ports:
-      - "3306:3306"
-    expose:
-      - 3306
-    volumes:
-      - db-volume:/var/lib/mysql
-    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_ROOT_HOST: '%'
-      MYSQL_USER: feirapp-user
-      MYSQL_PASSWORD: feirapp-password
-      MYSQL_DATABASE: feirapp-db
+      POSTGRES_DB: feirapp-db
+      POSTGRES_USER: feirapp-user
+      POSTGRES_PASSWORD: feirapp-password
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-volume:/var/lib/postgresql/data
       
 volumes:
   db-volume:

@@ -4,7 +4,7 @@ using FluentValidation.Results;
 namespace Feirapp.Domain.Services.GroceryItems.Dtos;
 
 public record StoreDto(
-    long? Id,
+    Guid Id,
     string Name,
     List<string>? AltNames,
     string? Cnpj = null,

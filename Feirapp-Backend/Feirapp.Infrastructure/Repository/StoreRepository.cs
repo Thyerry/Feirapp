@@ -20,22 +20,31 @@ public class StoreRepository(BaseContext context) : IStoreRepository, IDisposabl
 
     public async Task UpdateAsync(Store store, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var existingStore = await context.Stores.FindAsync([store.Id], ct);
+        if(existingStore == null)
+            throw new KeyNotFoundException($"Store with ID {store.Id} not found.");
+
+        context.Entry(existingStore).CurrentValues.SetValues(store);
     }
 
     public async Task<Store> InsertAsync(Store storeEntity, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var existingStore = await context.Stores.FirstOrDefaultAsync(x => x.Cnpj == storeEntity.Cnpj, ct);
+        if (existingStore != null)
+            return existingStore;
+
+        context.Stores.Add(storeEntity);
+        return storeEntity;
     }
 
     public async Task<List<Store>> GetAllAsync(CancellationToken ct)
     {
-        throw new NotImplementedException();
+        return await context.Stores.ToListAsync(ct);
     }
 
-    public async Task<Store> GetByIdAsync(long storeId, CancellationToken ct)
+    public async Task<Store?> GetByIdAsync(long storeId, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        return await context.Stores.FindAsync([storeId], ct); 
     }
 
     public void Dispose()

@@ -16,10 +16,9 @@ public static class PasswordHasher
     
     public static string ComputeHash(string password, string salt)
     {
-        using var sha256 = SHA256.Create();
-        var passwordSaltPepper = $"{password}{salt}";
-        var byteValue = Encoding.UTF8.GetBytes(passwordSaltPepper);
-        var byteHash = sha256.ComputeHash(byteValue);
+        var passwordWithSalt = $"{password}{salt}";
+        var byteValue = Encoding.UTF8.GetBytes(passwordWithSalt);
+        var byteHash = SHA256.HashData(byteValue);
         return Convert.ToBase64String(byteHash);
     }
 }

@@ -16,13 +16,13 @@ public partial class GroceryItemService(IUnitOfWork uow) : IGroceryItemService
         return entities.ToSearchResponse();
     }
 
-    public async Task<GetGroceryItemByIdResponse?> GetByIdAsync(long id, CancellationToken ct)
+    public async Task<GetGroceryItemByIdResponse?> GetByIdAsync(Guid id, CancellationToken ct)
     {
         var entity = await uow.GroceryItemRepository.GetByIdAsync(id, ct);
-        return entity.ToGetByIdResponse();
+        return entity?.ToGetByIdResponse();
     }
 
-    public async Task<GetGroceryItemFromStoreIdResponse> GetByStoreAsync(long storeId, CancellationToken ct)
+    public async Task<GetGroceryItemFromStoreIdResponse> GetByStoreAsync(Guid storeId, CancellationToken ct)
     {
         var result = await uow.GroceryItemRepository.GetByStoreAsync(storeId, ct);
         return new GetGroceryItemFromStoreIdResponse(result.Store.ToDto(), result.Items.ToStoreItem());
@@ -45,13 +45,13 @@ public partial class GroceryItemService(IUnitOfWork uow) : IGroceryItemService
             MeasureUnit = command.MeasureUnit,
         };
 
-        await InsertGroceryItem(groceryItem, (long)command.Store!.Id!, command.Price, DateTime.Now, command.ProductCode, ct);
+        await InsertGroceryItem(groceryItem, command.Store!.Id, command.Price, DateTime.Now, command.ProductCode, ct);
     }
 
     public async Task InsertListAsync(InsertListOfGroceryItemsCommand command, CancellationToken ct)
     {
         var store = await EnsureStoreExistsAsync(command.Store, ct);
-        await InsertNcmsAndCestsAsync(command, ct); 
+        await InsertNcmsAndCestsAsync(command, ct);
         await InsertGroceryItemsAsync(command.GroceryItems, store.Id, ct);
         await uow.SaveChangesAsync(ct);
     }
@@ -61,7 +61,7 @@ public partial class GroceryItemService(IUnitOfWork uow) : IGroceryItemService
         throw new NotImplementedException();
     }
 
-    public async Task DeleteAsync(long groceryId, CancellationToken ct)
+    public async Task DeleteAsync(Guid groceryId, CancellationToken ct)
     {
         throw new NotImplementedException();
     }

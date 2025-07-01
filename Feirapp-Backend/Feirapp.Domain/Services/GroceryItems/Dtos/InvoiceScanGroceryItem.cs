@@ -5,6 +5,7 @@ public record InvoiceScanGroceryItem(
     decimal Price,
     string MeasureUnit,
     string Barcode,
+    string ProductCode,
     DateTime PurchaseDate,
     string NcmCode,
     string CestCode
