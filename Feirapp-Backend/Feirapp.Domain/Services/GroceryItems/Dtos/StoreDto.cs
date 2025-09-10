@@ -13,7 +13,7 @@ public record StoreDto(
     string? StreetNumber = null,
     string? Neighborhood = null,
     string? CityName = null,
-    StatesEnum? State = StatesEnum.Empty)
+    string? State = null)
 {
     public List<ValidationFailure> ValidateForInsertGroceryItem()
     {
@@ -33,7 +33,7 @@ public record StoreDto(
         if (string.IsNullOrWhiteSpace(CityName))
             errors.Add(new ValidationFailure(nameof(CityName), "City Name cannot be null or empty.", CityName));
         if (State == null)
-            errors.Add(new ValidationFailure(nameof(State), "State cannot be null.", State.ToString()));
+            errors.Add(new ValidationFailure(nameof(State), "State cannot be null.", State));
 
         return errors;
     }    

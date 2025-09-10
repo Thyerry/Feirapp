@@ -32,11 +32,8 @@ public class StoreController(IStoreService storeService) : ControllerBase
 
     [HttpGet("by-id")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetAllStores([FromQuery] long storeId, CancellationToken ct = default)
+    public async Task<IActionResult> GetAllStores([FromQuery] Guid storeId, CancellationToken ct = default)
     {
-        if (storeId <= 0)
-            return BadRequest(ApiResponseFactory.Failure<StoreDto>("Invalid store id."));
-
         var store = await storeService.GetStoreById(storeId, ct);
         return store == null
             ? NotFound(ApiResponseFactory.Failure<StoreDto>("Stores not found."))

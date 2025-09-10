@@ -71,7 +71,6 @@ public partial class GroceryItemService
         else
         {
             InsertAltName(itemFromDb, item.Name);
-            await uow.GroceryItemRepository.UpdateAsync(itemFromDb, ct);
         }
 
         await InsertOrUpdatePriceLog(itemFromDb ?? item, storeId, price, purchaseDate, productCode, ct);

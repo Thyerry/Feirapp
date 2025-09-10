@@ -2,15 +2,16 @@
 
 namespace Feirapp.Domain.Services.GroceryItems.Dtos;
 
-public record GroceryItemDto(
-    Guid Id,
-    string Name,
-    string Description,
-    string ImageUrl,
-    string Barcode,
-    MeasureUnitEnum MeasureUnit,
-    List<PriceLogDto>? PriceHistory
-)
+public class GroceryItemDto
 {
-    public decimal Price { get; set; }
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public string? Description { get; set; }
+    public string? ImageUrl { get; set; }
+    public string? Brand { get; set; }
+    public string Barcode { get; set; }
+    public string NcmCode { get; set; }
+    public string CestCode { get; set; }
+    public MeasureUnitEnum MeasureUnit { get; set; }
+    public List<PriceLogDto> PriceHistory { get; set; }
 };

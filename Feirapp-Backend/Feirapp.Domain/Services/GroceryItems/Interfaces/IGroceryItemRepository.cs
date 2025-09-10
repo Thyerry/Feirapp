@@ -14,6 +14,5 @@ public interface IGroceryItemRepository
     Task<StoreWithItems> GetByStoreAsync(Guid storeId, CancellationToken ct);
     Task<List<SearchGroceryItemsDto>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct);
     Task<GroceryItem> InsertAsync(GroceryItem groceryItem, CancellationToken ct);
-    Task UpdateAsync(GroceryItem groceryItem, CancellationToken ct);
     Task<GroceryItem?> GetByIdAsync(Guid id, CancellationToken ct);
 }

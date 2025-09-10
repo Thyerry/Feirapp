@@ -52,34 +52,35 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
 
         context.GroceryItems.Remove(groceryItem);
     }
-
-    public async Task UpdateAsync(GroceryItem entity, CancellationToken ct)
+    
+    public async Task<List<GroceryItemDto>> GetAllAsync(CancellationToken ct)
     {
-        var existingItem = await context.GroceryItems.FindAsync([new { entity.Id }], ct);
-
-        if (existingItem == null)
+    var query = 
+        from gi in context.GroceryItems
+        join pl in context.PriceLogs on gi.Id equals pl.GroceryItemId
+        select new GroceryItemDto
         {
-            throw new KeyNotFoundException($"Store with ID {entity.Id} not found.");
-        }
-
-        context.Entry(existingItem).CurrentValues.SetValues(entity);
-    }
-
-    public async Task<List<GroceryItem>> GetAllAsync(CancellationToken ct)
-    {
-        return await context.GroceryItems
-            .Include(g => g.PriceHistory)!
-            .ThenInclude(p => p.Store)
-            .AsNoTracking()
-            .ToListAsync(ct);
+            Id = gi.Id,
+            Name = gi.Name,
+            Description = gi.Description,
+            Barcode = gi.Barcode,
+            CestCode = gi.CestCode,
+            NcmCode = gi.NcmCode,
+            ImageUrl = gi.ImageUrl,
+            Brand = gi.Brand,
+            MeasureUnit = gi.MeasureUnit,
+            PriceHistory = new List<PriceLogDto> { pl }
+        };
+        
+        return await query.AsNoTracking().ToListAsync(ct);
     }
 
     public async Task<GroceryItem?> GetByIdAsync(Guid id, CancellationToken ct)
     {
-        var query = context.GroceryItems
-            .Where(g => g.Id == id)
-            .Include(g => g.PriceHistory)!
-            .ThenInclude(p => p.Store);
+        var query = context.GroceryItems;
+            // .Where(g => g.Id == id)
+            // .Include(g => g.PriceHistory)!
+            // .ThenInclude(p => p.Store);
 
         var sd = query.ToQueryString();
         

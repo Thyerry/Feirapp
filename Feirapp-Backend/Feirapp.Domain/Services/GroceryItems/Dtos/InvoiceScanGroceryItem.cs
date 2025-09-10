@@ -1,15 +1,17 @@
-﻿namespace Feirapp.Domain.Services.GroceryItems.Dtos;
+﻿using Feirapp.Entities.Enums;
 
-public record InvoiceScanGroceryItem(
-    string Name,
-    decimal Price,
-    string MeasureUnit,
-    string Barcode,
-    string ProductCode,
-    DateTime PurchaseDate,
-    string NcmCode,
-    string CestCode
-)
+namespace Feirapp.Domain.Services.GroceryItems.Dtos;
+
+public class InvoiceScanGroceryItem
 {
+    public string Name { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+    public string MeasureUnit { get; set; } = string.Empty;
+    public string Barcode { get; set; } = string.Empty;
+    public string ProductCode { get; set; } = string.Empty;
+    public DateTime PurchaseDate { get; set; }
+    public string NcmCode { get; set; } = string.Empty;
+    public string CestCode { get; set; } = string.Empty;
     public decimal Quantity { get; set; }
+    public List<string> ImportIssues { get; set; } = [];
 };

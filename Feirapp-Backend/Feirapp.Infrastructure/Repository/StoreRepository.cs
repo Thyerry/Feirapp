@@ -42,7 +42,7 @@ public class StoreRepository(BaseContext context) : IStoreRepository, IDisposabl
         return await context.Stores.ToListAsync(ct);
     }
 
-    public async Task<Store?> GetByIdAsync(long storeId, CancellationToken ct)
+    public async Task<Store?> GetByIdAsync(Guid storeId, CancellationToken ct)
     {
         return await context.Stores.FindAsync([storeId], ct); 
     }

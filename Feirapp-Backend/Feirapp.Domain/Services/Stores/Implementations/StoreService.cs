@@ -36,7 +36,7 @@ public class StoreService(IUnitOfWork uow) : IStoreService
         return result.ToDtoList();
     }
 
-    public async Task<StoreDto?> GetStoreById(long storeId, CancellationToken ct)
+    public async Task<StoreDto?> GetStoreById(Guid storeId, CancellationToken ct)
     {
         var result = await uow.StoreRepository.GetByIdAsync(storeId, ct);
         return result?.ToDto();
