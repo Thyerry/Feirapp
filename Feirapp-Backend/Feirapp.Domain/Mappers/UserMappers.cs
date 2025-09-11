@@ -1,5 +1,5 @@
-using Feirapp.Domain.Services.Users.Commands;
-using Feirapp.Domain.Services.Users.Responses;
+using Feirapp.Domain.Services.Users.Methods.CreateUser;
+using Feirapp.Domain.Services.Users.Methods.Login;
 using Feirapp.Entities.Entities;
 using Riok.Mapperly.Abstractions;
 

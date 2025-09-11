@@ -1,0 +1,3 @@
+namespace Feirapp.Domain.Services.GroceryItems.Methods.InsertListOfGroceryItems;
+
+public record InsertListOfGroceryItemsRequest(List<InsertListOfGroceryItemsDto> GroceryItems, InsertListOfGroceryItemsStoreDto Store);

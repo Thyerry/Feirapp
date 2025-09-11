@@ -1,7 +1,7 @@
 ﻿using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
-using Feirapp.Domain.Services.GroceryItems.Dtos;
+using Feirapp.Domain.Services.GroceryItems.Misc;
 using Feirapp.Entities.Enums;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Options;

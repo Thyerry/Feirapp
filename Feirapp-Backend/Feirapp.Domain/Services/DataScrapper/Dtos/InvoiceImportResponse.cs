@@ -1,4 +1,4 @@
-﻿using Feirapp.Domain.Services.GroceryItems.Dtos;
+﻿using Feirapp.Domain.Services.GroceryItems.Misc;
 
 namespace Feirapp.Domain.Services.DataScrapper.Dtos;
 

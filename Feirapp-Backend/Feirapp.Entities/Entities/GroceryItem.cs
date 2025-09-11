@@ -28,5 +28,4 @@ public class GroceryItem
     [Column("alt_names")]
     public List<string>? AltNames { get; set; }
     public override string ToString() => $"{Name}";
-    
 }

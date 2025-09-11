@@ -1,7 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Feirapp.Domain.Services.Users.Responses;
+using Feirapp.Domain.Services.Users.Methods.Login;
 using Microsoft.IdentityModel.Tokens;
 using static System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames;
 

@@ -1,10 +1,13 @@
 using Feirapp.API.Helpers.Response;
 using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
-using Feirapp.Domain.Services.GroceryItems.Command;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
-using Feirapp.Domain.Services.GroceryItems.Queries;
-using Feirapp.Domain.Services.GroceryItems.Responses;
+using Feirapp.Domain.Services.GroceryItems.Methods.GetGroceryItemById;
+using Feirapp.Domain.Services.GroceryItems.Methods.GetGroceryItemsByStore;
+using Feirapp.Domain.Services.GroceryItems.Methods.InsertGroceryItem;
+using Feirapp.Domain.Services.GroceryItems.Methods.InsertListOfGroceryItems;
+using Feirapp.Domain.Services.GroceryItems.Methods.SearchGroceryItems;
+using Feirapp.Domain.Services.GroceryItems.Methods.UpdateGroceryItemCommand;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,9 +20,9 @@ public class GroceryItemController(IGroceryItemService groceryItemService, IInvo
 {
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> SearchGroceryItems([FromQuery]SearchGroceryItemsQuery query, CancellationToken ct = default)
+    public async Task<IActionResult> SearchGroceryItems([FromQuery]SearchGroceryItemsRequest request, CancellationToken ct = default)
     {
-        var groceryItems = await groceryItemService.SearchGroceryItemsAsync(query, ct);
+        var groceryItems = await groceryItemService.SearchGroceryItemsAsync(request, ct);
         return groceryItems.Count == 0
             ? NotFound(ApiResponseFactory.Failure<List<SearchGroceryItemsResponse>>("No Grocery Items Found"))
             : Ok(ApiResponseFactory.Success(groceryItems));
@@ -68,17 +71,17 @@ public class GroceryItemController(IGroceryItemService groceryItemService, IInvo
     }
 
     [HttpPost]
-    public async Task<IActionResult> Insert(InsertGroceryItemCommand command, CancellationToken ct = default)
+    public async Task<IActionResult> Insert(InsertGroceryItemRequest request, CancellationToken ct = default)
     {
-        await groceryItemService.InsertAsync(command, ct);
-        return Created(nameof(command), ApiResponseFactory.Success(true));
+        await groceryItemService.InsertAsync(request, ct);
+        return Created(nameof(request), ApiResponseFactory.Success(true));
     }
 
     [HttpPost("insert-list")]
-    public async Task<IActionResult> InsertList(InsertListOfGroceryItemsCommand command, CancellationToken ct = default)
+    public async Task<IActionResult> InsertList(InsertListOfGroceryItemsRequest request, CancellationToken ct = default)
     {
-        await groceryItemService.InsertListAsync(command, ct);
-        return Created(nameof(command), ApiResponseFactory.Success(true));
+        await groceryItemService.InsertListAsync(request, ct);
+        return Created(nameof(request), ApiResponseFactory.Success(true));
     }
     
     [HttpPut]
