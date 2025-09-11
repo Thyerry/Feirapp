@@ -1,7 +1,7 @@
 ﻿using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
-using Feirapp.Domain.Services.GroceryItems.Dtos;
+using Feirapp.Domain.Services.GroceryItems.Misc;
 using Feirapp.Entities.Enums;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Options;
@@ -62,7 +62,7 @@ public class InvoiceReaderService(IOptions<SefazPe> options) : IInvoiceReaderSer
 
     private static List<InvoiceScanGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList, HtmlNode purchaseDateXml)
     {
-        var result = new List<InvoiceScanGroceryItem>();
+        var items = new List<InvoiceScanGroceryItem>();
         foreach (var groceryItemXml in groceryItemXmlList)
         {
             var xpath = groceryItemXml.XPath;
@@ -73,36 +73,77 @@ public class InvoiceReaderService(IOptions<SefazPe> options) : IInvoiceReaderSer
             var cean = groceryItemXml.SelectSingleNode($"{xpath}/cean")?.InnerText;
 
             var groceryItem = new InvoiceScanGroceryItem
-            (
-                Name: groceryItemXml.SelectSingleNode($"{xpath}/xprod")!.InnerText,
-                Price: ToDecimal(groceryItemXml.SelectSingleNode($"{xpath}/vuncom")!.InnerText),
-                MeasureUnit: groceryItemXml.SelectSingleNode($"{xpath}/ucom")!.InnerText.NormalizeMeasureUnit(),
-                Barcode: cean ?? string.Empty,
-                ProductCode: productCode,
-                PurchaseDate: DateTime.Parse(purchaseDateXml.InnerText),
-                NcmCode: ncm,
-                CestCode: cest ?? string.Empty
-            )
             {
+                Name = groceryItemXml.SelectSingleNode($"{xpath}/xprod")!.InnerText,
+                Price = ToDecimal(groceryItemXml.SelectSingleNode($"{xpath}/vuncom")!.InnerText),
+                MeasureUnit = groceryItemXml.SelectSingleNode($"{xpath}/ucom")!.InnerText.NormalizeMeasureUnit(),
+                Barcode = cean ?? string.Empty,
+                ProductCode = productCode,
+                PurchaseDate = DateTime.Parse(purchaseDateXml.InnerText),
+                NcmCode = ncm,
+                CestCode = cest ?? string.Empty,
                 Quantity = ToDecimal(groceryItemXml.SelectSingleNode($"{xpath}/qcom")!.InnerText)
             };
 
-            var objectExists = result.FirstOrDefault(g =>
-                groceryItem.Name == g.Name
-                && groceryItem.Price == g.Price
-                && groceryItem.MeasureUnit == g.MeasureUnit
-                && groceryItem.MeasureUnit != MeasureUnitEnum.KILO.StringValue()
-                && groceryItem.Barcode == g.Barcode
-                && groceryItem.NcmCode == g.NcmCode
-                && groceryItem.CestCode == g.CestCode);
-            
-            if (objectExists is null)
-                result.Add(groceryItem);
-            else
-                objectExists.Quantity += groceryItem.Quantity;
+            items.Add(groceryItem);
         }
 
+        var result = DataValidation(items);
+        
         return result;
+    }
+
+    private static List<InvoiceScanGroceryItem> DataValidation(List<InvoiceScanGroceryItem> items)
+    {
+        foreach (var item in items)
+        {
+            if (string.IsNullOrWhiteSpace(item.Name))
+                item.ImportIssues.Add(ImportIssuesEnum.NameIsEmpty.StringValue());
+
+            if (item.Price <= 0)
+                item.ImportIssues.Add(ImportIssuesEnum.PriceIsZeroOrNegative.StringValue());
+
+            if ((string.IsNullOrWhiteSpace(item.Barcode) || item.Barcode == "SEM GTIN") && string.IsNullOrWhiteSpace(item.ProductCode))
+                item.ImportIssues.Add(ImportIssuesEnum.NoBarcodeAndProductCode.StringValue());
+
+            if (item.Quantity <= 0)
+                item.ImportIssues.Add(ImportIssuesEnum.QuantityIsZeroOrNegative.StringValue());
+            
+            if(string.IsNullOrWhiteSpace(item.MeasureUnit))
+                item.ImportIssues.Add(ImportIssuesEnum.MeasureUnitIsEmpty.StringValue());
+            
+            if (items.Count(x => x.MeasureUnit == MeasureUnitEnum.KILO.StringValue() && x.ProductCode == item.ProductCode) > 1)
+                item.ImportIssues.Add(ImportIssuesEnum.MultipleSameItemByKilo.StringValue());
+        }
+        
+        var nonKiloItems = items.Where(x => x.MeasureUnit != MeasureUnitEnum.KILO.StringValue()).ToList();
+        var kiloItems = items.Where(x => x.MeasureUnit == MeasureUnitEnum.KILO.StringValue()).ToList();
+
+        var aggregatedItems = nonKiloItems
+            .GroupBy(x => new { x.Barcode, x.ProductCode })
+            .Select(g =>
+            {
+                var first = g.First();
+                var totalQuantity = g.Sum(x => x.Quantity);
+                var weightedPrice = g.Sum(x => x.Price * x.Quantity) / totalQuantity;
+
+                return new InvoiceScanGroceryItem
+                {
+                    Name = first.Name,
+                    Price = weightedPrice,
+                    MeasureUnit = first.MeasureUnit,
+                    Barcode = first.Barcode,
+                    ProductCode = first.ProductCode,
+                    PurchaseDate = first.PurchaseDate,
+                    NcmCode = first.NcmCode,
+                    CestCode = first.CestCode,
+                    Quantity = totalQuantity,
+                    ImportIssues = first.ImportIssues
+                };
+            })
+            .ToList();
+
+        return aggregatedItems.Concat(kiloItems).ToList();
     }
 
     private static decimal ToDecimal(string text) => Convert.ToDecimal(string.Join(",", text.Split(".")));

@@ -26,5 +26,4 @@ public class Store
     public string? CityName { get; set; }
     [Column("state")]
     public StatesEnum? State { get; set; }
-    public ICollection<PriceLog> PriceLogs { get; init; } = new List<PriceLog>();
 }

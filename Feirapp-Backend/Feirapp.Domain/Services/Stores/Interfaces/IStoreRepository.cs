@@ -9,5 +9,5 @@ public interface IStoreRepository
     Task UpdateAsync(Store store, CancellationToken ct);
     Task<Store> InsertAsync(Store storeEntity, CancellationToken ct);
     Task<List<Store>> GetAllAsync(CancellationToken ct);
-    Task<Store?> GetByIdAsync(long storeId, CancellationToken ct);
+    Task<Store?> GetByIdAsync(Guid storeId, CancellationToken ct);
 }

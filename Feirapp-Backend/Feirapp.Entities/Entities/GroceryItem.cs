@@ -22,16 +22,10 @@ public class GroceryItem
     public MeasureUnitEnum MeasureUnit { get; set; }
     [Column("ncm_code")]
     public string? NcmCode { get; set; }
-    public Ncm Ncm { get; set; }
     [Column("cest_code")]
     public string? CestCode { get; set; }
-    public Cest Cest { get; set; }
 
     [Column("alt_names")]
     public List<string>? AltNames { get; set; }
-
-    public ICollection<PriceLog>? PriceHistory { get; set; }
-
     public override string ToString() => $"{Name}";
-    
 }

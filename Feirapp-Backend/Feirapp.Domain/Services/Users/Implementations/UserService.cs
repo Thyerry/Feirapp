@@ -1,8 +1,8 @@
 using Feirapp.Domain.Mappers;
 using Feirapp.Domain.Services.UnitOfWork;
-using Feirapp.Domain.Services.Users.Commands;
 using Feirapp.Domain.Services.Users.Interfaces;
-using Feirapp.Domain.Services.Users.Responses;
+using Feirapp.Domain.Services.Users.Methods.CreateUser;
+using Feirapp.Domain.Services.Users.Methods.Login;
 using Feirapp.Domain.Services.Utils;
 using Feirapp.Entities.Enums;
 using FluentValidation;
@@ -34,9 +34,9 @@ public class UserService(IUnitOfWork uow) : IUserService
         await uow.SaveChangesAsync(ct);
     }
 
-    public async Task<LoginResponse> LoginAsync(LoginCommand command, CancellationToken ct)
+    public async Task<LoginResponse> LoginAsync(LoginRequest request, CancellationToken ct)
     {
-        var user = await uow.UserRepository.GetByEmailAsync(command.Email, ct);
+        var user = await uow.UserRepository.GetByEmailAsync(request.Email, ct);
         if (user == null)
         {
             throw new ValidationException([
@@ -44,7 +44,7 @@ public class UserService(IUnitOfWork uow) : IUserService
             ]);
         }
 
-        var passwordHash = PasswordHasher.ComputeHash(command.Password, user.PasswordSalt);
+        var passwordHash = PasswordHasher.ComputeHash(request.Password, user.PasswordSalt);
         if (user.Password != passwordHash)
         {
             throw new ValidationException([

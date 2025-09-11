@@ -1,11 +1,10 @@
-using Feirapp.Domain.Services.GroceryItems.Dtos;
-using Feirapp.Domain.Services.Stores.Dtos.Commands;
+using Feirapp.Domain.Services.Stores.Methods.GetStoreById;
+using Feirapp.Domain.Services.Stores.Methods.InsertGroceryItem;
 
 namespace Feirapp.Domain.Services.Stores.Interfaces;
 
 public interface IStoreService
 {
-    Task InsertStoreAsync(InsertStoreCommand store, CancellationToken ct);
-    Task<List<StoreDto>> GetAllStoresAsync(CancellationToken ct);
-    Task<StoreDto?> GetStoreById(long storeId, CancellationToken ct);
+    Task InsertStoreAsync(InsertStoreRequest store, CancellationToken ct);
+    Task<GetStoreByIdResponse?> GetStoreById(Guid storeId, CancellationToken ct);
 }

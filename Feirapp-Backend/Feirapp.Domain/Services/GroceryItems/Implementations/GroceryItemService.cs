@@ -1,31 +1,33 @@
 using Feirapp.Domain.Mappers;
-using Feirapp.Domain.Services.GroceryItems.Command;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
-using Feirapp.Domain.Services.GroceryItems.Queries;
-using Feirapp.Domain.Services.GroceryItems.Responses;
+using Feirapp.Domain.Services.GroceryItems.Methods.GetGroceryItemById;
+using Feirapp.Domain.Services.GroceryItems.Methods.GetGroceryItemsByStore;
+using Feirapp.Domain.Services.GroceryItems.Methods.InsertGroceryItem;
+using Feirapp.Domain.Services.GroceryItems.Methods.InsertListOfGroceryItems;
+using Feirapp.Domain.Services.GroceryItems.Methods.SearchGroceryItems;
+using Feirapp.Domain.Services.GroceryItems.Methods.UpdateGroceryItemCommand;
 using Feirapp.Domain.Services.UnitOfWork;
-using Feirapp.Entities.Entities;
 
 namespace Feirapp.Domain.Services.GroceryItems.Implementations;
 
 public partial class GroceryItemService(IUnitOfWork uow) : IGroceryItemService
 {
-    public async Task<List<SearchGroceryItemsResponse>> SearchGroceryItemsAsync(SearchGroceryItemsQuery query, CancellationToken ct)
+    public async Task<List<SearchGroceryItemsResponse>> SearchGroceryItemsAsync(SearchGroceryItemsRequest request, CancellationToken ct)
     {
-        var entities = await uow.GroceryItemRepository.SearchGroceryItemsAsync(query, ct);
+        var entities = await uow.GroceryItemRepository.SearchGroceryItemsAsync(request, ct);
         return entities.ToSearchResponse();
     }
 
     public async Task<GetGroceryItemByIdResponse?> GetByIdAsync(Guid id, CancellationToken ct)
     {
         var entity = await uow.GroceryItemRepository.GetByIdAsync(id, ct);
-        return entity?.ToGetByIdResponse();
+        return entity?.ToResponse();
     }
 
     public async Task<GetGroceryItemFromStoreIdResponse> GetByStoreAsync(Guid storeId, CancellationToken ct)
     {
         var result = await uow.GroceryItemRepository.GetByStoreAsync(storeId, ct);
-        return new GetGroceryItemFromStoreIdResponse(result.Store.ToDto(), result.Items.ToStoreItem());
+        return new GetGroceryItemFromStoreIdResponse(result.Store.ToResponse(), result.Items.ToStoreItem());
     }
 
     public async Task<List<SearchGroceryItemsResponse>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct)
@@ -34,25 +36,31 @@ public partial class GroceryItemService(IUnitOfWork uow) : IGroceryItemService
         return result.ToSearchResponse().OrderBy(_ => Guid.NewGuid()).ToList();
     }
 
-    public async Task InsertAsync(InsertGroceryItemCommand command, CancellationToken ct)
+    public async Task InsertAsync(InsertGroceryItemRequest request, CancellationToken ct)
     {
-        var groceryItem = new GroceryItem
-        {
-            Name = command.Name,
-            Description = command.Description,
-            ImageUrl = command.ImageUrl,
-            Barcode = command.Barcode,
-            MeasureUnit = command.MeasureUnit,
-        };
-
-        await InsertGroceryItem(groceryItem, command.Store!.Id, command.Price, DateTime.Now, command.ProductCode, ct);
+        // var groceryItem = new InsertGroceryItem()
+        // {
+        //     Name = request.Name,
+        //     Description = request.Description ?? string.Empty,
+        //     ImageUrl = request.ImageUrl ?? string.Empty,
+        //     Barcode = request.Barcode,
+        //     MeasureUnit = request.MeasureUnit.StringValue(),
+        // };
+        //
+        // if (request.Store != null)
+        // {
+        //     var store = await EnsureStoreExistsAsync(request.Store, ct);
+        // }
+        //
+        // await InsertGroceryItem(groceryItem, request.Store!.Id, request.Price, DateTime.Now, request.ProductCode, ct);
+        // await uow.SaveChangesAsync(ct);
     }
 
-    public async Task InsertListAsync(InsertListOfGroceryItemsCommand command, CancellationToken ct)
+    public async Task InsertListAsync(InsertListOfGroceryItemsRequest request, CancellationToken ct)
     {
-        var store = await EnsureStoreExistsAsync(command.Store, ct);
-        await InsertNcmsAndCestsAsync(command, ct);
-        await InsertGroceryItemsAsync(command.GroceryItems, store.Id, ct);
+        var store = await EnsureStoreExistsAsync(request.Store.ToEntity(), ct);
+        await InsertNcmsAndCestsAsync(request, ct);
+        await InsertGroceryItemsAsync(request.GroceryItems, store.Id, ct);
         await uow.SaveChangesAsync(ct);
     }
 

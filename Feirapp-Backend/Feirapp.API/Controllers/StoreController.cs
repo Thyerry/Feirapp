@@ -1,7 +1,8 @@
 using Feirapp.API.Helpers.Response;
-using Feirapp.Domain.Services.GroceryItems.Dtos;
-using Feirapp.Domain.Services.Stores.Dtos.Commands;
+using Feirapp.Domain.Services.GroceryItems.Misc;
 using Feirapp.Domain.Services.Stores.Interfaces;
+using Feirapp.Domain.Services.Stores.Methods.GetStoreById;
+using Feirapp.Domain.Services.Stores.Methods.InsertGroceryItem;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -13,33 +14,19 @@ namespace Feirapp.API.Controllers;
 public class StoreController(IStoreService storeService) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> CreateStore(InsertStoreCommand store, CancellationToken ct = default)
+    public async Task<IActionResult> CreateStore(InsertStoreRequest store, CancellationToken ct = default)
     {
         await storeService.InsertStoreAsync(store, ct);
         return Created();
     }
 
-    [HttpGet]
-    [AllowAnonymous]
-    public async Task<IActionResult> GetAllStores(CancellationToken ct = default)
-    {
-        var stores = await storeService.GetAllStoresAsync(ct);
-
-        return stores.Count == 0
-            ? NotFound(ApiResponseFactory.Failure<List<StoreDto>>("Stores not found."))
-            : Ok(ApiResponseFactory.Success(stores));
-    }
-
     [HttpGet("by-id")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetAllStores([FromQuery] long storeId, CancellationToken ct = default)
+    public async Task<IActionResult> GetStoreById([FromQuery] Guid storeId, CancellationToken ct = default)
     {
-        if (storeId <= 0)
-            return BadRequest(ApiResponseFactory.Failure<StoreDto>("Invalid store id."));
-
         var store = await storeService.GetStoreById(storeId, ct);
         return store == null
-            ? NotFound(ApiResponseFactory.Failure<StoreDto>("Stores not found."))
+            ? NotFound(ApiResponseFactory.Failure<GetStoreByIdResponse>("Stores not found."))
             : Ok(ApiResponseFactory.Success(store));
     }
 }
