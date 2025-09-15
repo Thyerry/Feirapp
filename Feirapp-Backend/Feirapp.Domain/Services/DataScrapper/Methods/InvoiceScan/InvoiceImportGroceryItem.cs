@@ -1,6 +1,6 @@
-﻿namespace Feirapp.Domain.Services.GroceryItems.Misc;
+﻿namespace Feirapp.Domain.Services.DataScrapper.Methods.InvoiceScan;
 
-public class InvoiceScanGroceryItem
+public class InvoiceImportGroceryItem
 {
     public string Name { get; set; } = string.Empty;
     public decimal Price { get; set; }

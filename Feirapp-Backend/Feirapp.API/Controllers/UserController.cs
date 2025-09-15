@@ -13,7 +13,7 @@ namespace Feirapp.API.Controllers;
 [Route("api/user")]
 public class UserController(IUserService userService, IConfiguration config) : Controller
 {
-    [HttpPost("create-user")]
+    [HttpPost]
     [AllowAnonymous]
     [ProducesResponseType(typeof(ApiResponse<bool>), 201)]
     public async Task<ApiResponse<bool>> CreateUser([FromBody] CreateUserCommand command, CancellationToken ct)
@@ -33,7 +33,7 @@ public class UserController(IUserService userService, IConfiguration config) : C
         return ApiResponseFactory.Success(response);
     }
 
-    [HttpPost]
+    [HttpPost("test-auth")]
     public async Task<IActionResult> TestAuthEndpoint()
     {
         await Task.CompletedTask;

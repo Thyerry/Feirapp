@@ -6,6 +6,6 @@ public interface INcmRepository
 {
     Task<Ncm?> GetByCodeAsync(string code, CancellationToken ct);
     Task InsertListOfCodesAsync(List<string> ncmCodes, CancellationToken ct);
-    Task<List<Ncm>> GetByQuery(Func<Ncm, bool> func, CancellationToken ct);
+    Task<List<Ncm>> GetNcmsWithoutDescriptionAsync(CancellationToken ct);
     Task UpdateAsync(Ncm ncmUpdate, CancellationToken ct);
 }

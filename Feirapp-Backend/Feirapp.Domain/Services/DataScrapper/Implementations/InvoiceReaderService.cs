@@ -1,18 +1,17 @@
 ﻿using Feirapp.Domain.Mappers;
-using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
-using Feirapp.Domain.Services.GroceryItems.Misc;
+using Feirapp.Domain.Services.DataScrapper.Methods.InvoiceScan;
 using Feirapp.Entities.Enums;
 using HtmlAgilityPack;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 
 namespace Feirapp.Domain.Services.DataScrapper.Implementations;
 
-public class InvoiceReaderService(IOptions<SefazPe> options) : IInvoiceReaderService
+public class InvoiceReaderService(IConfiguration options) : IInvoiceReaderService
 {
-    private readonly SefazPe _sefazPe = options.Value;
+    private readonly string _sefazUrl = options["DataSources:SefazUrl"] ?? throw new ArgumentNullException("DataSources:SefazUrl");
 
-    public async Task<InvoiceImportResponse> InvoiceDataScrapperAsync(string invoiceCode, bool isInsert, CancellationToken ct)
+    public async Task<InvoiceImportResponse> InvoiceImportAsync(string invoiceCode, bool isInsert, CancellationToken ct)
     {
         var timeout = TimeSpan.FromSeconds(15);
         using var httpClient = new HttpClient();
@@ -26,7 +25,7 @@ public class InvoiceReaderService(IOptions<SefazPe> options) : IInvoiceReaderSer
                 return true;
             },
         };
-        var url = _sefazPe.SefazUrl.Replace("{INVOICE_CODE}", invoiceCode);
+        var url = _sefazUrl?.Replace("{INVOICE_CODE}", invoiceCode);
         var doc = await web.LoadFromWebAsync(url, ct);
 
         if (doc == null)
@@ -44,25 +43,26 @@ public class InvoiceReaderService(IOptions<SefazPe> options) : IInvoiceReaderSer
         if(storeNameXml == null)
             throw new Exception("Store not found.");
         
-        var store = new InvoiceScanStore(
-            Name: storeNameXml.SelectSingleNode("//xnome")!.InnerText,
-            Cnpj: storeNameXml.SelectSingleNode("//cnpj")!.InnerText,
-            Cep: storeNameXml.SelectSingleNode("//enderemit//cep")!.InnerText,
-            Street: storeNameXml.SelectSingleNode("//enderemit//xlgr")!.InnerText,
-            StreetNumber: storeNameXml.SelectSingleNode("//enderemit//nro")!.InnerText,
-            Neighborhood: storeNameXml.SelectSingleNode("//enderemit//xbairro")!.InnerText,
-            CityName: storeNameXml.SelectSingleNode("//enderemit//xmun")!.InnerText,
-            State: storeNameXml.SelectSingleNode("//enderemit//uf")!.InnerText
-        );
+        var store = new InvoiceImportStore
+        {
+            Name = storeNameXml.SelectSingleNode("//xnome")!.InnerText,
+            Cnpj = storeNameXml.SelectSingleNode("//cnpj")!.InnerText,
+            Cep = storeNameXml.SelectSingleNode("//enderemit//cep")!.InnerText,
+            Street = storeNameXml.SelectSingleNode("//enderemit//xlgr")!.InnerText,
+            StreetNumber = storeNameXml.SelectSingleNode("//enderemit//nro")!.InnerText,
+            Neighborhood = storeNameXml.SelectSingleNode("//enderemit//xbairro")!.InnerText,
+            CityName = storeNameXml.SelectSingleNode("//enderemit//xmun")!.InnerText,
+            State = storeNameXml.SelectSingleNode("//enderemit//uf")!.InnerText
+        };
 
         var groceryItems = GetGroceryItemList(groceryItemXmlList!, purchaseDateXml!);
 
         return new InvoiceImportResponse(invoiceCode, store, groceryItems);
     }
 
-    private static List<InvoiceScanGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList, HtmlNode purchaseDateXml)
+    private static List<InvoiceImportGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList, HtmlNode purchaseDateXml)
     {
-        var items = new List<InvoiceScanGroceryItem>();
+        var items = new List<InvoiceImportGroceryItem>();
         foreach (var groceryItemXml in groceryItemXmlList)
         {
             var xpath = groceryItemXml.XPath;
@@ -72,7 +72,7 @@ public class InvoiceReaderService(IOptions<SefazPe> options) : IInvoiceReaderSer
             var productCode = groceryItemXml.SelectSingleNode($"{xpath}/cprod")!.InnerText;
             var cean = groceryItemXml.SelectSingleNode($"{xpath}/cean")?.InnerText;
 
-            var groceryItem = new InvoiceScanGroceryItem
+            var groceryItem = new InvoiceImportGroceryItem
             {
                 Name = groceryItemXml.SelectSingleNode($"{xpath}/xprod")!.InnerText,
                 Price = ToDecimal(groceryItemXml.SelectSingleNode($"{xpath}/vuncom")!.InnerText),
@@ -93,7 +93,7 @@ public class InvoiceReaderService(IOptions<SefazPe> options) : IInvoiceReaderSer
         return result;
     }
 
-    private static List<InvoiceScanGroceryItem> DataValidation(List<InvoiceScanGroceryItem> items)
+    private static List<InvoiceImportGroceryItem> DataValidation(List<InvoiceImportGroceryItem> items)
     {
         foreach (var item in items)
         {
@@ -127,7 +127,7 @@ public class InvoiceReaderService(IOptions<SefazPe> options) : IInvoiceReaderSer
                 var totalQuantity = g.Sum(x => x.Quantity);
                 var weightedPrice = g.Sum(x => x.Price * x.Quantity) / totalQuantity;
 
-                return new InvoiceScanGroceryItem
+                return new InvoiceImportGroceryItem
                 {
                     Name = first.Name,
                     Price = weightedPrice,

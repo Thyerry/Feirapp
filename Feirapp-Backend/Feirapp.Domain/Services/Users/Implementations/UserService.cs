@@ -4,6 +4,7 @@ using Feirapp.Domain.Services.Users.Interfaces;
 using Feirapp.Domain.Services.Users.Methods.CreateUser;
 using Feirapp.Domain.Services.Users.Methods.Login;
 using Feirapp.Domain.Services.Utils;
+using Feirapp.Entities.Entities;
 using Feirapp.Entities.Enums;
 using FluentValidation;
 using FluentValidation.Results;
@@ -19,12 +20,13 @@ public class UserService(IUnitOfWork uow) : IUserService
         if (await uow.UserRepository.GetByEmailAsync(command.Email, ct) != null)
         {
             throw new ValidationException([
-                new ValidationFailure(nameof(command.Email), "The user name cannot be null or empty.", command.Email)
+                new ValidationFailure(nameof(command.Email), "The user email is already in use.", command.Email)
             ]);
         }
 
         var user = command.ToEntity();
         
+        user.Id = GuidGenerator.Generate();
         user.PasswordSalt = PasswordHasher.GenerateSalt();
         user.Password = PasswordHasher.ComputeHash(user.Password, user.PasswordSalt);
         user.CreatedAt = DateTime.UtcNow;
@@ -53,8 +55,7 @@ public class UserService(IUnitOfWork uow) : IUserService
         }
 
         user.LastLogin = DateTime.UtcNow;
-        uow.UserRepository.UpdateAsync(user, ct);
-
+        await uow.SaveChangesAsync(ct);
         return user.ToLoginResponse();
     }
 }

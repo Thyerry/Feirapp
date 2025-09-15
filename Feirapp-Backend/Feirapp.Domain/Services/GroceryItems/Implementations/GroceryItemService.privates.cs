@@ -1,16 +1,17 @@
 using Feirapp.Domain.Mappers;
-using Feirapp.Domain.Services.GroceryItems.Methods.InsertListOfGroceryItems;
+using Feirapp.Domain.Services.GroceryItems.Methods.InsertGroceryItems;
 using Feirapp.Domain.Services.GroceryItems.Misc;
+using Feirapp.Domain.Services.Utils;
 using Feirapp.Entities.Entities;
-using Feirapp.Entities.Utils;
 
 namespace Feirapp.Domain.Services.GroceryItems.Implementations;
 
 public partial class GroceryItemService
 {
-    private async Task<Store> EnsureStoreExistsAsync(Store storeToCheck, CancellationToken ct)
+    private async Task<Store> ValidateAndRegisterStoreAltNameAsync(Store storeToCheck, CancellationToken ct)
     {
-        var store = await AddIfNotExistsAsync(storeToCheck, ct);
+        storeToCheck.Id = GuidGenerator.Generate();
+        var store = await uow.StoreRepository.AddIfNotExistsAsync(x => x.Cnpj == storeToCheck.Cnpj, storeToCheck, ct);
         
         if (store.Name == storeToCheck.Name || (store.AltNames ?? []).Contains(storeToCheck.Name)) 
             return store;
@@ -19,26 +20,10 @@ public partial class GroceryItemService
             ? [storeToCheck.Name] 
             : store.AltNames.Append(storeToCheck.Name).ToList();
         
-        await uow.StoreRepository.UpdateAsync(store, ct);
-
         return store;
     }
 
-    private async Task<Store> AddIfNotExistsAsync(Store store, CancellationToken ct)
-    {
-        var existingStore = await uow.StoreRepository.GetByCnpjAsync(store.Cnpj, ct);
-        if (existingStore != null)
-        {
-            store.Id = existingStore.Id;
-            return existingStore;
-        }
-
-        store.Id = GuidGenerator.Generate();
-        await uow.StoreRepository.InsertAsync(store, ct);
-        return store;
-    }
-
-    private async Task InsertNcmsAndCestsAsync(InsertListOfGroceryItemsRequest request, CancellationToken ct)
+    private async Task InsertNcmsAndCestsAsync(InsertGroceryItemsRequest request, CancellationToken ct)
     {
         var ncms = request.GroceryItems.Select(g => g.NcmCode).Distinct().ToList();
         var cests = request.GroceryItems.Select(g => g.CestCode).Distinct().ToList();
@@ -47,21 +32,12 @@ public partial class GroceryItemService
             await uow.CestRepository.InsertListOfCodesAsync(cests, ct);
     }
 
-    private async Task InsertGroceryItemsAsync(List<InsertListOfGroceryItemsDto> items, Guid storeId, CancellationToken ct)
-    {
-        foreach (var itemDto in items)
-        {
-            itemDto.Barcode = ValidateBarcode(itemDto.Barcode);
-            await InsertGroceryItem(itemDto.ToGeneric(), storeId, itemDto.Price, itemDto.PurchaseDate, itemDto.ProductCode, ct);
-        }
-    }
-
-    private string ValidateBarcode(string barcode)
+    private static string ValidateBarcode(string barcode)
     {
         return barcode != "SEM GTIN" && barcode.Length > 13 ? barcode.Substring(1, 13) : barcode;
     }
     
-    private async Task InsertGroceryItem(GenericGroceryItemDto item, Guid storeId, decimal price, DateTime purchaseDate, string productCode, CancellationToken ct)
+    private async Task<GroceryItem> InsertGroceryItem(InsertGroceryItemsDto item, Guid storeId, decimal price, DateTime purchaseDate, string productCode, CancellationToken ct)
     {
         var toInsert = item.ToEntity();
         var itemFromDb = await uow.GroceryItemRepository.CheckIfGroceryItemExistsAsync(item.Barcode, item.ProductCode, storeId, ct);
@@ -69,23 +45,17 @@ public partial class GroceryItemService
         {
             toInsert.Id = GuidGenerator.Generate();
             await uow.GroceryItemRepository.InsertAsync(toInsert, ct);
+            return toInsert;
         }
-        else
-        {
-            InsertAltName(itemFromDb, item.Name);
-        }
-
-        await InsertOrUpdatePriceLog(itemFromDb ?? toInsert, storeId, price, purchaseDate, productCode, ct);
-    }
-
-    private static void InsertAltName(GroceryItem itemFromDb, string newName)
-    {
-        if (itemFromDb.Name == newName || (itemFromDb.AltNames ?? []).Contains(newName))
-            return;
         
+        if (itemFromDb.Name == item.Name || (itemFromDb.AltNames ?? []).Contains(item.Name))
+            return itemFromDb;
+    
         itemFromDb.AltNames = itemFromDb.AltNames == null
-            ? [newName]
-            : itemFromDb.AltNames.Append(newName).ToList();
+            ? [item.Name]
+            : itemFromDb.AltNames.Append(item.Name).ToList();
+        
+        return itemFromDb;
     }
 
     private async Task InsertOrUpdatePriceLog(GroceryItem item, Guid storeId, decimal price, DateTime purchaseDate, string productCode, CancellationToken ct)

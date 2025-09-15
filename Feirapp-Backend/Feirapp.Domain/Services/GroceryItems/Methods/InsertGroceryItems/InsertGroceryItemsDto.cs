@@ -1,8 +1,6 @@
-using Feirapp.Domain.Services.GroceryItems.Misc;
+namespace Feirapp.Domain.Services.GroceryItems.Methods.InsertGroceryItems;
 
-namespace Feirapp.Domain.Services.GroceryItems.Methods.InsertListOfGroceryItems;
-
-public class InsertListOfGroceryItemsDto
+public class InsertGroceryItemsDto
 {
     public string Name { get; set; }
     public decimal Price { get; set; }

@@ -7,10 +7,10 @@ namespace Feirapp.Infrastructure.Repository;
 
 public class NcmRepository(BaseContext context) : INcmRepository
 {
-    public async Task<List<Ncm>> GetByQuery(Func<Ncm, bool> func, CancellationToken ct)
+    public async Task<List<Ncm>> GetNcmsWithoutDescriptionAsync(CancellationToken ct)
     {
         return await context.Ncms
-            .Where(func)
+            .Where(n => string.IsNullOrEmpty(n.Description))
             .AsQueryable()
             .ToListAsync(ct);
     }

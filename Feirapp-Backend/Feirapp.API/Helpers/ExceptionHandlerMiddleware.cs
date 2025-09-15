@@ -4,20 +4,13 @@ using Feirapp.API.Helpers.Response;
 
 namespace Feirapp.API.Helpers;
 
-public partial class ExceptionHandlerMiddleware
+public partial class ExceptionHandlerMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate _next;
-
-    public ExceptionHandlerMiddleware(RequestDelegate next)
-    {
-        _next = next;
-    }
-
     public async Task Invoke(HttpContext context)
     {
         try
         {
-            await _next(context);
+            await next(context);
         }
         catch (Exception ex)
         {
@@ -39,13 +32,7 @@ public partial class ExceptionHandlerMiddleware
 
         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-        var genericResponse = new ApiResponse<object>
-        (
-            Status: "error",
-            Message: "An unexpected error ocurred",
-            Data: default,
-            Errors: [exception.Message]
-        );
+        var genericResponse = ApiResponseFactory.Failure<object>("An unexpected error ocurred", [exception.Message]);
 
         return context.Response.WriteAsJsonAsync(genericResponse);
     }

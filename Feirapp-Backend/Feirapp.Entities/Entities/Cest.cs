@@ -13,6 +13,4 @@ public class Cest
     public string? Description { get; set; }
     [Column("ncm_code")]
     public string? NcmCode { get; set; }
-    public Ncm Ncm { get; set; }
-    public ICollection<GroceryItem> GroceryItems { get; set; }
 }

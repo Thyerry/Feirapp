@@ -19,8 +19,8 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
             from p in pg.OrderByDescending(p => p.LogDate).Take(1)
             join s in context.Stores on p.StoreId equals s.Id
             where
-                (string.IsNullOrEmpty(requestParams.Name) || g.Name.Contains(requestParams.Name)) &&
-                (!requestParams.StoreId.HasValue || s.Id == requestParams.StoreId.Value)
+                (string.IsNullOrEmpty(requestParams.Name) || g.Name.ILike(requestParams.Name)) 
+                && (!requestParams.StoreId.HasValue || s.Id == requestParams.StoreId.Value)
             select new SearchGroceryItemsDto
             {
                 Id= g.Id, 
@@ -36,9 +36,9 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
             };
         
         return await query
-            .Skip(requestParams.PageSize * requestParams.Page)
-            .Take(requestParams.PageSize)
             .AsNoTracking()
+            .Skip(requestParams.PageSize * requestParams.PageIndex)
+            .Take(requestParams.PageSize)
             .ToListAsync(ct);
     }
 
@@ -48,18 +48,13 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
         return entity;
     }
 
-    public async Task InsertListAsync(List<GroceryItem> groceryItems, CancellationToken ct)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        var groceryItem = await context.GroceryItems.FindAsync([new { Id = id }], ct);
+        var groceryItem = await context.GroceryItems.FirstOrDefaultAsync(g => g.Id == id, ct);
 
         if (groceryItem == null)
         {
-            throw new KeyNotFoundException($"Grocery item with ID {id} not found.");
+            throw new KeyNotFoundException($"Grocery item with not found.");
         }
 
         context.GroceryItems.Remove(groceryItem);
@@ -81,18 +76,7 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
         return await query.FirstOrDefaultAsync(ct);
     }
 
-    public async Task<GroceryItem> AddIfNotExistsAsync(Func<GroceryItem, bool> predicate, GroceryItem entity, CancellationToken ct = default)
-    {
-        return await context.GroceryItems.AddIfNotExistsAsync(entity, predicate, ct);
-    }
-
-    public List<GroceryItem> GetByQuery(Func<GroceryItem, bool> predicate, CancellationToken ct)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<GroceryItem?> CheckIfGroceryItemExistsAsync(string barcode,
-        string productCode, Guid storeId, CancellationToken ct)
+    public async Task<GroceryItem?> CheckIfGroceryItemExistsAsync(string barcode, string productCode, Guid storeId, CancellationToken ct)
     {
         var query = context.GroceryItems
             .Join(context.PriceLogs,
@@ -136,7 +120,7 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
         return new StoreWithItems { Store = store, Items = items };
     }
 
-    public async Task<List<SearchGroceryItemsDto>> GetRandomGroceryItemsAsync(int quantity, CancellationToken ct)
+    public async Task<List<SearchGroceryItemsDto>> GetRandomAsync(int quantity, CancellationToken ct)
     {
         var query =
              from g in context.GroceryItems
@@ -160,17 +144,6 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
         return await query.Take(quantity).ToListAsync(ct);
     }
     
-    public async Task<bool> UpdateNameAndBrandAsync(Guid id, string name, string brand, CancellationToken ct)
-    {
-        var groceryItem = await context.GroceryItems.FindAsync([new { Id = id }], ct);
-        if (groceryItem == null)
-            return false;
-
-        groceryItem.Name = name;
-        groceryItem.Brand = brand;
-        return true;
-    }
-
     public void Dispose()
     {
         context.Dispose();
