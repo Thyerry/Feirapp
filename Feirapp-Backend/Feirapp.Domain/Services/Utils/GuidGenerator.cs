@@ -1,4 +1,4 @@
-namespace Feirapp.Entities.Utils;
+namespace Feirapp.Domain.Services.Utils;
 
 public static class GuidGenerator
 {
@@ -14,7 +14,7 @@ public static class GuidGenerator
         {
             randomBytes[10 + i] = timestamp[i];
         }
-
+        
         return new Guid(randomBytes);
     }
 }

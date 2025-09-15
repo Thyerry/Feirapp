@@ -10,9 +10,9 @@ public class NcmCestDataScrapper(IUnitOfWork uow) : INcmCestDataScrapper
 {
     private const string BaseUrl = "https://codigocest.com.br/consulta-codigo-cest-pelo-ncm";
     
-    public async Task UpdateNcmAndCestsDetails(CancellationToken ct)
+    public async Task UpdateNcmAndCestsDetailsAsync(CancellationToken ct)
     {
-        var ncms = await uow.NcmRepository.GetByQuery(c => string.IsNullOrEmpty(c.Description), ct);
+        var ncms = await uow.NcmRepository.GetNcmsWithoutDescriptionAsync(ct);
         var driver = new ChromeDriver();
         await driver.Navigate().GoToUrlAsync(BaseUrl);
         

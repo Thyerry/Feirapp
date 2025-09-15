@@ -11,5 +11,4 @@ public class Ncm
     public string? Description { get; set; }
     [Column("last_update")]
     public DateTime LastUpdate { get; set; }
-    public ICollection<Cest> Cests { get; set; }
 }

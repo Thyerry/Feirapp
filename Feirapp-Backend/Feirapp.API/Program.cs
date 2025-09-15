@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using Feirapp.API.Helpers;
-using Feirapp.Domain.Services.DataScrapper.Dtos;
 using Feirapp.Domain.Services.DataScrapper.Implementations;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Implementations;
@@ -12,6 +11,7 @@ using Feirapp.Domain.Services.Stores.Interfaces;
 using Feirapp.Domain.Services.UnitOfWork;
 using Feirapp.Domain.Services.Users.Implementations;
 using Feirapp.Domain.Services.Users.Interfaces;
+using Feirapp.Entities.Enums;
 using Feirapp.Infrastructure.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -32,7 +32,7 @@ builder.Services.AddDbContext<BaseContext>(options =>
 
 #endregion DB Context Configuration
 
-DependencyInjection(builder.Services, builder.Configuration);
+DependencyInjection(builder.Services);
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"] ?? throw new InvalidOperationException("Secret key not found."));
@@ -93,6 +93,15 @@ builder.Services.AddSwaggerGen(c =>
     });
     
     c.EnableAnnotations();
+    
+    c.MapType<StatesEnum>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Enum = Enum.GetNames(typeof(StatesEnum))
+            .Select(name => new Microsoft.OpenApi.Any.OpenApiString(name))
+            .Cast<Microsoft.OpenApi.Any.IOpenApiAny>()
+            .ToList()
+    });
 });
 
 
@@ -128,14 +137,8 @@ app.MapControllers();
 app.Run();
 return;
 
-void DependencyInjection(IServiceCollection services, IConfiguration configuration)
+void DependencyInjection(IServiceCollection services)
 {
-    #region Configurations
-
-    services.Configure<SefazPe>(configuration.GetSection("DataScrappingResources:SefazPE"));
-
-    #endregion Configurations
-
     #region Services
 
     services.AddScoped<IUnitOfWork, UnitOfWork>();

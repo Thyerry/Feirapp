@@ -90,7 +90,7 @@ public class BaseContext(DbContextOptions options) : DbContext(options)
                 .Property(e => e.MeasureUnit)
                 .IsRequired()
                 .HasConversion<string>()
-                .HasMaxLength(5);
+                .HasMaxLength(25);
         });
 
         modelBuilder.Entity<PriceLog>(entity =>
@@ -138,8 +138,7 @@ public class BaseContext(DbContextOptions options) : DbContext(options)
                 .IsRequired();
             entity
                 .Property(e => e.Password)
-                .HasMaxLength(50)
-                .IsFixedLength();
+                .HasMaxLength(50);
             entity
                 .Property(e => e.PasswordSalt)
                 .HasMaxLength(50);

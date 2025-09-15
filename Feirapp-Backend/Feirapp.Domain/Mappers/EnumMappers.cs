@@ -1,24 +1,9 @@
-﻿using System.Diagnostics;
-using Feirapp.Entities.Enums;
+﻿using Feirapp.Entities.Enums;
 
 namespace Feirapp.Domain.Mappers;
 
 public static class EnumMappers
 {
-    public static StatesEnum MapToStatesEnum(this string stateAbbreviation)
-    {
-        foreach (StatesEnum state in Enum.GetValues(typeof(StatesEnum)))
-        {
-            var fieldInfo = state.GetType().GetField(state.ToString());
-            if (fieldInfo?.GetCustomAttributes(typeof(StringValueAttribute), false).FirstOrDefault() is StringValueAttribute attribute && attribute.Value == stateAbbreviation)
-            {
-                return state;
-            }
-        }
-
-        return StatesEnum.Empty;
-    }
-    
     public static StatesEnum ToStatesEnum(string state) => state switch
     {
         "AC" => StatesEnum.AC,

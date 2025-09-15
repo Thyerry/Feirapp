@@ -23,15 +23,10 @@ public class PriceLog
     [Column("product_code")]
     public string? ProductCode { get; set; }
 
-    public GroceryItem GroceryItem { get; set; }
-
     [Column("store_id")]
     public Guid StoreId;
-
-    public Store Store { get; set; }
 
     [Column("invoice_id")]
     public Guid? InvoiceId { get; set; }
 
-    public Invoice Invoice { get; set; }
 }

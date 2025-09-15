@@ -1,6 +1,6 @@
-namespace Feirapp.Domain.Services.GroceryItems.Methods.InsertListOfGroceryItems;
+namespace Feirapp.Domain.Services.GroceryItems.Methods.InsertGroceryItems;
 
-public class InsertListOfGroceryItemsStoreDto
+public class InsertGroceryItemsStoreDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; }

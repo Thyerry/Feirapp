@@ -14,7 +14,5 @@ public class Invoice
     [Column("scan_date")]
     public DateTime ScanDate { get; set; }
     [Column("user_id")]
-    [ForeignKey(nameof(User))]
     public Guid UserId { get; set; }
-    public User User { get; set; }
 }

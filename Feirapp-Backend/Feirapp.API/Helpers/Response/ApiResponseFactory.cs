@@ -11,9 +11,4 @@ public static class ApiResponseFactory
     {
         return new ApiResponse<T>("failure", message, default, errors ?? []);
     }
-    
-    public static ApiResponse<T> Error<T>(string message, List<string>? errors = null)
-    {
-        return new ApiResponse<T>("error", message, default, errors ?? []);
-    }
 }

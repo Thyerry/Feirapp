@@ -22,6 +22,6 @@ public class User
     public DateTime LastLogin { get; set; }
     [Column("failed_login_attempts")]    
     public int FailedLoginAttempts { get; set; } = 0;
-    [Column("status'")]
+    [Column("status")]
     public UserStatus Status { get; set; }
 }
