@@ -12,7 +12,6 @@ public interface IGroceryItemRepository
     Task InsertPriceLog(PriceLog priceLog, CancellationToken ct);
     Task<PriceLog?> GetLastPriceLogAsync(Guid groceryItemId, Guid storeId, CancellationToken ct);
     Task<StoreWithItems> GetByStoreAsync(Guid storeId, CancellationToken ct);
-    Task<List<SearchGroceryItemsDto>> GetRandomAsync(int quantity, CancellationToken ct);
     Task<GroceryItem> InsertAsync(GroceryItem groceryItem, CancellationToken ct);
     Task<GetGroceryItemByIdDto?> GetByIdAsync(Guid id, CancellationToken ct);
     Task DeleteAsync(Guid groceryId, CancellationToken ct);

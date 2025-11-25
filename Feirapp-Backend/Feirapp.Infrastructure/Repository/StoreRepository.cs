@@ -10,11 +10,6 @@ namespace Feirapp.Infrastructure.Repository;
 
 public class StoreRepository(BaseContext context) : IStoreRepository, IDisposable
 {
-    public Task<Store?> GetByCnpjAsync(string? storeCnpj, CancellationToken ct)
-    {
-        return context.Stores.FirstOrDefaultAsync(x => x.Cnpj == storeCnpj, ct);
-    }
-
     public async Task<Store> AddIfNotExistsAsync(Func<Store, bool> query, Store store, CancellationToken ct)
     {
         return await context.Stores.AddIfNotExistsAsync(store, query, ct);
@@ -30,11 +25,6 @@ public class StoreRepository(BaseContext context) : IStoreRepository, IDisposabl
         return storeEntity;
     }
 
-    public async Task<List<Store>> GetAllAsync(CancellationToken ct)
-    {
-        return await context.Stores.ToListAsync(ct);
-    }
-
     public async Task<Store?> GetByIdAsync(Guid storeId, CancellationToken ct)
     {
         return await context.Stores.FindAsync([storeId], ct); 
@@ -45,11 +35,11 @@ public class StoreRepository(BaseContext context) : IStoreRepository, IDisposabl
         var query =
             from s in context.Stores
             where 
-                (string.IsNullOrEmpty(request.Name) || s.Name.ILike(request.Name))
-                && (request.State == StatesEnum.Empty || s.State == request.State)
-                && (string.IsNullOrEmpty(request.CityName) || s.State.StringValue().ILike(request.CityName))
+                (string.IsNullOrEmpty(request.Name) || EF.Functions.ILike(s.Name, $"%{request.Name}%")) && 
+                (string.IsNullOrEmpty(request.CityName) || EF.Functions.ILike(s.CityName, $"%{request.CityName}%")) &&
+                (request.State == StatesEnum.Empty || s.State == request.State)
             select s;
-
+        
         return await query
             .AsNoTracking()
             .Skip(request.PageSize * request.PageIndex)

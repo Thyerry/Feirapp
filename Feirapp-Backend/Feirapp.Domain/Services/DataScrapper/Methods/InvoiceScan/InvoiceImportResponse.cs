@@ -1,3 +1,8 @@
 ﻿namespace Feirapp.Domain.Services.DataScrapper.Methods.InvoiceScan;
 
-public record InvoiceImportResponse(string InvoiceCode, InvoiceImportStore? Store, List<InvoiceImportGroceryItem> Items);
+public class InvoiceImportResponse
+{
+    public string InvoiceCode { get; set; }
+    public InvoiceImportStore? Store { get; set; }
+    public List<InvoiceImportGroceryItem> Items { get; set; }
+}

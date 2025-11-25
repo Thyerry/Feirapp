@@ -1,400 +1,637 @@
+using System;
+using System.Collections.Generic;
 using Feirapp.API.Controllers;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using NSubstitute;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Feirapp.API.Helpers.Response;
+using Feirapp.Domain.Services.DataScrapper.Interfaces;
+using Feirapp.Domain.Services.DataScrapper.Methods.InvoiceScan;
+using Feirapp.Domain.Services.GroceryItems.Methods.GetGroceryItemById;
+using Feirapp.Domain.Services.GroceryItems.Methods.GetGroceryItemsByStore;
+using Feirapp.Domain.Services.GroceryItems.Methods.InsertGroceryItems;
+using Feirapp.Domain.Services.GroceryItems.Methods.SearchGroceryItems;
+using NSubstitute.ReturnsExtensions;
 using Xunit;
 
 namespace Feirapp.Tests.UnitTest.API;
 
 public class GroceryItemControllerTests
 {
-    // private static readonly List<GroceryItemResponse> GetAllGroceryItemsResponseEmptyList = new();
-    //
-    // private static readonly List<GroceryItemResponse> GetAllGroceryItemsResponseList = new()
-    // {
-    //     new GroceryItemResponse()
-    // };
-    //
-    // private const string ValidGroceryItemId = "123456789012345678901234";
-    //
-    // #region GetAll
-    //
-    // [Fact]
-    // public async Task GetAll_OnSuccess_ReturnsStatusCode200()
-    // {
-    //     // Arrange
-    //     var logger = Substitute.For<ILogger<GroceryItemController>>();
-    //     var mockGroceryItemService = Substitute.For<IGroceryItemService>();
-    //     mockGroceryItemService
-    //         .GetAllAsync(Arg.Any<CancellationToken>())
-    //         .Returns(GetAllGroceryItemsResponseList);
-    //     var sut = new GroceryItemController(mockGroceryItemService, logger);
-    //
-    //     // Act
-    //     var result = (OkObjectResult)await sut.GetAll();
-    //
-    //     // Assert
-    //     result.StatusCode.Should().Be(200);
-    // }
-    //
-    // [Fact]
-    // public async Task GetAll_OnSuccess_InvokeGroceryItemService()
-    // {
-    //     // Arrange
-    //     var logger = Substitute.For<ILogger<GroceryItemController>>();
-    //     var mockGroceryItemService = Substitute.For<IGroceryItemService>();
-    //     mockGroceryItemService
-    //         .GetAllAsync(Arg.Any<CancellationToken>())
-    //         .Returns(GetAllGroceryItemsResponseList);
-    //     var sut = new GroceryItemController(mockGroceryItemService, logger);
-    //
-    //     // Act
-    //     await sut.GetAll();
-    //
-    //     // Assert
-    //     await mockGroceryItemService.Received().GetAllAsync();
-    // }
-    //
-    // [Fact]
-    // public async Task GetAll_OnSuccess_ReturnListOfGroceryItems()
-    // {
-    //     // Arrange
-    //     var logger = Substitute.For<ILogger<GroceryItemController>>();
-    //     var mockGroceryItemService = Substitute.For<IGroceryItemService>();
-    //     mockGroceryItemService
-    //         .GetAllAsync(Arg.Any<CancellationToken>())
-    //         .Returns(GetAllGroceryItemsResponseList);
-    //     var sut = new GroceryItemController(mockGroceryItemService, logger);
-    //
-    //     // Act
-    //     var result = await sut.GetAll();
-    //
-    //     // Assert
-    //     result.Should().BeOfType<OkObjectResult>();
-    //     var objectResult = result as OkObjectResult;
-    //     objectResult?.Value.Should().BeOfType<List<GroceryItemResponse>>();
-    // }
-    //
-    // [Fact]
-    // public async Task GetAll_OnNoGroceryItemsFound_Returns404()
-    // {
-    //     // Arrange
-    //     var logger = Substitute.For<ILogger<GroceryItemController>>();
-    //     var mockGroceryItemService = Substitute.For<IGroceryItemService>();
-    //     mockGroceryItemService
-    //         .GetAllAsync(Arg.Any<CancellationToken>())
-    //         .Returns(GetAllGroceryItemsResponseEmptyList);
-    //     var sut = new GroceryItemController(mockGroceryItemService, logger);
-    //
-    //     // Act
-    //     var result = await sut.GetAll();
-    //
-    //     // Assert
-    //     result.Should().BeOfType<NotFoundObjectResult>();
-    //     var objectResult = result as NotFoundObjectResult;
-    //     objectResult?.StatusCode.Should().Be(404);
-    // }
-    //
-    // #endregion GetAll
+    #region SearchGroceryItems
 
-    //    #region GetRandomGroceryItems
+    [Fact]
+    public async Task SearchGroceryItems_OnSuccess_ReturnStatus200()
+    {
+        // Arrange
+        var service = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
 
-    //    [Fact]
-    //    public async Task GetRandomGroceryItems_OnSuccess_ShouldReturnStatusCode200()
-    //    {
-    //        // Arrange
-    //        var groceryItems = GroceryItemFixture.CreateGroceryItemsModels(10);
-    //        var mockGroceryItemService = new Mock<IGroceryItemService>();
-    //        mockGroceryItemService
-    //            .Setup(service => service.GetAllAsync(It.IsAny<CancellationToken>()))
-    //            .ReturnsAsync(groceryItems);
-    //        var sut = new GroceryItemController(mockGroceryItemService.Object);
+        List<SearchGroceryItemsResponse> response =
+        [
+            new() { Name = "Arroz" },
+            new() { Name = "Feijão" }
+        ];
 
-    //        // Act
-    //        var result = (OkObjectResult)await sut.GetRandomGroceryItems(1);
+        service
+            .SearchAsync(Arg.Any<SearchGroceryItemsRequest>(), Arg.Any<CancellationToken>())
+            .Returns(response);
 
-    //        // Assert
-    //        result.StatusCode.Should().Be(200);
-    //    }
+        var sut = new GroceryItemController(service, invoiceService);
 
-    //    [Fact]
-    //    public async Task GetRandomGroceryItems_OnSuccess_ShouldReturnListOfGroceryItems()
-    //    {
-    //        // Arrange
-    //        var groceryItems = GroceryItemFixture.CreateGroceryItemsModels(10);
-    //        var mockGroceryItemService = new Mock<IGroceryItemService>();
-    //        mockGroceryItemService
-    //            .Setup(service => service.GetRandomGroceryItemsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-    //            .ReturnsAsync(groceryItems);
-    //        var sut = new GroceryItemController(mockGroceryItemService.Object);
+        // Act
+        var result = await sut.SearchGroceryItems(new SearchGroceryItemsRequest());
 
-    //        // Act
-    //        var result = (OkObjectResult)await sut.GetRandomGroceryItems(1);
+        // Assert
+        result.Should().BeOfType<OkObjectResult>();
+        var objectResult = result as OkObjectResult;
+        objectResult?.StatusCode.Should().Be(200);
+    }
 
-    //        // Assert
-    //        result.Should().BeOfType<OkObjectResult>();
-    //        result.Value.Should().BeOfType<List<GroceryItemDto>>();
-    //    }
+    [Fact]
+    public async Task SearchGroceryItems_OnSuccess_ReturnGroceryItems()
+    {
+        // Arrange
+        var service = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
 
-    //    [Fact]
-    //    public async Task GetRandomGroceryItems_OnSuccess_ShouldInvokeGroceryItemService()
-    //    {
-    //        // Arrange
-    //        var groceryItems = GroceryItemFixture.CreateGroceryItemsModels(10);
-    //        var mockGroceryItemService = new Mock<IGroceryItemService>();
-    //        mockGroceryItemService
-    //            .Setup(service => service.GetAllAsync(It.IsAny<CancellationToken>()))
-    //            .ReturnsAsync(groceryItems);
-    //        var sut = new GroceryItemController(mockGroceryItemService.Object);
+        List<SearchGroceryItemsResponse> expectedResponse =
+        [
+            new() { Name = "Arroz" },
+            new() { Name = "Feijão" }
+        ];
 
-    //        // Act
-    //        await sut.GetRandomGroceryItems(1);
+        service
+            .SearchAsync(Arg.Any<SearchGroceryItemsRequest>(), Arg.Any<CancellationToken>())
+            .Returns(expectedResponse);
 
-    //        // Assert
-    //        mockGroceryItemService.Verify(
-    //            service => service.GetRandomGroceryItemsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
-    //    }
+        var sut = new GroceryItemController(service, invoiceService);
 
-    //    [Fact]
-    //    public async Task GetRandomGroceryItems_OnQuantityLessThanOne_ShouldReturnStatus400()
-    //    {
-    //        // Arrange
-    //        var groceryItems = GroceryItemFixture.CreateGroceryItemsModels(10);
-    //        var mockGroceryItemService = new Mock<IGroceryItemService>();
-    //        mockGroceryItemService
-    //            .Setup(service => service.GetAllAsync(It.IsAny<CancellationToken>()))
-    //            .ReturnsAsync(groceryItems);
-    //        var sut = new GroceryItemController(mockGroceryItemService.Object);
+        // Act
+        var result = await sut.SearchGroceryItems(new SearchGroceryItemsRequest());
 
-    //        // Act
-    //        var result = (BadRequestResult)await sut.GetRandomGroceryItems(0);
+        // Assert
+        result.Should().BeOfType<OkObjectResult>();
+        var objectResult = result as OkObjectResult;
+        objectResult.Value.Should().BeOfType<ApiResponse<List<SearchGroceryItemsResponse>>>();
 
-    //        // Assert
-    //        result.Should().BeOfType<BadRequestResult>();
-    //        result.StatusCode.Should().Be(400);
-    //    }
+        var apiResponse = objectResult.Value as ApiResponse<List<SearchGroceryItemsResponse>>;
+        apiResponse.Status.Should().Be("success");
+        apiResponse.Data.Should().BeEquivalentTo(expectedResponse);
+    }
 
-    //    #endregion GetRandomGroceryItems
+    [Fact]
+    public async Task SearchGroceryItems_OnSuccess_InvokeGroceryItemService()
+    {
+        // Arrange
+        var service = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+        var request = new SearchGroceryItemsRequest();
+        List<SearchGroceryItemsResponse> response =
+        [
+            new() { Name = "Arroz" },
+            new() { Name = "Feijão" }
+        ];
 
-    //    #region GetById
+        service
+            .SearchAsync(Arg.Any<SearchGroceryItemsRequest>(), Arg.Any<CancellationToken>())
+            .Returns(response);
 
-    //    [Fact]
-    //    public async Task GetById_OnSuccess_ReturnStatus200()
-    //    {
-    //        // Arrange
-    //        var mockService = new Mock<IGroceryItemService>();
-    //        mockService
-    //            .Setup(service => service.GetById(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-    //            .ReturnsAsync(new GroceryItemDto());
-    //        var sut = new GroceryItemController(mockService.Object);
+        var sut = new GroceryItemController(service, invoiceService);
 
-    //        // Act
-    //        var result = (OkObjectResult)await sut.GetById(ValidGroceryItemId);
+        // Act
+        await sut.SearchGroceryItems(request);
 
-    //        // Assert
-    //        result.StatusCode.Should().Be(200);
-    //    }
+        // Assert
+        await service.Received(1).SearchAsync(Arg.Is<SearchGroceryItemsRequest>(r => r == request),
+            Arg.Any<CancellationToken>());
+    }
 
-    //    [Fact]
-    //    public async Task GetById_OnSuccess_ReturnGroceryItem()
-    //    {
-    //        // Arrange
-    //        var mockService = new Mock<IGroceryItemService>();
-    //        mockService
-    //            .Setup(service => service.GetById(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-    //            .ReturnsAsync(new GroceryItemDto());
-    //        var sut = new GroceryItemController(mockService.Object);
+    [Fact]
+    public async Task SearchGroceryItems_WhenNoItemsFound_ReturnStatus404()
+    {
+        // Arrange
+        var service = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+        service
+            .SearchAsync(Arg.Any<SearchGroceryItemsRequest>(), Arg.Any<CancellationToken>())
+            .Returns([]);
 
-    //        // Act
-    //        var result = await sut.GetById(ValidGroceryItemId, CancellationToken.None);
+        var sut = new GroceryItemController(service, invoiceService);
 
-    //        // Assert
-    //        result.Should().BeOfType<OkObjectResult>();
-    //        var objectResult = (OkObjectResult)result;
-    //        objectResult.Value.Should().BeOfType<GroceryItemDto>();
-    //    }
+        // Act
+        var result = await sut.SearchGroceryItems(new SearchGroceryItemsRequest());
 
-    //    [Fact]
-    //    public async Task GetById_OnSuccess_InvokeGroceryItemService()
-    //    {
-    //        // Arrange
-    //        var mockService = new Mock<IGroceryItemService>();
-    //        mockService
-    //            .Setup(service => service.GetById(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-    //            .ReturnsAsync(new GroceryItemDto());
+        // Assert
+        result.Should().BeOfType<NotFoundObjectResult>();
+        var objectResult = result as NotFoundObjectResult;
+        objectResult?.StatusCode.Should().Be(404);
+    }
 
-    //        var sut = new GroceryItemController(mockService.Object);
+    [Fact]
+    public async Task SearchGroceryItems_WhenNoItemsFound_ReturnCorrectErrorMessage()
+    {
+        // Arrange
+        var service = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+        service
+            .SearchAsync(Arg.Any<SearchGroceryItemsRequest>(), Arg.Any<CancellationToken>())
+            .Returns([]);
 
-    //        // Act
-    //        await sut.GetById(ValidGroceryItemId);
+        var sut = new GroceryItemController(service, invoiceService);
 
-    //        // Assert
-    //        mockService.Verify(service => service.GetById(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
-    //    }
+        // Act
+        var result = await sut.SearchGroceryItems(new SearchGroceryItemsRequest());
 
-    //    [Fact]
-    //    public async Task GetById_OnNoGroceryItemFound_ReturnStatus404()
-    //    {
-    //        // Arrange
-    //        var mockService = new Mock<IGroceryItemService>();
-    //        mockService
-    //            .Setup(service => service.GetById(It.IsAny<string>(), It.IsAny<CancellationToken>()));
-    //        var sut = new GroceryItemController(mockService.Object);
+        // Assert
+        var objectResult = result as NotFoundObjectResult;
+        var response = objectResult?.Value as ApiResponse<List<SearchGroceryItemsResponse>>;
+        response?.Message.Should().Be("No Grocery Items Found");
+        response?.Status.Should().Be("failure");
+    }
 
-    //        // Act
-    //        var result = await sut.GetById(ValidGroceryItemId);
+    #endregion SearchGroceryItems
 
-    //        // Assert
-    //        result.Should().BeOfType<NotFoundResult>();
-    //        var objectResult = result as NotFoundResult;
-    //        objectResult?.StatusCode.Should().Be(404);
-    //    }
+    #region GetById
 
-    //    #endregion GetById
+    [Fact]
+    public async Task GetById_OnSuccess_ReturnStatus200()
+    {
+        // Arrange
+        var service = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+        var groceryItemResponse = new GetGroceryItemByIdResponse { Name = "Arroz" };
+        service
+            .GetByIdAsync(Arg.Any<Guid>(), CancellationToken.None)
+            .Returns(groceryItemResponse);
 
-    //    #region Create
+        var sut = new GroceryItemController(service, invoiceService);
 
-    //    [Fact]
-    //    public async Task Create_OnSuccess_ReturnStatusCode201()
-    //    {
-    //        // Assert
-    //        var mockGroceryService = new Mock<IGroceryItemService>();
-    //        var sut = new GroceryItemController(mockGroceryService.Object);
+        // Act
+        var result = (OkObjectResult)await sut.GetById(Guid.NewGuid());
 
-    //        // Act
-    //        var result = await sut.Insert(new GroceryItemDto());
+        // Assert
+        result.StatusCode.Should().Be(200);
+    }
 
-    //        // Assert
-    //        result.Should().BeOfType<CreatedResult>();
-    //        var objectResult = result as CreatedResult;
-    //        objectResult?.StatusCode.Should().Be(201);
-    //    }
+    [Fact]
+    public async Task GetById_OnSuccess_ReturnGroceryItem()
+    {
+        // Arrange
+        var service = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+        var groceryItemResponse = new GetGroceryItemByIdResponse { Name = "Arroz" };
 
-    //    [Fact]
-    //    public async Task Create_OnSuccess_ReturnGroceryItem()
-    //    {
-    //        // Arrange
-    //        var mockGroceryService = new Mock<IGroceryItemService>();
-    //        mockGroceryService
-    //            .Setup(service => service.InsertAsync(It.IsAny<GroceryItemDto>(), It.IsAny<CancellationToken>()))
-    //            .ReturnsAsync(new GroceryItemDto());
-    //        var sut = new GroceryItemController(mockGroceryService.Object);
+        service
+            .GetByIdAsync(Arg.Any<Guid>(), CancellationToken.None)
+            .Returns(groceryItemResponse);
 
-    //        // Act
-    //        var result = await sut.Insert(new GroceryItemDto());
+        var sut = new GroceryItemController(service, invoiceService);
 
-    //        // Assert
-    //        result.Should().BeOfType<CreatedResult>();
-    //        var objectResult = (CreatedResult)result;
-    //        objectResult.Value.Should().BeOfType<GroceryItemDto>();
-    //    }
+        // Act
+        var result = await sut.GetById(Guid.NewGuid());
 
-    //    [Fact]
-    //    public async Task Create_OnSuccess_InvokeGroceryItemService()
-    //    {
-    //        // Arrange
-    //        var mockGroceryService = new Mock<IGroceryItemService>();
-    //        mockGroceryService
-    //            .Setup(service => service.InsertAsync(It.IsAny<GroceryItemDto>(), It.IsAny<CancellationToken>()))
-    //            .ReturnsAsync(new GroceryItemDto());
-    //        var sut = new GroceryItemController(mockGroceryService.Object);
+        // Assert
+        result.Should().BeOfType<OkObjectResult>();
 
-    //        // Act
-    //        await sut.Insert(new GroceryItemDto());
+        var objectResult = (OkObjectResult)result;
+        objectResult.Value.Should().BeOfType<ApiResponse<GetGroceryItemByIdResponse>>();
 
-    //        // Assert
-    //        mockGroceryService.Verify(
-    //            service => service.InsertAsync(It.IsAny<GroceryItemDto>(), It.IsAny<CancellationToken>()),
-    //            Times.Once
-    //        );
-    //    }
+        var apiResponse = objectResult.Value as ApiResponse<GetGroceryItemByIdResponse>;
+        apiResponse.Status.Should().Be("success");
+        apiResponse.Data.Should().BeEquivalentTo(groceryItemResponse);
+    }
 
-    //    #endregion Create
+    [Fact]
+    public async Task GetById_OnSuccess_InvokeGroceryItemService()
+    {
+        // Arrange
+        var service = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+        var groceryItemResponse = new GetGroceryItemByIdResponse { Name = "Arroz" };
 
-    //    #region Update
+        service
+            .GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(groceryItemResponse);
 
-    //    [Fact]
-    //    public async Task Update_OnSuccess_ReturnStatus202()
-    //    {
-    //        // Arrange
-    //        var mockService = new Mock<IGroceryItemService>();
-    //        var sut = new GroceryItemController(mockService.Object);
+        var sut = new GroceryItemController(service, invoiceService);
 
-    //        // Act
-    //        var result = (AcceptedResult)await sut.Update(new GroceryItemDto());
+        // Act
+        await sut.GetById(Guid.NewGuid());
 
-    //        // Assert
-    //        result.StatusCode.Should().Be(202);
-    //    }
+        // Assert
+        await service.Received(1).GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
 
-    //    [Fact]
-    //    public async Task Update_OnSuccess_InvokeGroceryItemService()
-    //    {
-    //        // Arrange
-    //        var mockService = new Mock<IGroceryItemService>();
-    //        mockService
-    //            .Setup(service => service.UpdateAsync(It.IsAny<GroceryItemDto>(), It.IsAny<CancellationToken>()));
-    //        var sut = new GroceryItemController(mockService.Object);
+    [Fact]
+    public async Task GetById_OnNoGroceryItemFound_ReturnStatus404()
+    {
+        // Arrange
+        var service = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+        service
+            .GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .ReturnsNull();
 
-    //        // Act
-    //        await sut.Update(new GroceryItemDto());
+        var sut = new GroceryItemController(service, invoiceService);
 
-    //        // Assert
-    //        mockService.Verify(service => service.UpdateAsync(It.IsAny<GroceryItemDto>(), It.IsAny<CancellationToken>()));
-    //    }
+        // Act
+        var result = await sut.GetById(Guid.NewGuid());
 
-    //    #endregion Update
+        // Assert
+        result.Should().BeOfType<NotFoundObjectResult>();
+        var objectResult = result as NotFoundObjectResult;
+        objectResult?.StatusCode.Should().Be(404);
+    }
 
-    //    #region Delete
+    #endregion GetById
 
-    //    [Fact]
-    //    public async Task Delete_OnSuccess_ReturnStatus202()
-    //    {
-    //        // Arrange
-    //        var mockService = new Mock<IGroceryItemService>();
-    //        var sut = new GroceryItemController(mockService.Object);
+    #region GetFromStore
 
-    //        // Act
-    //        var result = (AcceptedResult)await sut.Delete(new string('*', 10));
+    [Fact]
+    public async Task GetFromStore_OnSuccess_ReturnStatus200()
+    {
+        // Arrange
+        var service = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
 
-    //        // Assert
-    //        result.StatusCode.Should().Be(202);
-    //    }
+        var response = new GetGroceryItemsByStoreIdResponse
+        {
+            Store = new GetGroceryItemsByStoreStoreDto { Name = "Supermercado Central", Id = Guid.NewGuid() },
+            Items =
+            [
+                new GetGroceryItemsByStoreGroceryItemDto { Name = "Arroz" },
+                new GetGroceryItemsByStoreGroceryItemDto { Name = "Feijão" }
+            ]
+        };
 
-    //    [Fact]
-    //    public async Task Delete_OnSuccess_InvokeGroceryItemService()
-    //    {
-    //        // Arrange
-    //        var mockService = new Mock<IGroceryItemService>();
-    //        var sut = new GroceryItemController(mockService.Object);
+        service
+            .GetByStoreAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(response);
 
-    //        // Act
-    //        await sut.Delete(new string('*', 10));
+        var sut = new GroceryItemController(service, invoiceService);
 
-    //        // Assert
-    //        mockService.Verify(service => service.DeleteAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
-    //            Times.Once);
-    //    }
+        // Act
+        var result = await sut.GetFromStore(Guid.NewGuid());
 
-    //    [Fact]
-    //    public async Task Delete_OnIdNullOrEmpty_ReturnStatus400()
-    //    {
-    //        // Arrange
-    //        var mockService = new Mock<IGroceryItemService>();
-    //        var sut = new GroceryItemController(mockService.Object);
+        // Assert
+        result.Should().BeOfType<OkObjectResult>();
+        var objectResult = result as OkObjectResult;
+        objectResult?.StatusCode.Should().Be(200);
+    }
 
-    //        // Act
-    //        var result = await sut.Delete(string.Empty);
+    [Fact]
+    public async Task GetFromStore_OnSuccess_ReturnGroceryItems()
+    {
+        // Arrange
+        var service = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+        var expectedResponse = new GetGroceryItemsByStoreIdResponse
+        {
+            Store = new GetGroceryItemsByStoreStoreDto { Name = "Supermercado Central", Id = Guid.NewGuid() },
+            Items =
+            [
+                new GetGroceryItemsByStoreGroceryItemDto { Name = "Arroz" },
+                new GetGroceryItemsByStoreGroceryItemDto { Name = "Feijão" }
+            ]
+        };
 
-    //        // Assert
-    //        result.Should().BeOfType<BadRequestResult>();
-    //        result.As<BadRequestResult>().StatusCode.Should().Be(400);
-    //    }
+        service
+            .GetByStoreAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(expectedResponse);
 
-    //    #endregion Delete
+        var sut = new GroceryItemController(service, invoiceService);
+
+        // Act
+        var result = await sut.GetFromStore(Guid.NewGuid());
+
+        // Assert
+        result.Should().BeOfType<OkObjectResult>();
+        var objectResult = result as OkObjectResult;
+        objectResult.Value.Should().BeOfType<ApiResponse<GetGroceryItemsByStoreIdResponse>>();
+
+        var apiResponse = objectResult.Value as ApiResponse<GetGroceryItemsByStoreIdResponse>;
+        apiResponse.Status.Should().Be("success");
+        apiResponse.Data.Should().BeEquivalentTo(expectedResponse);
+    }
+
+    [Fact]
+    public async Task GetFromStore_OnSuccess_InvokeGroceryItemService()
+    {
+        // Arrange
+        var service = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+
+        var storeId = Guid.NewGuid();
+
+        var response = new GetGroceryItemsByStoreIdResponse
+        {
+            Store = new GetGroceryItemsByStoreStoreDto { Name = "Supermercado Central", Id = Guid.NewGuid() },
+            Items =
+            [
+                new GetGroceryItemsByStoreGroceryItemDto { Name = "Arroz" },
+                new GetGroceryItemsByStoreGroceryItemDto { Name = "Feijão" }
+            ]
+        };
+
+        service
+            .GetByStoreAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(response);
+
+        var sut = new GroceryItemController(service, invoiceService);
+
+        // Act
+        await sut.GetFromStore(storeId);
+
+        // Assert
+        await service.Received(1).GetByStoreAsync(storeId, Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task GetFromStore_WhenStoreNotFound_ReturnStatus404()
+    {
+        // Arrange
+        var service = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+        var response = new GetGroceryItemsByStoreIdResponse { Items = [] };
+
+        service
+            .GetByStoreAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(response);
+
+        var sut = new GroceryItemController(service, invoiceService);
+
+        // Act
+        var result = await sut.GetFromStore(Guid.NewGuid());
+
+        // Assert
+        result.Should().BeOfType<NotFoundObjectResult>();
+        var objectResult = result as NotFoundObjectResult;
+        objectResult?.StatusCode.Should().Be(404);
+    }
+
+    [Fact]
+    public async Task GetFromStore_WhenStoreNotFound_ReturnCorrectErrorMessage()
+    {
+        // Arrange
+        var service = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+        var response = new GetGroceryItemsByStoreIdResponse { Items = [] };
+        service
+            .GetByStoreAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(response);
+
+        var sut = new GroceryItemController(service, invoiceService);
+
+        // Act
+        var result = await sut.GetFromStore(Guid.NewGuid());
+
+        // Assert
+        var objectResult = result as NotFoundObjectResult;
+        var apiResponse = objectResult?.Value as ApiResponse<GetGroceryItemsByStoreIdResponse>;
+        apiResponse?.Message.Should().Be("Store not found");
+        apiResponse?.Status.Should().Be("failure");
+    }
+
+    #endregion GetFromStore
+
+    #region GetFromInvoice
+
+    [Fact]
+    public async Task GetFromInvoice_OnSuccess_ReturnStatus200()
+    {
+        // Arrange
+        var groceryItemService = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+        var response = new InvoiceImportResponse
+        {
+            Items =
+            [
+                new InvoiceImportGroceryItem { Name = "Arroz" },
+                new InvoiceImportGroceryItem { Name = "Feijão" }
+            ]
+        };
+
+        invoiceService
+            .InvoiceImportAsync(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(response);
+
+        var sut = new GroceryItemController(groceryItemService, invoiceService);
+
+        // Act
+        var result = await sut.GetFromInvoice("invoice123");
+
+        // Assert
+        result.Should().BeOfType<OkObjectResult>();
+        var objectResult = result as OkObjectResult;
+        objectResult?.StatusCode.Should().Be(200);
+    }
+
+    [Fact]
+    public async Task GetFromInvoice_OnSuccess_ReturnInvoiceItems()
+    {
+        // Arrange
+        var groceryItemService = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+        var expectedResponse = new InvoiceImportResponse
+        {
+            Items =
+            [
+                new InvoiceImportGroceryItem { Name = "Arroz" },
+                new InvoiceImportGroceryItem { Name = "Feijão" }
+            ]
+        };
+
+        invoiceService
+            .InvoiceImportAsync(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(expectedResponse);
+
+        var sut = new GroceryItemController(groceryItemService, invoiceService);
+
+        // Act
+        var result = await sut.GetFromInvoice("invoice123");
+
+        // Assert
+        result.Should().BeOfType<OkObjectResult>();
+        var objectResult = result as OkObjectResult;
+        objectResult.Value.Should().BeOfType<ApiResponse<InvoiceImportResponse>>();
+
+        var apiResponse = objectResult.Value as ApiResponse<InvoiceImportResponse>;
+        apiResponse.Status.Should().Be("success");
+        apiResponse.Data.Should().BeEquivalentTo(expectedResponse);
+    }
+
+    [Fact]
+    public async Task GetFromInvoice_OnSuccess_InvokeServiceWithCorrectParameters()
+    {
+        // Arrange
+        var groceryItemService = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+
+        var invoiceId = "invoice123";
+
+        var response = new InvoiceImportResponse { Items = [] };
+
+        invoiceService
+            .InvoiceImportAsync(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(response);
+
+        var sut = new GroceryItemController(groceryItemService, invoiceService);
+
+        // Act
+        await sut.GetFromInvoice(invoiceId);
+
+        // Assert
+        await invoiceService.Received(1)
+            .InvoiceImportAsync(
+                Arg.Is<string>(x => x == invoiceId),
+                Arg.Is<bool>(x => x == false),
+                Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task GetFromInvoice_WhenNoItemsFound_ReturnStatus404()
+    {
+        // Arrange
+        var groceryItemService = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+        var response = new InvoiceImportResponse { Items = [] };
+
+        invoiceService
+            .InvoiceImportAsync(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(response);
+
+        var sut = new GroceryItemController(groceryItemService, invoiceService);
+
+        // Act
+        var result = await sut.GetFromInvoice("invoice123");
+
+        // Assert
+        result.Should().BeOfType<NotFoundObjectResult>();
+        var objectResult = result as NotFoundObjectResult;
+        objectResult?.StatusCode.Should().Be(404);
+    }
+
+    [Fact]
+    public async Task GetFromInvoice_WhenNoItemsFound_ReturnCorrectErrorMessage()
+    {
+        // Arrange
+        var groceryItemService = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+        var response = new InvoiceImportResponse { Items = [] };
+
+        invoiceService
+            .InvoiceImportAsync(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(response);
+
+        var sut = new GroceryItemController(groceryItemService, invoiceService);
+
+        // Act
+        var result = await sut.GetFromInvoice("invoice123");
+
+        // Assert
+        var objectResult = result as NotFoundObjectResult;
+        var apiResponse = objectResult?.Value as ApiResponse<InvoiceImportResponse>;
+        apiResponse?.Message.Should().Be("Grocery items not found");
+        apiResponse?.Status.Should().Be("failure");
+    }
+
+    #endregion GetFromInvoice
+
+    #region Create
+
+    [Fact]
+    public async Task Create_OnSuccess_ReturnStatusCode201()
+    {
+        // Assert
+        var request = new InsertGroceryItemsRequest
+        {
+            GroceryItems =
+            [
+                new InsertGroceryItemsDto { Name = "Arroz" },
+                new InsertGroceryItemsDto { Name = "Feijão" }
+            ]
+        };
+
+        var groceryItemService = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+
+        await groceryItemService.InsertAsync(Arg.Any<InsertGroceryItemsRequest>(), Arg.Any<CancellationToken>());
+
+        var sut = new GroceryItemController(groceryItemService, invoiceService);
+
+        // Act
+        var result = await sut.Insert(request);
+
+        // Assert
+        result.Should().BeOfType<CreatedResult>();
+        var objectResult = result as CreatedResult;
+        objectResult?.StatusCode.Should().Be(201);
+    }
+
+    [Fact]
+    public async Task Create_OnSuccess_InvokeGroceryItemService()
+    {
+        // Arrange
+        var request = new InsertGroceryItemsRequest
+        {
+            GroceryItems =
+            [
+                new InsertGroceryItemsDto { Name = "Arroz" },
+                new InsertGroceryItemsDto { Name = "Feijão" }
+            ]
+        };
+        var groceryItemService = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+        await groceryItemService
+            .InsertAsync(Arg.Any<InsertGroceryItemsRequest>(), Arg.Any<CancellationToken>());
+
+        var sut = new GroceryItemController(groceryItemService, invoiceService);
+
+        // Act
+        await sut.Insert(request);
+
+        // Assert
+        await groceryItemService.Received(1)
+            .InsertAsync(Arg.Any<InsertGroceryItemsRequest>(), Arg.Any<CancellationToken>());
+    }
+
+    #endregion Create
+
+    #region Delete
+
+    [Fact]
+    public async Task Delete_OnSuccess_ReturnStatus202()
+    {
+        // Arrange
+        var service = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+        var sut = new GroceryItemController(service, invoiceService);
+
+        // Act
+        var result = (AcceptedResult)await sut.Delete(Guid.NewGuid());
+
+        // Assert
+        result.StatusCode.Should().Be(202);
+    }
+
+    [Fact]
+    public async Task Delete_OnSuccess_InvokeGroceryItemService()
+    {
+        // Arrange
+        var service = Substitute.For<IGroceryItemService>();
+        var invoiceService = Substitute.For<IInvoiceReaderService>();
+        var sut = new GroceryItemController(service, invoiceService);
+
+        // Act
+        await sut.Delete(Guid.NewGuid());
+
+        // Assert
+        await service.Received(1).DeleteAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
+
+    #endregion Delete
 }

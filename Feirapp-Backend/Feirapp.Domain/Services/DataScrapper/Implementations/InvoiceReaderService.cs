@@ -57,7 +57,12 @@ public class InvoiceReaderService(IConfiguration options) : IInvoiceReaderServic
 
         var groceryItems = GetGroceryItemList(groceryItemXmlList!, purchaseDateXml!);
 
-        return new InvoiceImportResponse(invoiceCode, store, groceryItems);
+        return new InvoiceImportResponse
+        {
+            InvoiceCode = invoiceCode,
+            Store = store,
+            Items = groceryItems
+        };
     }
 
     private static List<InvoiceImportGroceryItem> GetGroceryItemList(HtmlNodeCollection groceryItemXmlList, HtmlNode purchaseDateXml)

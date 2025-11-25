@@ -1,10 +1,10 @@
 using Feirapp.Domain.Mappers;
+using Feirapp.Domain.Services.UnitOfWork;
 using Feirapp.Domain.Services.GroceryItems.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Methods.GetGroceryItemById;
 using Feirapp.Domain.Services.GroceryItems.Methods.GetGroceryItemsByStore;
 using Feirapp.Domain.Services.GroceryItems.Methods.InsertGroceryItems;
 using Feirapp.Domain.Services.GroceryItems.Methods.SearchGroceryItems;
-using Feirapp.Domain.Services.UnitOfWork;
 
 namespace Feirapp.Domain.Services.GroceryItems.Implementations;
 
@@ -25,13 +25,11 @@ public partial class GroceryItemService(IUnitOfWork uow) : IGroceryItemService
     public async Task<GetGroceryItemsByStoreIdResponse> GetByStoreAsync(Guid storeId, CancellationToken ct)
     {
         var result = await uow.GroceryItemRepository.GetByStoreAsync(storeId, ct);
-        return new GetGroceryItemsByStoreIdResponse(result.Store.ToResponse(), result.Items.ToStoreItem());
-    }
-
-    public async Task<List<SearchGroceryItemsResponse>> GetRandomAsync(int quantity, CancellationToken ct)
-    {
-        var result = await uow.GroceryItemRepository.GetRandomAsync(quantity, ct);
-        return result.ToSearchResponse().OrderBy(_ => Guid.NewGuid()).ToList();
+        return new GetGroceryItemsByStoreIdResponse
+        {
+            Store = result.Store.ToResponse(),
+            Items = result.Items.ToStoreItem()
+        };
     }
 
     public async Task InsertAsync(InsertGroceryItemsRequest request, CancellationToken ct)

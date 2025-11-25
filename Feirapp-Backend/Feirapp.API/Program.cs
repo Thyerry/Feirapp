@@ -156,16 +156,20 @@ void ApplyMigrations(IApplicationBuilder application)
     using var scope = application.ApplicationServices.CreateScope();
     var services = scope.ServiceProvider;
 
-    using var context = services.GetRequiredService<BaseContext>(); 
-    Console.WriteLine($"""  
-                      Migrating database...
-                      Server: {context.Database.GetDbConnection().DataSource}
-                      Connection String: {context.Database.GetConnectionString()}
-                      Database Provider: {context.Database.ProviderName}
-                      Database Name: {context.Database.GetDbConnection().Database}
-                      """);
-    if (!context.Database.GetPendingMigrations().Any()) return;
+    using var context = services.GetRequiredService<BaseContext>();
+    var logger = services.GetRequiredService<ILogger<Program>>();
+
+    logger.LogDebug("Server: {Server}", context.Database.GetDbConnection().DataSource);
+    logger.LogDebug("Connection String: {ConnectionString}", context.Database.GetConnectionString());
+    logger.LogDebug("Database Provider: {Provider}", context.Database.ProviderName);
+    logger.LogDebug("Database Name: {DatabaseName}", context.Database.GetDbConnection().Database);
     
-    Console.WriteLine("Applying migrations...");
+    if (!context.Database.GetPendingMigrations().Any())
+    {
+        logger.LogDebug("No pending migrations.");
+        return;
+    }
+    
+    logger.LogDebug("Applying migrations...");
     context.Database.Migrate();
 }

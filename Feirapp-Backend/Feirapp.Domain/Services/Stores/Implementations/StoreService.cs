@@ -9,23 +9,21 @@ namespace Feirapp.Domain.Services.Stores.Implementations;
 
 public class StoreService(IUnitOfWork uow) : IStoreService
 {
+    public async Task InsertStoreAsync(InsertStoreRequest store, CancellationToken ct)
+    {
+        await uow.StoreRepository.InsertAsync(store.ToEntity(), ct);
+        await uow.SaveChangesAsync(ct);
+    }
+    
     public async Task<List<SearchStoresResponse>> SearchStoresAsync(SearchStoresRequest request, CancellationToken ct)
     {
         var stores = await uow.StoreRepository.SearchStoresAsync(request, ct);
         return stores.ToSearchResponse();
     }
     
-    public async Task<GetStoreByIdResponse?> GetStoreById(Guid storeId, CancellationToken ct)
+    public async Task<GetStoreByIdResponse?> GetStoreByIdAsync(Guid storeId, CancellationToken ct)
     {
         var result = await uow.StoreRepository.GetByIdAsync(storeId, ct);
         return result?.ToGetStoreByIdResponse();
-    }
-    
-    public async Task InsertStoreAsync(InsertStoreRequest store, CancellationToken ct)
-    {
-        var storeEntity = store.ToEntity();
-        
-        await uow.StoreRepository.InsertAsync(storeEntity, ct);
-        await uow.SaveChangesAsync(ct);
     }
 }
