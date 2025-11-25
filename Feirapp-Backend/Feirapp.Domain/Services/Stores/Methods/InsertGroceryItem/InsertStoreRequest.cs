@@ -1,13 +1,14 @@
 namespace Feirapp.Domain.Services.Stores.Methods.InsertGroceryItem;
 
-public record InsertStoreRequest(
-    string Name,
-    List<string>? AltNames,
-    string? Cnpj,
-    string? Cep,
-    string? Street,
-    string? StreetNumber,
-    string? Neighborhood,
-    string? CityName,
-    string? State
-);
+public record InsertStoreRequest()
+{
+    public string Name { get; set; }
+    public List<string>? AltNames { get; set; }
+    public string? Cnpj { get; set; }
+    public string? Cep { get; set; }
+    public string? Street { get; set; }
+    public string? StreetNumber { get; set; }
+    public string? Neighborhood { get; set; }
+    public string? CityName { get; set; }
+    public string? States { get; set; }
+}

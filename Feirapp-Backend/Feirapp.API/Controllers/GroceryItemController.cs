@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Feirapp.API.Controllers;
 
 [ApiController]
-//[Authorize]
+// [Authorize]
 [Route("api/grocery-item")]
 public class GroceryItemController(IGroceryItemService groceryItemService, IInvoiceReaderService invoiceService) : ControllerBase
 {
@@ -56,28 +56,17 @@ public class GroceryItemController(IGroceryItemService groceryItemService, IInvo
             : Ok(ApiResponseFactory.Success(groceryItems));
     }
 
-    [HttpGet("random")]
-    [AllowAnonymous]
-    public async Task<IActionResult> GetRandomGroceryItems([FromQuery] int quantity, CancellationToken ct = default)
-    {
-        if (quantity <= 0)
-            return BadRequest(ApiResponseFactory.Failure<List<SearchGroceryItemsResponse>>("Quantity must be greater than 0"));
-
-        var randomGroceryItems = await groceryItemService.GetRandomAsync(quantity, ct);
-        return Ok(ApiResponseFactory.Success(randomGroceryItems));
-    }
-
     [HttpPost]
     public async Task<IActionResult> Insert([FromBody] InsertGroceryItemsRequest request, CancellationToken ct = default)
     {
         await groceryItemService.InsertAsync(request, ct);
         return Created(nameof(request), ApiResponseFactory.Success(true));
     }
-    
+
     [HttpDelete]
-    public async Task<IActionResult> Delete([FromQuery]Guid groceryId, CancellationToken ct = default)
+    public async Task<IActionResult> Delete([FromQuery] Guid id, CancellationToken ct = default)
     {
-        await groceryItemService.DeleteAsync(groceryId, ct);
+        await groceryItemService.DeleteAsync(id, ct);
         return Accepted(ApiResponseFactory.Success(true));
     }
 }

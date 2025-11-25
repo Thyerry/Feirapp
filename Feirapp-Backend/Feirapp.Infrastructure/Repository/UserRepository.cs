@@ -16,9 +16,4 @@ public class UserRepository(BaseContext context) : IUserRepository
     {
         await context.Users.AddAsync(user, ct);
     }
-
-    public void UpdateAsync(User user, CancellationToken ct)
-    {
-        context.Users.Update(user);
-    }
 }

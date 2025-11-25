@@ -2,7 +2,7 @@
 
 namespace Feirapp.Tests.Helpers;
 
-[CollectionDefinition("Database Integration Test")]
+[CollectionDefinition("integration-tests-collection")]
 public class IntegrationTestCollection : ICollectionFixture<DockerComposeTestBase>
 {
 }

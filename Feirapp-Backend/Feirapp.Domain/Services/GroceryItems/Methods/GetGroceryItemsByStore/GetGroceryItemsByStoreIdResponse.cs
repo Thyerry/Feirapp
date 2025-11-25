@@ -1,3 +1,7 @@
 namespace Feirapp.Domain.Services.GroceryItems.Methods.GetGroceryItemsByStore;
 
-public record GetGroceryItemsByStoreIdResponse(GetGroceryItemsByStoreStoreDto Store, List<GetGroceryItemsByStoreGroceryItemDto> Items);
+public class GetGroceryItemsByStoreIdResponse
+{
+    public GetGroceryItemsByStoreStoreDto Store { get; set; }
+    public List<GetGroceryItemsByStoreGroceryItemDto> Items { get; set; }
+}

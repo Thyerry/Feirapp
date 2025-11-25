@@ -17,11 +17,11 @@ public record CreateUserCommand(string Name, string Email, string Password, stri
             errors.Add(new ValidationFailure(nameof(Password), "The password cannot be null or empty.", Password));
         if (Password.Length < 8)
             errors.Add(new ValidationFailure(nameof(Password), "The password must be at least 8 characters long.", Password));
-        if (!Regex.IsMatch(Password, @"[A-Z]"))
+        if (!Regex.IsMatch(Password, "[A-Z]"))
             errors.Add(new ValidationFailure(nameof(Password), "The password must contain at least one uppercase letter.", Password));
-        if (!Regex.IsMatch(Password, @"[a-z]"))
+        if (!Regex.IsMatch(Password, "[a-z]"))
             errors.Add(new ValidationFailure(nameof(Password), "The password must contain at least one lowercase letter.", Password));
-        if (!Regex.IsMatch(Password, @"[0-9]"))
+        if (!Regex.IsMatch(Password, "[0-9]"))
             errors.Add(new ValidationFailure(nameof(Password), "The password must contain at least one digit.", Password));
         if (!Regex.IsMatch(Password, @"[\W_]"))
             errors.Add(new ValidationFailure(nameof(Password), "The password must contain at least one special character.", Password));

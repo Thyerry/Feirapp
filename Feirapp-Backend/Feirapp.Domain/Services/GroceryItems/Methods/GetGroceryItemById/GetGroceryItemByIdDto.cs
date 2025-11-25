@@ -14,9 +14,4 @@ public class GetGroceryItemByIdDto
     public string CestCode { get; set; }
     public MeasureUnitEnum MeasureUnit { get; set; }
     public List<GetGroceryItemByIdPriceLogDto> PriceHistory { get; set; }
-
-    public GetGroceryItemByIdResponse ToResponse()
-    {
-        return new GetGroceryItemByIdResponse(Id, Name, Description, ImageUrl, Brand, Barcode, NcmCode, CestCode, MeasureUnit, PriceHistory);
-    }
 }

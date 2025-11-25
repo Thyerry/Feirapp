@@ -1,3 +1,3 @@
 ﻿namespace Feirapp.Domain.Services.GroceryItems.Methods.SearchGroceryItems;
 
-public record SearchGroceryItemsRequest(string? Name, Guid? StoreId, int PageIndex = 0, int PageSize = 10);
+public record SearchGroceryItemsRequest(string? Name = null, Guid? StoreId = null, int PageIndex = 0, int PageSize = 10);

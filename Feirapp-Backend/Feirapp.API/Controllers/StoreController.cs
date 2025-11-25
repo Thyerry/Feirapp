@@ -1,16 +1,15 @@
 using Feirapp.API.Helpers.Response;
-using Feirapp.Domain.Services.GroceryItems.Misc;
 using Feirapp.Domain.Services.Stores.Interfaces;
 using Feirapp.Domain.Services.Stores.Methods.GetStoreById;
 using Feirapp.Domain.Services.Stores.Methods.InsertGroceryItem;
 using Feirapp.Domain.Services.Stores.Methods.SearchStores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace Feirapp.API.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/store")]
 public class StoreController(IStoreService storeService) : ControllerBase
 {
@@ -34,7 +33,7 @@ public class StoreController(IStoreService storeService) : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> GetStoreById([FromQuery] Guid storeId, CancellationToken ct = default)
     {
-        var store = await storeService.GetStoreById(storeId, ct);
+        var store = await storeService.GetStoreByIdAsync(storeId, ct);
         return store == null
             ? NotFound(ApiResponseFactory.Failure<GetStoreByIdResponse>("Stores not found."))
             : Ok(ApiResponseFactory.Success(store));
