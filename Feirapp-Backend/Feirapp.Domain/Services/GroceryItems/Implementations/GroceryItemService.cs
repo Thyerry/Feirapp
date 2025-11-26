@@ -41,7 +41,7 @@ public partial class GroceryItemService(IUnitOfWork uow) : IGroceryItemService
         foreach (var item in request.GroceryItems)
         {
             item.Barcode = ValidateBarcode(item.Barcode);
-            var groceryItem = await InsertGroceryItem(item, store.Id, item.Price, item.PurchaseDate, item.ProductCode, ct);
+            var groceryItem = await InsertGroceryItem(item, store.Id, ct);
             await InsertOrUpdatePriceLog(groceryItem, store.Id, item.Price, item.PurchaseDate, item.ProductCode, ct);
         }
         

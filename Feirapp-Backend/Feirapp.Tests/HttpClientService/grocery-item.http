@@ -1,0 +1,76 @@
+### Search Grocery Items Endpoint
+GET https://localhost:7049/api/grocery-item
+    ?pageIndex=0
+    &pageSize=20
+    &name=pi
+    &storeId=
+
+### Get by id
+GET https://localhost:7049/api/grocery-item/by-id
+    ?id=480f1028-8e87-4239-8e67-08ddf2d86b55
+
+### Get by store id
+GET https://localhost:7049/api/grocery-item/by-store
+    ?storeId=c6251d4b-21d8-43b1-a358-08ddf54c7e79
+
+### Get by invoice
+GET http://localhost:7049/api/grocery-item/by-invoice
+    ?invoiceId=
+
+### Create Grocery Item
+POST https://localhost:7049/api/grocery-item
+Content-Type: application/json
+
+{
+  "groceryItems": [
+    {
+      "name": "Produto Teste",
+      "price": 5,
+      "measureUnit": "KG",
+      "barcode": "1234567890123",
+      "productCode": "00000",
+      "brand": "Marca Teste",
+      "altNames": [
+        "Produto", "Teste", "Placeholder"
+      ],
+      "purchaseDate": "2025-10-07T20:03:52.605Z",
+      "ncmCode": "",
+      "cestCode": "",
+      "description": "Produto PlaceHolder para teste de api",
+      "imageUrl": "https://picsum.photos/200/300"
+    },
+        {
+      "name": "Produto Teste 2",
+      "price": 10,
+      "measureUnit": "UN",
+      "barcode": "9876543210987",
+      "productCode": "11111",
+      "brand": "Marca Teste",
+      "altNames": [
+        "Produto", "Teste Dois", "Dois"
+      ],
+      "purchaseDate": "2025-10-07T20:03:52.605Z",
+      "ncmCode": "",
+      "cestCode": "",
+      "description": "Produto 2 Placeholder para teste de api",
+      "imageUrl": "https://picsum.photos/200/300"
+    }
+  ],
+  "store": {
+    "id": "b132d216-bbe4-4b40-a4dc-08ddf2d86a50",
+    "name": "Novo Atacarejo",
+    "altNames": [
+      "Novo", "Atacarejo"
+    ],
+    "cnpj": "20300157001030",
+    "cep": "53437810",
+    "street": "RUA JOAO PEREIRA DE OLIVEIRA",
+    "streetNumber": "2015",
+    "neighborhood": "JANGA",
+    "cityName": "PAULISTA",
+    "state": "PE"
+  }
+}
+
+### Delete Grocery Item
+DELETE https://localhost:7049/api/grocery-item?id=5d65d25f-d4dc-4399-bdd4-08de05defd93
