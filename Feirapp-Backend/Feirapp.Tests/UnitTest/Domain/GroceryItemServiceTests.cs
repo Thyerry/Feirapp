@@ -412,11 +412,7 @@ public class GroceryItemServiceTests
         // Assert
         await _uow.GroceryItemRepository
             .Received(1)
-            .InsertPriceLog(
-                Arg.Is<PriceLog>(p =>
-                    p.GroceryItemId == groceryItem.Id &&
-                    p.Price == 15.00m),
-                cancellationToken);
+            .InsertPriceLog(Arg.Is<PriceLog>(p => p.GroceryItemId == groceryItem.Id && p.Price == 15.00m), cancellationToken);
     }
 
     [Fact]

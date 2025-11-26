@@ -19,7 +19,7 @@ namespace Feirapp.Tests.IntegrationTest.Infrastructure;
 public class GroceryItemRepositoryTests : IAsyncLifetime
 {
     private readonly BaseContext _context;
-    private const string ConnectionString = "Host=localhost;Port=5433;Database=feirapp-db;Username=feirapp-user;Password=feirapp-password;Include Error Detail=true;";
+    private const string ConnectionString = "Host=localhost;Port=5433;Database=feirapp-test-db;Username=feirapp-test-user;Password=feirapp-test-password;Include Error Detail=true;";
 
     public GroceryItemRepositoryTests()
     {

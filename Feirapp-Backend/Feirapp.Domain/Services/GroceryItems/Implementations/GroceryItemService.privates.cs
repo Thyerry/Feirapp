@@ -11,14 +11,14 @@ public partial class GroceryItemService
     {
         storeToCheck.Id = GuidGenerator.Generate();
         var store = await uow.StoreRepository.AddIfNotExistsAsync(x => x.Cnpj == storeToCheck.Cnpj, storeToCheck, ct);
-        
-        if (store.Name == storeToCheck.Name || (store.AltNames ?? []).Contains(storeToCheck.Name)) 
+
+        if (store.Name == storeToCheck.Name || (store.AltNames ?? []).Contains(storeToCheck.Name))
             return store;
 
-        store.AltNames = store.AltNames == null 
-            ? [storeToCheck.Name] 
+        store.AltNames = store.AltNames == null
+            ? [storeToCheck.Name]
             : store.AltNames.Append(storeToCheck.Name).ToList();
-        
+
         return store;
     }
 
@@ -27,7 +27,7 @@ public partial class GroceryItemService
         var ncms = request.GroceryItems.Select(g => g.NcmCode).Distinct().ToList();
         var cests = request.GroceryItems.Select(g => g.CestCode).Distinct().ToList();
         await uow.NcmRepository.InsertListOfCodesAsync(ncms, ct);
-        if(cests.Count != 0)
+        if (cests.Count != 0)
             await uow.CestRepository.InsertListOfCodesAsync(cests, ct);
     }
 
@@ -35,31 +35,39 @@ public partial class GroceryItemService
     {
         return barcode != "SEM GTIN" && barcode.Length > 13 ? barcode.Substring(1, 13) : barcode;
     }
-    
-    internal async Task<GroceryItem> InsertGroceryItem(InsertGroceryItemsDto item, Guid storeId, decimal price, DateTime purchaseDate, string productCode, CancellationToken ct)
+
+    internal async Task<GroceryItem> InsertGroceryItem(InsertGroceryItemsDto item, Guid storeId, CancellationToken ct)
     {
         var toInsert = item.ToEntity();
-        var itemFromDb = await uow.GroceryItemRepository.CheckIfGroceryItemExistsAsync(item.Barcode, item.ProductCode, storeId, ct);
+        var itemFromDb =
+            await uow.GroceryItemRepository.CheckIfGroceryItemExistsAsync(item.Barcode, item.ProductCode, storeId, ct);
         if (itemFromDb == null)
         {
             toInsert.Id = GuidGenerator.Generate();
             await uow.GroceryItemRepository.InsertAsync(toInsert, ct);
             return toInsert;
         }
-        
+
         if (itemFromDb.Name == item.Name || (itemFromDb.AltNames ?? []).Contains(item.Name))
             return itemFromDb;
-    
+
         itemFromDb.AltNames = itemFromDb.AltNames == null
             ? [item.Name]
             : itemFromDb.AltNames.Append(item.Name).ToList();
-        
+
         return itemFromDb;
     }
 
+    /**
+     * TODO: Need to improve this method. I need it insert new price logs even if the purchase date is before the last one and the price is different.
+     * But to do this I need to check the log before the last too.
+     * Can't be two logs with the same date.
+     * Only the last price on each date will be saved.
+     */
     internal async Task InsertOrUpdatePriceLog(GroceryItem item, Guid storeId, decimal price, DateTime purchaseDate, string productCode, CancellationToken ct)
     {
         var lastPriceLog = await uow.GroceryItemRepository.GetLastPriceLogAsync(item.Id, storeId, ct);
+
         if (lastPriceLog == null || (Math.Round(price, 2) != Math.Round(lastPriceLog.Price, 2) && purchaseDate > lastPriceLog.LogDate))
         {
             var priceLog = new PriceLog
