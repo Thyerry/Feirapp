@@ -36,6 +36,7 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
 
         return await query
             .AsNoTracking()
+            .OrderByDescending(g => g.LastUpdate)
             .Skip(requestParams.PageSize * requestParams.PageIndex)
             .Take(requestParams.PageSize)
             .ToListAsync(ct);

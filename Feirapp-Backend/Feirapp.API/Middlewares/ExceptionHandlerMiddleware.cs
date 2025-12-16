@@ -1,24 +1,12 @@
-using FluentValidation;
 using System.Net;
 using Feirapp.API.Helpers.Response;
+using FluentValidation;
 
-namespace Feirapp.API.Helpers;
+namespace Feirapp.API.Middlewares;
 
-public partial class ExceptionHandlerMiddleware(RequestDelegate next)
+public abstract partial class ExceptionHandlerMiddleware()
 {
-    public async Task Invoke(HttpContext context)
-    {
-        try
-        {
-            await next(context);
-        }
-        catch (Exception ex)
-        {
-            await HandleExceptionAsync(context, ex);
-        }
-    }
-
-    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+    public static Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
 

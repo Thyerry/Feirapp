@@ -57,7 +57,7 @@ public class GroceryItemController(IGroceryItemService groceryItemService, IInvo
     }
 
     [HttpPost]
-    public async Task<IActionResult> Insert([FromBody] InsertGroceryItemsRequest request, CancellationToken ct = default)
+    public async Task<IActionResult> Insert(InsertGroceryItemsRequest request, CancellationToken ct = default)
     {
         await groceryItemService.InsertAsync(request, ct);
         return Created(nameof(request), ApiResponseFactory.Success(true));

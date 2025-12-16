@@ -4,25 +4,29 @@ using Feirapp.Domain.Services.Users.Interfaces;
 using Feirapp.Domain.Services.Users.Methods.CreateUser;
 using Feirapp.Domain.Services.Users.Methods.Login;
 using Feirapp.Domain.Services.Utils;
-using Feirapp.Entities.Entities;
 using Feirapp.Entities.Enums;
 using FluentValidation;
-using FluentValidation.Results;
 
 namespace Feirapp.Domain.Services.Users.Implementations;
 
 public class UserService(IUnitOfWork uow) : IUserService
 {
-    public async Task CreateUserAsync(CreateUserCommand command, CancellationToken ct)
+    public async Task<Result<bool>> CreateUserAsync(CreateUserCommand command, CancellationToken ct)
     {
-        command.Validate();
+        try
+        {
+            command.Validate();
+        }
+        catch (ValidationException ex)
+        {
+            var message = ex.Errors != null && ex.Errors.Any()
+                ? string.Join(" | ", ex.Errors.Select(e => e.ErrorMessage))
+                : ex.Message;
+            return Result<bool>.Fail(message);
+        }
 
         if (await uow.UserRepository.GetByEmailAsync(command.Email, ct) != null)
-        {
-            throw new ValidationException([
-                new ValidationFailure(nameof(command.Email), "The user email is already in use.", command.Email)
-            ]);
-        }
+            return Result<bool>.Fail("The user email is already in use.");
 
         var user = command.ToEntity();
         
@@ -34,28 +38,21 @@ public class UserService(IUnitOfWork uow) : IUserService
         
         await uow.UserRepository.InsertAsync(user, ct);
         await uow.SaveChangesAsync(ct);
+        return Result<bool>.Ok(true, "User created successfully.");
     }
 
-    public async Task<LoginResponse> LoginAsync(LoginRequest request, CancellationToken ct)
+    public async Task<Result<LoginResponse>> LoginAsync(LoginRequest request, CancellationToken ct)
     {
         var user = await uow.UserRepository.GetByEmailAsync(request.Email, ct);
         if (user == null)
-        {
-            throw new ValidationException([
-                new ValidationFailure("Email or Password", "The user email or password is incorrect.")
-            ]);
-        }
+            return Result<LoginResponse>.Fail("The user email or password is incorrect.");
 
         var passwordHash = PasswordHasher.ComputeHash(request.Password, user.PasswordSalt);
         if (user.Password != passwordHash)
-        {
-            throw new ValidationException([
-                new ValidationFailure("Email or Password", "The user email or password is incorrect.")
-            ]);
-        }
+            return Result<LoginResponse>.Fail("The user email or password is incorrect.");
 
         user.LastLogin = DateTime.UtcNow;
         await uow.SaveChangesAsync(ct);
-        return user.ToLoginResponse();
+        return Result<LoginResponse>.Ok(user.ToLoginResponse());
     }
 }

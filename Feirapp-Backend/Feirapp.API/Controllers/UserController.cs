@@ -17,8 +17,11 @@ public class UserController(IUserService userService, IConfiguration config) : C
     [AllowAnonymous]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserCommand command, CancellationToken ct)
     {
-        await userService.CreateUserAsync(command, ct);
-        return Ok(ApiResponseFactory.Success(true));
+        var result = await userService.CreateUserAsync(command, ct);
+        if (!result.Success)
+            return BadRequest(ApiResponseFactory.FromResult(result));
+
+        return Ok(ApiResponseFactory.FromResult(result));
     }
 
     [HttpPost("login")]
@@ -26,7 +29,10 @@ public class UserController(IUserService userService, IConfiguration config) : C
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
     {
         var result = await userService.LoginAsync(request, ct);
-        var response = new TokenResponse(JwtHelper.GenerateJwtToken(result, config.GetSection("JwtSettings")));
+        if (!result.Success)
+            return Unauthorized(ApiResponseFactory.Failure<TokenResponse>(result.Message ?? "The user email or password is incorrect."));
+
+        var response = new TokenResponse(JwtHelper.GenerateJwtToken(result.Value!, config.GetSection("JwtSettings")));
         return Ok(ApiResponseFactory.Success(response));
     }
 
