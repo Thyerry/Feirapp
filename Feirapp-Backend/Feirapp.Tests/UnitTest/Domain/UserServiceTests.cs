@@ -121,7 +121,7 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task CreateUserAsync_WhenEmailAlreadyExists_ThrowsValidationException_And_DoesNotInsert()
+    public async Task CreateUserAsync_WhenEmailAlreadyExists_ReturnsFail_And_DoesNotInsert()
     {
         // Arrange
         var (sut, uow, userRepo) = BuildSut();
@@ -130,11 +130,12 @@ public class UserServiceTests
         var command = new CreateUserCommand("Taken User", "taken@example.com", "Abcd1234!", "Abcd1234!");
 
         // Act
-        var act = () => sut.CreateUserAsync(command, CancellationToken.None);
+        var result = await sut.CreateUserAsync(command, CancellationToken.None);
 
         // Assert
-        await act.Should().ThrowAsync<ValidationException>()
-            .WithMessage("*already in use*");
+        result.Success.Should().BeFalse();
+        result.Message.Should().NotBeNull();
+        result.Message!.ToLowerInvariant().Should().Contain("already in use");
         
         await userRepo.DidNotReceive().InsertAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
         await uow.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
@@ -142,16 +143,17 @@ public class UserServiceTests
 
     [Theory]
     [MemberData(nameof(CreateUserCommandData))]
-    public async Task CreateUserAsync_WhenNameIsEmpty_ThrowsValidationException_And_SkipsRepository(CreateUserCommand command)
+    public async Task CreateUserAsync_WhenNameIsInvalid_ReturnsFail_And_SkipsRepository(CreateUserCommand command)
     {
         // Arrange
         var (sut, uow, userRepo) = BuildSut();
 
         // Act
-        var act = () => sut.CreateUserAsync(command, CancellationToken.None);
+        var result = await sut.CreateUserAsync(command, CancellationToken.None);
         
         // Assert
-        await act.Should().ThrowAsync<ValidationException>();
+        result.Success.Should().BeFalse();
+        result.Message.Should().NotBeNullOrWhiteSpace();
 
         await userRepo.DidNotReceive().GetByEmailAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
         await userRepo.DidNotReceive().InsertAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
@@ -219,9 +221,11 @@ public class UserServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Id.Should().Be(user.Id.ToString());
-        result.Name.Should().Be(user.Name);
-        result.Email.Should().Be(user.Email);
+        result.Success.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+        result.Value!.Id.Should().Be(user.Id.ToString());
+        result.Value!.Name.Should().Be(user.Name);
+        result.Value!.Email.Should().Be(user.Email);
     }
 
     [Fact]
@@ -259,7 +263,7 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task LoginAsync_WhenUserNotFound_ThrowsValidationException_And_DoesNotSave()
+    public async Task LoginAsync_WhenUserNotFound_ReturnsFail_And_DoesNotSave()
     {
         // Arrange
         var (sut, uow, userRepo) = BuildSut();
@@ -267,16 +271,18 @@ public class UserServiceTests
         userRepo.GetByEmailAsync(email, Arg.Any<CancellationToken>()).Returns((User?)null);
 
         // Act
-        var act = async () => await sut.LoginAsync(new LoginRequest(email, "Whatever1!"), CancellationToken.None);
+        var result = await sut.LoginAsync(new LoginRequest(email, "Whatever1!"), CancellationToken.None);
 
         // Assert
-        await act.Should().ThrowAsync<ValidationException>().WithMessage("*incorrect*");
+        result.Success.Should().BeFalse();
+        result.Message.Should().NotBeNull();
+        result.Message!.ToLowerInvariant().Should().Contain("incorrect");
         await uow.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
         await userRepo.Received(1).GetByEmailAsync(email, Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task LoginAsync_WhenPasswordMismatch_ThrowsValidationException_And_DoesNotSave_Or_UpdateLastLogin()
+    public async Task LoginAsync_WhenPasswordMismatch_ReturnsFail_And_DoesNotSave_Or_UpdateLastLogin()
     {
         // Arrange
         var (sut, uow, userRepo) = BuildSut();
@@ -286,10 +292,12 @@ public class UserServiceTests
         userRepo.GetByEmailAsync(user.Email, Arg.Any<CancellationToken>()).Returns(user);
 
         // Act
-        var act = async () => await sut.LoginAsync(new LoginRequest(user.Email, "Wrong1!"), CancellationToken.None);
+        var result = await sut.LoginAsync(new LoginRequest(user.Email, "Wrong1!"), CancellationToken.None);
 
         // Assert
-        await act.Should().ThrowAsync<ValidationException>().WithMessage("*incorrect*");
+        result.Success.Should().BeFalse();
+        result.Message.Should().NotBeNull();
+        result.Message!.ToLowerInvariant().Should().Contain("incorrect");
         user.LastLogin.Should().Be(originalLastLogin);
         await uow.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
         await userRepo.DidNotReceive().InsertAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
@@ -312,7 +320,7 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task LoginAsync_OnFailure_WithEmptyEmail_ThrowsValidationException_And_DoesNotSave()
+    public async Task LoginAsync_OnFailure_WithEmptyEmail_ReturnsFail_And_DoesNotSave()
     {
         // Arrange
         var (sut, uow, userRepo) = BuildSut();
@@ -320,16 +328,18 @@ public class UserServiceTests
         userRepo.GetByEmailAsync(emptyEmail, Arg.Any<CancellationToken>()).Returns((User?)null);
 
         // Act
-        var act = async () => await sut.LoginAsync(new LoginRequest(emptyEmail, "Anything1!"), CancellationToken.None);
+        var result = await sut.LoginAsync(new LoginRequest(emptyEmail, "Anything1!"), CancellationToken.None);
 
         // Assert
-        await act.Should().ThrowAsync<ValidationException>().WithMessage("*incorrect*");
+        result.Success.Should().BeFalse();
+        result.Message.Should().NotBeNull();
+        result.Message!.ToLowerInvariant().Should().Contain("incorrect");
         await uow.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
         await userRepo.Received(1).GetByEmailAsync(emptyEmail, Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task LoginAsync_OnFailure_WithWhitespacePassword_ThrowsValidationException_And_DoesNotSave()
+    public async Task LoginAsync_OnFailure_WithWhitespacePassword_ReturnsFail_And_DoesNotSave()
     {
         // Arrange
         var (sut, uow, userRepo) = BuildSut();
@@ -337,10 +347,12 @@ public class UserServiceTests
         userRepo.GetByEmailAsync(user.Email, Arg.Any<CancellationToken>()).Returns(user);
 
         // Act
-        var act = async () => await sut.LoginAsync(new LoginRequest(user.Email, " "), CancellationToken.None);
+        var result = await sut.LoginAsync(new LoginRequest(user.Email, " "), CancellationToken.None);
 
         // Assert
-        await act.Should().ThrowAsync<ValidationException>().WithMessage("*incorrect*");
+        result.Success.Should().BeFalse();
+        result.Message.Should().NotBeNull();
+        result.Message!.ToLowerInvariant().Should().Contain("incorrect");
         await uow.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 

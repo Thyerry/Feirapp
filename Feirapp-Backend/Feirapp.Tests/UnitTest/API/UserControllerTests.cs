@@ -6,6 +6,7 @@ using Feirapp.API.Helpers.Response;
 using Feirapp.Domain.Services.Users.Interfaces;
 using Feirapp.Domain.Services.Users.Methods.CreateUser;
 using Feirapp.Domain.Services.Users.Methods.Login;
+using Feirapp.Domain.Services.Utils;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -40,6 +41,8 @@ public class UserControllerTests
         var userService = Substitute.For<IUserService>();
         var config = Substitute.For<IConfiguration>();
         var command = new CreateUserCommand("Test User", "test@example.com", "password", "password");
+        userService.CreateUserAsync(command, Arg.Any<CancellationToken>())
+            .Returns(Result<bool>.Ok(true));
         var sut = new UserController(userService, config);
         
         // Act
@@ -68,7 +71,8 @@ public class UserControllerTests
         var config = BuildJwtConfig();
         var request = new LoginRequest("test@example.com", "password");
         var loginResponse = new LoginResponse("user-id-1", "Test User", request.Email);
-        userService.LoginAsync(request, Arg.Any<CancellationToken>()).Returns(loginResponse);
+        userService.LoginAsync(request, Arg.Any<CancellationToken>())
+            .Returns(Result<LoginResponse>.Ok(loginResponse));
         var sut = new UserController(userService, config);
 
         // Act
@@ -93,7 +97,7 @@ public class UserControllerTests
         var config = BuildJwtConfig();
         var request = new LoginRequest("john.doe@example.com", "strongPassword!");
         userService.LoginAsync(request, Arg.Any<CancellationToken>())
-            .Returns(new LoginResponse("user-id-2", "John Doe", request.Email));
+            .Returns(Result<LoginResponse>.Ok(new LoginResponse("user-id-2", "John Doe", request.Email)));
         var sut = new UserController(userService, config);
 
         // Act

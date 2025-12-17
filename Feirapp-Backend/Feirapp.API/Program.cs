@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using Feirapp.API.Helpers;
+using Feirapp.API.Middlewares;
 using Feirapp.Domain.Services.DataScrapper.Implementations;
 using Feirapp.Domain.Services.DataScrapper.Interfaces;
 using Feirapp.Domain.Services.GroceryItems.Implementations;
@@ -17,6 +18,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -104,6 +106,10 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Host.UseSerilog((context, loggerConfig) =>
+{
+    loggerConfig.ReadFrom.Configuration(context.Configuration);
+});
 
 var app = builder.Build();
 
@@ -130,7 +136,7 @@ if (!Debugger.IsAttached)
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseMiddleware<ExceptionHandlerMiddleware>();
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.MapControllers();
 
@@ -159,17 +165,20 @@ void ApplyMigrations(IApplicationBuilder application)
     using var context = services.GetRequiredService<BaseContext>();
     var logger = services.GetRequiredService<ILogger<Program>>();
 
-    logger.LogDebug("Server: {Server}", context.Database.GetDbConnection().DataSource);
-    logger.LogDebug("Connection String: {ConnectionString}", context.Database.GetConnectionString());
-    logger.LogDebug("Database Provider: {Provider}", context.Database.ProviderName);
-    logger.LogDebug("Database Name: {DatabaseName}", context.Database.GetDbConnection().Database);
+    if (Debugger.IsAttached)
+    {
+        logger.LogInformation("Server: {Server}", context.Database.GetDbConnection().DataSource);
+        logger.LogInformation("Connection String: {ConnectionString}", context.Database.GetConnectionString());
+        logger.LogInformation("Database Provider: {Provider}", context.Database.ProviderName);
+        logger.LogInformation("Database Name: {DatabaseName}", context.Database.GetDbConnection().Database);
+    }
     
     if (!context.Database.GetPendingMigrations().Any())
     {
-        logger.LogDebug("No pending migrations.");
+        logger.LogInformation("No pending migrations.");
         return;
     }
     
-    logger.LogDebug("Applying migrations...");
+    logger.LogInformation("Applying migrations...");
     context.Database.Migrate();
 }
