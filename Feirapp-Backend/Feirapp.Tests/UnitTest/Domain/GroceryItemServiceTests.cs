@@ -75,7 +75,9 @@ public class GroceryItemServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Should().HaveCount(2);
+        result.Success.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+        result.Value!.Should().HaveCount(2);
 
         await _uow.GroceryItemRepository
             .Received(1)
@@ -100,7 +102,9 @@ public class GroceryItemServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Should().BeEmpty();
+        result.Success.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+        result.Value!.Should().BeEmpty();
 
         await _uow.GroceryItemRepository
             .Received(1)
@@ -171,6 +175,8 @@ public class GroceryItemServiceTests
 
         // Assert
         result.Should().NotBeNull();
+        result.Success.Should().BeTrue();
+        result.Value.Should().NotBeNull();
         await _uow.GroceryItemRepository
             .Received(1)
             .GetByIdAsync(Arg.Is<Guid>(g => g == id), Arg.Is(cancellationToken));
@@ -193,7 +199,9 @@ public class GroceryItemServiceTests
         var result = await sut.GetByIdAsync(id, cancellationToken);
 
         // Assert
-        result.Should().BeNull();
+        result.Should().NotBeNull();
+        result.Success.Should().BeFalse();
+        result.Message.Should().NotBeNullOrWhiteSpace();
         await _uow.GroceryItemRepository
             .Received(1)
             .GetByIdAsync(Arg.Is<Guid>(g => g == id), Arg.Is(cancellationToken));

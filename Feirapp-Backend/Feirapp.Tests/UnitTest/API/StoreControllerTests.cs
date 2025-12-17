@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using Xunit;
+using Feirapp.API.Helpers.Response;
+using Feirapp.Domain.Services.Utils;
 
 namespace Feirapp.Tests.UnitTest.API;
 
@@ -27,6 +29,7 @@ public class StoreControllerTests
         var controller = new StoreController(storeService);
         var request = new InsertStoreRequest();
         var cancellationToken = CancellationToken.None;
+        storeService.InsertStoreAsync(request, cancellationToken).Returns(Result<bool>.Ok(true));
 
         // Act
         var result = await controller.CreateStore(request, cancellationToken);
@@ -34,6 +37,8 @@ public class StoreControllerTests
         // Assert
         await storeService.Received(1).InsertStoreAsync(request, cancellationToken);
         result.Should().BeOfType<CreatedResult>();
+        var created = result as CreatedResult;
+        created?.Value.Should().BeOfType<ApiResponse<bool>>();
     }
 
     [Fact]
@@ -66,7 +71,8 @@ public class StoreControllerTests
         var request = new SearchStoresRequest();
         var cancellationToken = CancellationToken.None;
         var stores = new List<SearchStoresResponse> { new(), new() };
-        storeService.SearchStoresAsync(request, cancellationToken).Returns(stores);
+        storeService.SearchStoresAsync(request, cancellationToken)
+            .Returns(Result<List<SearchStoresResponse>>.Ok(stores));
 
         // Act
         var result = await controller.SearchStores(request, cancellationToken);
@@ -83,7 +89,8 @@ public class StoreControllerTests
         var controller = new StoreController(storeService);
         var request = new SearchStoresRequest();
         var cancellationToken = CancellationToken.None;
-        storeService.SearchStoresAsync(request, cancellationToken).Returns(new List<SearchStoresResponse>());
+        storeService.SearchStoresAsync(request, cancellationToken)
+            .Returns(Result<List<SearchStoresResponse>>.Ok([]));
 
         // Act
         var result = await controller.SearchStores(request, cancellationToken);
@@ -122,7 +129,8 @@ public class StoreControllerTests
         var storeId = Guid.NewGuid();
         var cancellationToken = CancellationToken.None;
         var storeResponse = new GetStoreByIdResponse();
-        storeService.GetStoreByIdAsync(storeId, cancellationToken).Returns(storeResponse);
+        storeService.GetStoreByIdAsync(storeId, cancellationToken)
+            .Returns(Result<GetStoreByIdResponse>.Ok(storeResponse));
 
         // Act
         var result = await controller.GetStoreById(storeId, cancellationToken);
@@ -139,7 +147,8 @@ public class StoreControllerTests
         var controller = new StoreController(storeService);
         var storeId = Guid.NewGuid();
         var cancellationToken = CancellationToken.None;
-        storeService.GetStoreByIdAsync(storeId, cancellationToken).Returns((GetStoreByIdResponse?)null);
+        storeService.GetStoreByIdAsync(storeId, cancellationToken)
+            .Returns(Result<GetStoreByIdResponse>.Fail("Stores not found."));
 
         // Act
         var result = await controller.GetStoreById(storeId, cancellationToken);

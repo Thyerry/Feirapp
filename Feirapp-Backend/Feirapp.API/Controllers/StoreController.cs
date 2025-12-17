@@ -1,6 +1,5 @@
 using Feirapp.API.Helpers.Response;
 using Feirapp.Domain.Services.Stores.Interfaces;
-using Feirapp.Domain.Services.Stores.Methods.GetStoreById;
 using Feirapp.Domain.Services.Stores.Methods.InsertGroceryItem;
 using Feirapp.Domain.Services.Stores.Methods.SearchStores;
 using Microsoft.AspNetCore.Authorization;
@@ -16,14 +15,21 @@ public class StoreController(IStoreService storeService) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateStore(InsertStoreRequest store, CancellationToken ct = default)
     {
-        await storeService.InsertStoreAsync(store, ct);
-        return Created();
+        var result = await storeService.InsertStoreAsync(store, ct);
+        if (!result.Success)
+            return BadRequest(ApiResponseFactory.FromResult(result));
+
+        return Created(nameof(store), ApiResponseFactory.FromResult(result));
     }
 
     [HttpGet]
     public async Task<IActionResult> SearchStores([FromQuery] SearchStoresRequest request, CancellationToken ct = default)
     {
-        var stores = await storeService.SearchStoresAsync(request, ct);
+        var result = await storeService.SearchStoresAsync(request, ct);
+        if (!result.Success)
+            return BadRequest(ApiResponseFactory.FromResult(result));
+
+        var stores = result.Value ?? [];
         return stores.Count == 0 
             ? NotFound(ApiResponseFactory.Failure<List<SearchStoresResponse>>("No stores found")) 
             : Ok(ApiResponseFactory.Success(stores));
@@ -33,9 +39,9 @@ public class StoreController(IStoreService storeService) : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> GetStoreById([FromQuery] Guid storeId, CancellationToken ct = default)
     {
-        var store = await storeService.GetStoreByIdAsync(storeId, ct);
-        return store == null
-            ? NotFound(ApiResponseFactory.Failure<GetStoreByIdResponse>("Stores not found."))
-            : Ok(ApiResponseFactory.Success(store));
+        var result = await storeService.GetStoreByIdAsync(storeId, ct);
+        return !result.Success
+            ? NotFound(ApiResponseFactory.FromResult(result))
+            : Ok(ApiResponseFactory.FromResult(result));
     }
 }

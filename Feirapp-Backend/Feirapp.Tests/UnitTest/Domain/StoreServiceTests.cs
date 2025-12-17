@@ -30,11 +30,13 @@ public class StoreServiceTests
         var service = new StoreService(_uow);
 
         // Act
-        await service.InsertStoreAsync(request, ct);
+        var result = await service.InsertStoreAsync(request, ct);
 
         // Assert
         await storeRepository.Received(1).InsertAsync(Arg.Any<Store>(), Arg.Any<CancellationToken>());
         await _uow.Received(1).SaveChangesAsync(ct);
+        result.Should().NotBeNull();
+        result.Success.Should().BeTrue();
     }
     
     #endregion InsertStore
@@ -59,9 +61,11 @@ public class StoreServiceTests
 
         // Assert
         await storeRepository.Received(1).SearchStoresAsync(Arg.Any<SearchStoresRequest>(), Arg.Any<CancellationToken>());
-        result.Count.Should().Be(2);
-        result[0].Name.Should().Be(store1.Name);
-        result[1].Name.Should().Be(store2.Name);
+        result.Success.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+        result.Value!.Count.Should().Be(2);
+        result.Value![0].Name.Should().Be(store1.Name);
+        result.Value![1].Name.Should().Be(store2.Name);
     }
 
     [Fact]
@@ -78,7 +82,9 @@ public class StoreServiceTests
         var result = await service.SearchStoresAsync(new SearchStoresRequest(), CancellationToken.None);
 
         // Assert
-        result.Should().BeEmpty();
+        result.Success.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+        result.Value!.Should().BeEmpty();
     }
 
     [Fact]
@@ -118,11 +124,13 @@ public class StoreServiceTests
         // Assert
         await storeRepository.Received(1).GetByIdAsync(storeId, Arg.Any<CancellationToken>());
         result.Should().NotBeNull();
-        result!.Name.Should().Be(store.Name);
+        result.Success.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+        result.Value!.Name.Should().Be(store.Name);
     }
 
     [Fact]
-    public async Task GetStoreByIdAsync_ShouldReturnNull_WhenStoreDoesNotExist()
+    public async Task GetStoreByIdAsync_ShouldReturnFail_WhenStoreDoesNotExist()
     {
         // Arrange
         var storeRepository = _uow.StoreRepository;
@@ -134,7 +142,8 @@ public class StoreServiceTests
         var result = await service.GetStoreByIdAsync(storeId, CancellationToken.None);
 
         // Assert
-        result.Should().BeNull();
+        result.Success.Should().BeFalse();
+        result.Message.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
