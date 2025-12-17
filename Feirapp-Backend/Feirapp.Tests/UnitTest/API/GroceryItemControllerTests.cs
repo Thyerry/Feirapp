@@ -14,7 +14,7 @@ using Feirapp.Domain.Services.GroceryItems.Methods.GetGroceryItemById;
 using Feirapp.Domain.Services.GroceryItems.Methods.GetGroceryItemsByStore;
 using Feirapp.Domain.Services.GroceryItems.Methods.InsertGroceryItems;
 using Feirapp.Domain.Services.GroceryItems.Methods.SearchGroceryItems;
-using NSubstitute.ReturnsExtensions;
+using Feirapp.Domain.Services.Utils;
 using Xunit;
 
 namespace Feirapp.Tests.UnitTest.API;
@@ -38,7 +38,7 @@ public class GroceryItemControllerTests
 
         service
             .SearchAsync(Arg.Any<SearchGroceryItemsRequest>(), Arg.Any<CancellationToken>())
-            .Returns(response);
+            .Returns(Result<List<SearchGroceryItemsResponse>>.Ok(response));
 
         var sut = new GroceryItemController(service, invoiceService);
 
@@ -66,7 +66,7 @@ public class GroceryItemControllerTests
 
         service
             .SearchAsync(Arg.Any<SearchGroceryItemsRequest>(), Arg.Any<CancellationToken>())
-            .Returns(expectedResponse);
+            .Returns(Result<List<SearchGroceryItemsResponse>>.Ok(expectedResponse));
 
         var sut = new GroceryItemController(service, invoiceService);
 
@@ -98,7 +98,7 @@ public class GroceryItemControllerTests
 
         service
             .SearchAsync(Arg.Any<SearchGroceryItemsRequest>(), Arg.Any<CancellationToken>())
-            .Returns(response);
+            .Returns(Result<List<SearchGroceryItemsResponse>>.Ok(response));
 
         var sut = new GroceryItemController(service, invoiceService);
 
@@ -118,7 +118,7 @@ public class GroceryItemControllerTests
         var invoiceService = Substitute.For<IInvoiceReaderService>();
         service
             .SearchAsync(Arg.Any<SearchGroceryItemsRequest>(), Arg.Any<CancellationToken>())
-            .Returns([]);
+            .Returns(Result<List<SearchGroceryItemsResponse>>.Ok([]));
 
         var sut = new GroceryItemController(service, invoiceService);
 
@@ -139,7 +139,7 @@ public class GroceryItemControllerTests
         var invoiceService = Substitute.For<IInvoiceReaderService>();
         service
             .SearchAsync(Arg.Any<SearchGroceryItemsRequest>(), Arg.Any<CancellationToken>())
-            .Returns([]);
+            .Returns(Result<List<SearchGroceryItemsResponse>>.Ok([]));
 
         var sut = new GroceryItemController(service, invoiceService);
 
@@ -166,7 +166,7 @@ public class GroceryItemControllerTests
         var groceryItemResponse = new GetGroceryItemByIdResponse { Name = "Arroz" };
         service
             .GetByIdAsync(Arg.Any<Guid>(), CancellationToken.None)
-            .Returns(groceryItemResponse);
+            .Returns(Result<GetGroceryItemByIdResponse>.Ok(groceryItemResponse));
 
         var sut = new GroceryItemController(service, invoiceService);
 
@@ -187,7 +187,7 @@ public class GroceryItemControllerTests
 
         service
             .GetByIdAsync(Arg.Any<Guid>(), CancellationToken.None)
-            .Returns(groceryItemResponse);
+            .Returns(Result<GetGroceryItemByIdResponse>.Ok(groceryItemResponse));
 
         var sut = new GroceryItemController(service, invoiceService);
 
@@ -215,7 +215,7 @@ public class GroceryItemControllerTests
 
         service
             .GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(groceryItemResponse);
+            .Returns(Result<GetGroceryItemByIdResponse>.Ok(groceryItemResponse));
 
         var sut = new GroceryItemController(service, invoiceService);
 
@@ -234,7 +234,7 @@ public class GroceryItemControllerTests
         var invoiceService = Substitute.For<IInvoiceReaderService>();
         service
             .GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .ReturnsNull();
+            .Returns(Result<GetGroceryItemByIdResponse>.Fail("Grocery item not found"));
 
         var sut = new GroceryItemController(service, invoiceService);
 
@@ -270,7 +270,7 @@ public class GroceryItemControllerTests
 
         service
             .GetByStoreAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(response);
+            .Returns(Result<GetGroceryItemsByStoreIdResponse>.Ok(response));
 
         var sut = new GroceryItemController(service, invoiceService);
 
@@ -301,7 +301,7 @@ public class GroceryItemControllerTests
 
         service
             .GetByStoreAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(expectedResponse);
+            .Returns(Result<GetGroceryItemsByStoreIdResponse>.Ok(expectedResponse));
 
         var sut = new GroceryItemController(service, invoiceService);
 
@@ -339,7 +339,7 @@ public class GroceryItemControllerTests
 
         service
             .GetByStoreAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(response);
+            .Returns(Result<GetGroceryItemsByStoreIdResponse>.Ok(response));
 
         var sut = new GroceryItemController(service, invoiceService);
 
@@ -360,7 +360,7 @@ public class GroceryItemControllerTests
 
         service
             .GetByStoreAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(response);
+            .Returns(Result<GetGroceryItemsByStoreIdResponse>.Fail("Store not found"));
 
         var sut = new GroceryItemController(service, invoiceService);
 
@@ -379,10 +379,9 @@ public class GroceryItemControllerTests
         // Arrange
         var service = Substitute.For<IGroceryItemService>();
         var invoiceService = Substitute.For<IInvoiceReaderService>();
-        var response = new GetGroceryItemsByStoreIdResponse { Items = [] };
         service
             .GetByStoreAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(response);
+            .Returns(Result<GetGroceryItemsByStoreIdResponse>.Fail("Store not found"));
 
         var sut = new GroceryItemController(service, invoiceService);
 
@@ -559,7 +558,9 @@ public class GroceryItemControllerTests
         var groceryItemService = Substitute.For<IGroceryItemService>();
         var invoiceService = Substitute.For<IInvoiceReaderService>();
 
-        await groceryItemService.InsertAsync(Arg.Any<InsertGroceryItemsRequest>(), Arg.Any<CancellationToken>());
+        groceryItemService
+            .InsertAsync(Arg.Any<InsertGroceryItemsRequest>(), Arg.Any<CancellationToken>())
+            .Returns(Result<int>.Ok(2));
 
         var sut = new GroceryItemController(groceryItemService, invoiceService);
 
@@ -586,8 +587,9 @@ public class GroceryItemControllerTests
         };
         var groceryItemService = Substitute.For<IGroceryItemService>();
         var invoiceService = Substitute.For<IInvoiceReaderService>();
-        await groceryItemService
-            .InsertAsync(Arg.Any<InsertGroceryItemsRequest>(), Arg.Any<CancellationToken>());
+        groceryItemService
+            .InsertAsync(Arg.Any<InsertGroceryItemsRequest>(), Arg.Any<CancellationToken>())
+            .Returns(Result<int>.Ok(2));
 
         var sut = new GroceryItemController(groceryItemService, invoiceService);
 
@@ -609,6 +611,9 @@ public class GroceryItemControllerTests
         // Arrange
         var service = Substitute.For<IGroceryItemService>();
         var invoiceService = Substitute.For<IInvoiceReaderService>();
+        service
+            .DeleteAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result<bool>.Ok(true));
         var sut = new GroceryItemController(service, invoiceService);
 
         // Act
@@ -624,6 +629,9 @@ public class GroceryItemControllerTests
         // Arrange
         var service = Substitute.For<IGroceryItemService>();
         var invoiceService = Substitute.For<IInvoiceReaderService>();
+        service
+            .DeleteAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result<bool>.Ok(true));
         var sut = new GroceryItemController(service, invoiceService);
 
         // Act

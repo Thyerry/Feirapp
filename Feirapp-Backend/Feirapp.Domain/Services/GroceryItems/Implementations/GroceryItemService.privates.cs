@@ -58,12 +58,6 @@ public partial class GroceryItemService
         return itemFromDb;
     }
 
-    /**
-     * TODO: Need to improve this method. I need it insert new price logs even if the purchase date is before the last one and the price is different.
-     * But to do this I need to check the log before the last too.
-     * Can't be two logs with the same date.
-     * Only the last price on each date will be saved.
-     */
     internal async Task InsertOrUpdatePriceLog(GroceryItem item, Guid storeId, decimal price, DateTime purchaseDate, string productCode, CancellationToken ct)
     {
         var lastPriceLog = await uow.GroceryItemRepository.GetLastPriceLogAsync(item.Id, storeId, ct);
