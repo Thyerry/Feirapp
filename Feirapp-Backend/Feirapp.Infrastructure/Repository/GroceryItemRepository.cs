@@ -142,7 +142,7 @@ public class GroceryItemRepository(BaseContext context) : IGroceryItemRepository
 
     public async Task<StoreWithItems> GetByStoreAsync(Guid storeId, CancellationToken ct)
     {
-        var store = await context.Stores.FindAsync([storeId], ct);
+        var store = await context.Stores.FirstOrDefaultAsync(s => s.Id == storeId, ct);
         
         if (store == null)
             throw new KeyNotFoundException("Store not found");
