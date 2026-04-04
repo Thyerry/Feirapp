@@ -19,6 +19,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.OpenSearch;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -106,10 +108,27 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Host.UseSerilog((context, loggerConfig) =>
-{
-    loggerConfig.ReadFrom.Configuration(context.Configuration);
-});
+var openSearchUrl =
+    builder.Environment.IsDevelopment()
+        ? "http://localhost:9200"
+        : builder.Configuration["OpenSearch:Url"] ?? "http://localhost:9200";
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("System", LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .Enrich.WithEnvironmentName()
+    .Enrich.WithProperty("Application", "FeirApp.Api")
+    .WriteTo.Console()
+    .WriteTo.OpenSearch(new OpenSearchSinkOptions(new Uri(openSearchUrl))
+    {
+        AutoRegisterTemplate = true,
+        IndexFormat = "feirapp-api-logs-{0:yyyy.MM.dd}",
+        EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog
+    })
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 var app = builder.Build();
 

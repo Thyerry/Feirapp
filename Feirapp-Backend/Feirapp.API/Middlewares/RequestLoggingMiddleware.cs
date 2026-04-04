@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using Serilog;
+using Serilog.Context;
 
 namespace Feirapp.API.Middlewares;
 
@@ -9,74 +10,68 @@ public class RequestLoggingMiddleware(RequestDelegate next)
 {
     public async Task Invoke(HttpContext context)
     {
-        var sw = new Stopwatch();
-        sw.Start();
+        var sw = Stopwatch.StartNew();
 
-        var traceId = Activity.Current?.TraceId.ToString() ?? Guid.NewGuid().ToString();
+        var endpoint = context.GetEndpoint() as RouteEndpoint;
+        var routePattern =
+            endpoint?.RoutePattern?.RawText
+            ?? context.Request.Path.Value;
 
-        context.Items["TraceId"] = traceId;
         var requestBody = await ReadRequestBody(context);
-        try
-        {
-            await next(context);
 
-            sw.Stop();
-            
-            Log.Information("HTTP Request Completed {@Log}",
-                new
-                {
-                    timestamp = DateTime.UtcNow,
-                    level = "Information",
-                    message = "Request completed",
-                    traceId,
-                    request = new
-                    {
-                        method = context.Request.Method,
-                        path = context.Request.Path,
-                        query = context.Request.QueryString.ToString(),
-                        body = requestBody,
-                        ip = context.Connection.RemoteIpAddress?.ToString()
-                    },
-                    response = new
-                    {
-                        statusCode = context.Response.StatusCode,
-                        elapsedMs = sw.ElapsedMilliseconds
-                    },
-                    user = GetUser(context)
-                }
-            );
-        }
-        catch (Exception ex)
+        var request = new
         {
-            sw.Stop();
-            
-            Log.Error(ex, "HTTP Request Error {@Log}",
-                new
-                {
-                    timestamp = DateTime.UtcNow,
-                    level = "Error",
-                    message = "Unhandled exception",
-                    traceId,
-                    request = new
-                    {
-                        method = context.Request.Method,
-                        path = context.Request.Path,
-                        body = requestBody,
-                        query = context.Request.QueryString.ToString()
-                    },
-                    exception = new
-                    {
-                        type = ex.GetType().Name,
-                        message = ex.Message,
-                        stackTrace = ex.StackTrace
-                    }
-                }
-            );
+            method = context.Request.Method,
+            path = context.Request.Path.Value,
+            query = context.Request.QueryString.Value,
+            ip = context.Connection.RemoteIpAddress?.ToString(),
+            body = string.IsNullOrWhiteSpace(requestBody) ? null : requestBody
+        };
+        
+        using (LogContext.PushProperty("traceId", context.TraceIdentifier))
+        using (LogContext.PushProperty("user", context.User.FindFirst("id")?.Value))
+        using (LogContext.PushProperty("endpoint", $"{context.Request.Method} {routePattern}"))
+        {
+            try
+            {
+                await next(context);
 
-            await ExceptionHandlerMiddleware.HandleExceptionAsync(context, ex);
+                sw.Stop();
+
+                var response = new
+                {
+                    statusCode = context.Response.StatusCode,
+                    elapsedMs = sw.ElapsedMilliseconds
+                };
+
+                Log.Information(
+                    "Request completed {@request} {@response}",
+                    request,
+                    response
+                );
+            }
+            catch (Exception ex)
+            {
+                sw.Stop();
+
+                var response = new
+                {
+                    statusCode = 500,
+                    elapsedMs = sw.ElapsedMilliseconds
+                };
+
+                Log.Error(
+                    ex,
+                    "Request failed {@request} {@response}",
+                    request,
+                    response
+                );
+
+                throw;
+            }
         }
     }
-    
+
     private static async Task<string> ReadRequestBody(HttpContext context)
     {
         var body = "";
@@ -84,11 +79,12 @@ public class RequestLoggingMiddleware(RequestDelegate next)
         if (context.Request.Method is "POST" or "PUT" or "PATCH")
         {
             context.Request.EnableBuffering();
-            using (var reader = new StreamReader(context.Request.Body, Encoding.UTF8, leaveOpen: true, detectEncodingFromByteOrderMarks: false))
+            using (var reader = new StreamReader(context.Request.Body, Encoding.UTF8, leaveOpen: true,
+                       detectEncodingFromByteOrderMarks: false))
             {
                 body = await reader.ReadToEndAsync();
             }
-            
+
             if (body.Length > 10_000)
                 body = body[..10_000] + "...(truncated)";
 
@@ -96,13 +92,13 @@ public class RequestLoggingMiddleware(RequestDelegate next)
             {
                 body = Sanitize(body);
             }
-            
+
             context.Request.Body.Position = 0;
         }
 
         return body;
     }
-    
+
     private static string Sanitize(string body)
     {
         try
@@ -112,7 +108,7 @@ public class RequestLoggingMiddleware(RequestDelegate next)
             if (json == null)
                 return body;
 
-            var sensitiveFields = new[] { "password", "token", "secret", "confirmPassword" };
+            var sensitiveFields = new[] { "password", "confirmPassword" , "token", "secret" };
 
             foreach (var field in sensitiveFields)
             {
@@ -126,18 +122,5 @@ public class RequestLoggingMiddleware(RequestDelegate next)
         {
             return body;
         }
-    }
-    
-    private static object? GetUser(HttpContext context)
-    {
-        if (context.User?.Identity?.IsAuthenticated != true)
-            return null;
-        
-        return new
-        {
-            id = context.User.FindFirst("id")?.Value,
-            email = context.User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value,
-            name = context.User.FindFirst("name")?.Value
-        };
     }
 }

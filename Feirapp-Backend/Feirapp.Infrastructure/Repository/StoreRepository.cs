@@ -42,6 +42,7 @@ public class StoreRepository(BaseContext context) : IStoreRepository, IDisposabl
         
         return await query
             .AsNoTracking()
+            .OrderBy(x => x.Name)
             .Skip(request.PageSize * request.PageIndex)
             .Take(request.PageSize)
             .ToListAsync(ct);
